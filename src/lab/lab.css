@@ -1,0 +1,41 @@
+.lab {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  width: 18rem;
+  max-height: calc(100svh - 2rem);
+  overflow: auto;
+  padding: 1rem;
+  border: 2px solid var(--glow);
+  border-radius: 8px;
+  background: rgb(7 8 26 / 0.85);
+  font-size: 0.85rem;
+}
+
+.lab h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.lab-stats {
+  margin: 0 0 0.75rem;
+  font-family: ui-monospace, monospace;
+  color: var(--gold);
+}
+
+.lab label {
+  display: grid;
+  gap: 0.15rem;
+  margin-bottom: 0.5rem;
+}
+
+.lab label span {
+  display: flex;
+  justify-content: space-between;
+}
+
+.lab output {
+  font-family: ui-monospace, monospace;
+  color: var(--mute);
+}
