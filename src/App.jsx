@@ -1,12 +1,24 @@
 import { Route, Routes } from 'react-router'
 import Shell from './app/Shell'
+import TransitionProvider from './motion/TransitionProvider'
+import { useSceneTransition } from './motion/transitionContext'
 
 // Every URL the site serves. `pages` comes from src/routes/pages.lazy.js in the browser
 // and pages.eager.js when prerendering. Titles and descriptions live in src/site/meta.js;
 // the URL list used for prerendering and the sitemap is allPaths() there.
-export default function App({ pages: P }) {
+export default function App({ pages }) {
   return (
-    <Routes>
+    <TransitionProvider preload={pages.preload}>
+      <AppRoutes pages={pages} />
+    </TransitionProvider>
+  )
+}
+
+/** Routes render the location the transition is showing, which lags the URL. */
+function AppRoutes({ pages: P }) {
+  const { displayLocation } = useSceneTransition()
+  return (
+    <Routes location={displayLocation}>
       <Route element={<Shell />}>
         <Route index element={<P.Home />} />
         <Route path="about" element={<P.About />} />

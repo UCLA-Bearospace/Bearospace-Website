@@ -17,9 +17,11 @@ if (import.meta.env.DEV && location.pathname.startsWith('/lab')) {
   const RocketLab = lazy(() => import('./lab/RocketLab.jsx'))
   createRoot(container).render(
     <StrictMode>
-      <Suspense fallback={null}>
-        <RocketLab />
-      </Suspense>
+      <BrowserRouter>
+        <Suspense fallback={null}>
+          <RocketLab />
+        </Suspense>
+      </BrowserRouter>
     </StrictMode>,
   )
 } else {
