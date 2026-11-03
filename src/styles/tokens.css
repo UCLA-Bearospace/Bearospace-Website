@@ -1,0 +1,33 @@
+/* Bearospace visual system (docs/PLAN.md §5). One fixed palette; no theme switching. */
+:root {
+  --ink: #07081a; /* deep space, outlines */
+  --night: #11143a; /* panels */
+  --nebula: #3b1f73;
+  --bear: #3d7bff; /* brand blue */
+  --glow: #a9c6ff; /* constellation lines, links, focus */
+  --star: #f2f4ff; /* body text on dark */
+  --mute: #a6abcc; /* secondary text */
+  --gold: #ffd100; /* UCLA gold: primary actions, selected */
+  --flame: #ff6a2b;
+  --paper: #f4f1e8; /* light plates (institutional logos) */
+
+  --panel: rgb(9 11 34 / 0.92);
+  --line: rgb(169 198 255 / 0.28);
+
+  --font-display: 'Saira Variable', 'Saira', system-ui, sans-serif;
+  --font-body: 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace;
+
+  --step--1: 0.9rem;
+  --step-0: clamp(1.0625rem, 1rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.1rem + 0.5vw, 1.45rem);
+  --step-2: clamp(1.55rem, 1.3rem + 1vw, 2rem);
+  --step-3: clamp(2rem, 1.5rem + 2vw, 3rem);
+  --step-4: clamp(2.6rem, 1.8rem + 3.4vw, 4.6rem);
+
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2rem);
+  --radius: 10px;
+  --axis: 14deg; /* the "ascent axis" for tilted accents */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --fast: 150ms;
+}

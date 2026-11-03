@@ -1,46 +1,29 @@
-import FlightBackdrop from './app/FlightBackdrop'
-import { setMotionPaused, useMotionAllowed, useMotionPaused, useReducedMotion } from './motion/useMotionPref'
+import { Route, Routes } from 'react-router'
+import Shell from './app/Shell'
 
-// Holding page until slice 2 (routes, content model, prerender) lands; it also shows
-// off the slice 1 rocket prototype. See docs/PLAN.md §11.
-function App() {
-  const motion = useMotionAllowed()
-  const paused = useMotionPaused()
-  const reduced = useReducedMotion()
-
+// Every URL the site serves. `pages` comes from src/routes/pages.lazy.js in the browser
+// and pages.eager.js when prerendering. Titles and descriptions live in src/site/meta.js;
+// the URL list used for prerendering and the sitemap is allPaths() there.
+export default function App({ pages: P }) {
   return (
-    <>
-      <FlightBackdrop motion={motion} />
-      <main className="placeholder">
-        <p className="kicker">Bearospace at UCLA</p>
-        <h1>A new launch is in progress.</h1>
-        <p>
-          We're building a new home for UCLA's student rocketry team. Until it
-          lands, reach us at{' '}
-          <a href="mailto:ucla.bearospace@gmail.com">ucla.bearospace@gmail.com</a>
-          .
-        </p>
-        <ul className="links">
-          <li>
-            <a href="https://www.instagram.com/uclabearospace/">Instagram</a>
-          </li>
-          <li>
-            <a href="https://www.linkedin.com/company/bearospace-ucla/">LinkedIn</a>
-          </li>
-        </ul>
-      </main>
-      {!reduced && (
-        <button
-          type="button"
-          className="motion-toggle"
-          aria-pressed={paused}
-          onClick={() => setMotionPaused(!paused)}
-        >
-          {paused ? 'Play motion' : 'Pause motion'}
-        </button>
-      )}
-    </>
+    <Routes>
+      <Route element={<Shell />}>
+        <Route index element={<P.Home />} />
+        <Route path="about" element={<P.About />} />
+        <Route path="engineering" element={<P.Engineering />} />
+        <Route path="engineering/:discipline" element={<P.Discipline />} />
+        <Route path="projects" element={<P.Projects />} />
+        <Route path="projects/:slug" element={<P.Project />} />
+        <Route path="competitions" element={<P.Competitions />} />
+        <Route path="history" element={<P.History />} />
+        <Route path="team" element={<P.Team />} />
+        <Route path="team/season/:season" element={<P.TeamSeason />} />
+        <Route path="team/:person" element={<P.Member />} />
+        <Route path="gallery" element={<P.Gallery />} />
+        <Route path="sponsors" element={<P.Sponsors />} />
+        <Route path="join" element={<P.Join />} />
+        <Route path="*" element={<P.NotFound />} />
+      </Route>
+    </Routes>
   )
 }
-
-export default App

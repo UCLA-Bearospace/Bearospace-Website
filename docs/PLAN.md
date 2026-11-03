@@ -268,7 +268,7 @@ Recommend: once the new site launches, the old site should link to it (or be unp
 | `--flame` | `#FF6A2B` | Exhaust core, rare alerts only |
 | `--paper` | `#F4F1E8` | Light comic panels (Sponsors, printable/long-read sections) |
 
-**Typography:** Display **Saira** variable (width + weight axes — condensed for kinetic headings, expanded for impact frames; its rounded technical forms echo the logo wordmark). Body **Atkinson Hyperlegible Next** (readability for long engineering copy). Data/mission-log **JetBrains Mono**. All self-hosted via @fontsource. Body 17–18 px, line length ≤72ch, line-height 1.6.
+**Typography:** Display **Saira** variable (weight axis only; its rounded technical forms echo the logo wordmark). Body **Atkinson Hyperlegible Next** (readability for long engineering copy). Data/mission-log text uses the system monospace stack. Both webfonts are self-hosted via @fontsource, latin subset (~67 KB total). Body 17–18 px, line length ≤72ch, line-height 1.6. *(Slice 2: the width axis (+99 KB) and JetBrains Mono (+40 KB) were dropped to stay inside the 80 KB font budget.)*
 
 **Graphic language:**
 - Ink outlines (ported shader) on 3D; 2-px ink borders and offset "panel" shadows on cards.
@@ -756,3 +756,20 @@ Ordering principle: real visuals early (slice 1 renders the actual rocket), but 
 
 **Missing materials**
 Vector/large Bearospace logo · white UCLA Samueli lockup · identification of `Icon.jpeg` · headshots for Jonathan Mendez Aguilar and Daniel Montano · full-resolution photos with captions, dates, locations, photographer credit · launch video · project facts (objectives, specs, test logs, results, contributors) · discipline photos · member LinkedIn URLs · any sponsorship prospectus.
+
+
+---
+
+## Implementation notes
+
+Decisions made while building, recorded so later slices start from what is actually true.
+
+### Slice 2 (shell, content model, accessible baseline)
+- **Fonts:** Saira (weight axis only) + Atkinson Hyperlegible Next, latin subsets (~67 KB); system monospace for kicker/log text. The Saira width axis (+99 KB) and JetBrains Mono (+40 KB) were dropped to stay inside the 80 KB font budget.
+- **Prerender:** flat files (`about.html`, `team/joel-venegas.html`) served at clean URLs by Vercel `cleanUrls` and `vite preview`. The stylesheet is inlined; the app script moves to the end of `<body>` with `fetchpriority="low"`. Pages are lazy chunks in the browser (eager on the server); React keeps the prerendered HTML on screen until a page chunk loads.
+- **Canonical URLs and sitemap** are written only once `org.siteUrl` is set (checklist C14). A relative canonical fails Lighthouse SEO.
+- **3D scene** loads after the browser is idle, and is skipped entirely on phone-width content pages (the page panel covers it). `?scene=0` forces the poster.
+- **Roles** have an optional `publish: false`; the 2013–14 Bruin Rocketeers roster is hidden until lineage is confirmed (C4).
+- **Budgets measured (2026-11-03):** main JS (entry + shared chunks + largest page) 109.4 / 110 KB gz; scene chunk 140.1 / 190 KB; model 30.0 / 60 KB. Lighthouse mobile (simulated): FCP 1.2–1.7 s, LCP 2.0–2.4 s, TBT ≤ 100 ms, CLS ≤ 0.01, accessibility 100, SEO 100. The plan's 1.8 s LCP target for content pages is **not met** under simulation: the 66 KB of webfonts sit in Lighthouse's simulated critical path (observed LCP is ~0.2 s). Lighthouse CI asserts LCP ≤ 2.5 s (Core Web Vitals "good") and FCP ≤ 1.8 s.
+- **Lighthouse measures `/` with the scene off:** headless Lighthouse renders WebGL on the CPU (SwiftShader), adding ~900 ms of blocking time that real GPUs don't have. Scene cost is measured by the GPU `@perf` tests instead.
+- **Open budget question for slice 3:** GSAP (~28 KB gz) will not fit the 110 KB main-JS budget, since React, React DOM, and React Router already take ~85 KB. Options: load GSAP with the scene chunk, or raise the budget.
