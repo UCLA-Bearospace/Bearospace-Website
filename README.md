@@ -1,20 +1,24 @@
-# Bearospace-Website
-# React + Vite
+# Bearospace at UCLA — website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The website for Bearospace, UCLA's student rocketry team and the technical project of AISES at UCLA. It's built with React 19, Vite 8, React Router, Three.js, and GSAP.
 
-Currently, two official plugins are available:
+- **Plan, architecture, and build slices:** [docs/PLAN.md](docs/PLAN.md)
+- **Open facts, confirmations, and missing materials:** [docs/CONTENT-CHECKLIST.md](docs/CONTENT-CHECKLIST.md)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Commands
 
-## React Compiler
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Validate content, then build to `dist/` |
+| `npm run preview` | Serve the production build |
+| `npm run lint` | ESLint |
+| `npm test` | Unit tests (`node --test`) |
+| `npm run test:e2e` | Playwright tests against the production build (run `npx playwright install chromium` once first) |
+| `npm run assets:verify` | Check supplied originals against `assets-src/MANIFEST.json` |
+| `npm run budgets` | Check built bundle sizes against the budgets in the plan |
+| `npm run models` / `npm run images` | Generate web-ready rocket model and images (slices 1 and 2) |
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Assets
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+`assets-src/` holds the original files exactly as supplied: the rocket STL, logos, headshots, and gallery photos. Never edit them. Scripts generate optimized copies into `public/` and `src/generated/`. If you add an original, add its entry and SHA-256 to `assets-src/MANIFEST.json`.

@@ -1,0 +1,2 @@
+# Supplied originals must stay byte-identical to assets-src/MANIFEST.json; never convert line endings.
+assets-src/** -text
