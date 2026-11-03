@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'playwright-report', 'test-results', 'blob-report']),
+  globalIgnores(['dist', 'dist-test', 'playwright-report', 'test-results', 'blob-report']),
   {
     files: ['src/**/*.{js,jsx}'],
     extends: [
@@ -22,5 +22,10 @@ export default defineConfig([
     files: ['scripts/**/*.mjs', 'tests/**/*.js', '*.config.js'],
     extends: [js.configs.recommended],
     languageOptions: { globals: globals.node },
+  },
+  {
+    // Playwright callbacks passed to page.evaluate() run in the browser
+    files: ['tests/e2e/**/*.js'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 ])
