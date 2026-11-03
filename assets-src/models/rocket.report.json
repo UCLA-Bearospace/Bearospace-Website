@@ -1,0 +1,466 @@
+{
+  "generated": "npm run models",
+  "sourceSha256": "99c733c0be60ba63508e44db9f50b05a7de9b84a664f823e067dfb297f8a09c9",
+  "sourceTriangles": 33748,
+  "bodyRadiusMm": 82.55,
+  "rule": "drop shells with max radius < body radius - 1 mm that end more than 30 mm ahead of the tail",
+  "regionTriangles": {
+    "body": 392,
+    "nose": 3000,
+    "fin": 112,
+    "hardware": 608
+  },
+  "simplifyError": 0,
+  "shells": [
+    {
+      "id": 0,
+      "triangles": 3000,
+      "xMinMm": 0,
+      "xMaxMm": 381,
+      "maxRadiusMm": 82.6,
+      "kept": true,
+      "reason": "visible",
+      "region": "nose"
+    },
+    {
+      "id": 1,
+      "triangles": 304,
+      "xMinMm": 381,
+      "xMaxMm": 471,
+      "maxRadiusMm": 79.4,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 2,
+      "triangles": 128,
+      "xMinMm": 381,
+      "xMaxMm": 1828.8,
+      "maxRadiusMm": 82.6,
+      "kept": true,
+      "reason": "visible",
+      "region": "body"
+    },
+    {
+      "id": 3,
+      "triangles": 264,
+      "xMinMm": 1828.8,
+      "xMaxMm": 2565.4,
+      "maxRadiusMm": 82.6,
+      "kept": true,
+      "reason": "visible",
+      "region": "body"
+    },
+    {
+      "id": 4,
+      "triangles": 260,
+      "xMinMm": 1524,
+      "xMaxMm": 1537.7,
+      "maxRadiusMm": 80.6,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 5,
+      "triangles": 156,
+      "xMinMm": 397.8,
+      "xMaxMm": 411.5,
+      "maxRadiusMm": 76.2,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 6,
+      "triangles": 176,
+      "xMinMm": 2159.5,
+      "xMaxMm": 2603.5,
+      "maxRadiusMm": 52.1,
+      "kept": true,
+      "reason": "visible",
+      "region": "hardware"
+    },
+    {
+      "id": 7,
+      "triangles": 288,
+      "xMinMm": 2501.9,
+      "xMaxMm": 2511,
+      "maxRadiusMm": 79.4,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 8,
+      "triangles": 288,
+      "xMinMm": 2556.3,
+      "xMaxMm": 2565.4,
+      "maxRadiusMm": 79.4,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 9,
+      "triangles": 288,
+      "xMinMm": 2429.3,
+      "xMaxMm": 2438.4,
+      "maxRadiusMm": 79.4,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 10,
+      "triangles": 288,
+      "xMinMm": 2353.1,
+      "xMaxMm": 2362.2,
+      "maxRadiusMm": 79.4,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 11,
+      "triangles": 284,
+      "xMinMm": 2159.5,
+      "xMaxMm": 2173.2,
+      "maxRadiusMm": 79.4,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 12,
+      "triangles": 28,
+      "xMinMm": 2347,
+      "xMaxMm": 2586.2,
+      "maxRadiusMm": 285.8,
+      "kept": true,
+      "reason": "visible",
+      "region": "fin"
+    },
+    {
+      "id": 13,
+      "triangles": 28,
+      "xMinMm": 2347,
+      "xMaxMm": 2586.2,
+      "maxRadiusMm": 285.8,
+      "kept": true,
+      "reason": "visible",
+      "region": "fin"
+    },
+    {
+      "id": 14,
+      "triangles": 28,
+      "xMinMm": 2347,
+      "xMaxMm": 2586.2,
+      "maxRadiusMm": 285.8,
+      "kept": true,
+      "reason": "visible",
+      "region": "fin"
+    },
+    {
+      "id": 15,
+      "triangles": 28,
+      "xMinMm": 2347,
+      "xMaxMm": 2586.2,
+      "maxRadiusMm": 285.8,
+      "kept": true,
+      "reason": "visible",
+      "region": "fin"
+    },
+    {
+      "id": 16,
+      "triangles": 1816,
+      "xMinMm": 2057.8,
+      "xMaxMm": 2072.8,
+      "maxRadiusMm": 48.5,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 17,
+      "triangles": 396,
+      "xMinMm": 2065.3,
+      "xMaxMm": 2070.2,
+      "maxRadiusMm": 45.2,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 18,
+      "triangles": 396,
+      "xMinMm": 2065.3,
+      "xMaxMm": 2070.2,
+      "maxRadiusMm": 39.9,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 19,
+      "triangles": 1066,
+      "xMinMm": 2062.7,
+      "xMaxMm": 2068.3,
+      "maxRadiusMm": 39.6,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 20,
+      "triangles": 1066,
+      "xMinMm": 2062.7,
+      "xMaxMm": 2068.3,
+      "maxRadiusMm": 34.6,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 21,
+      "triangles": 1066,
+      "xMinMm": 2062.7,
+      "xMaxMm": 2068.3,
+      "maxRadiusMm": 40.6,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 22,
+      "triangles": 1066,
+      "xMinMm": 2062.7,
+      "xMaxMm": 2068.3,
+      "maxRadiusMm": 44.9,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 23,
+      "triangles": 1816,
+      "xMinMm": 2057.8,
+      "xMaxMm": 2072.8,
+      "maxRadiusMm": 50,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 24,
+      "triangles": 396,
+      "xMinMm": 2065.3,
+      "xMaxMm": 2070.2,
+      "maxRadiusMm": 41.1,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 25,
+      "triangles": 396,
+      "xMinMm": 2065.3,
+      "xMaxMm": 2070.2,
+      "maxRadiusMm": 46.9,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 26,
+      "triangles": 1066,
+      "xMinMm": 2062.7,
+      "xMaxMm": 2068.3,
+      "maxRadiusMm": 46.5,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 27,
+      "triangles": 1066,
+      "xMinMm": 2062.7,
+      "xMaxMm": 2068.3,
+      "maxRadiusMm": 42.6,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 28,
+      "triangles": 1066,
+      "xMinMm": 2062.7,
+      "xMaxMm": 2068.3,
+      "maxRadiusMm": 36.2,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 29,
+      "triangles": 1066,
+      "xMinMm": 2062.7,
+      "xMaxMm": 2068.3,
+      "maxRadiusMm": 40.8,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 30,
+      "triangles": 1808,
+      "xMinMm": 2266.8,
+      "xMaxMm": 2281.8,
+      "maxRadiusMm": 50.8,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 31,
+      "triangles": 396,
+      "xMinMm": 2269.4,
+      "xMaxMm": 2274.3,
+      "maxRadiusMm": 41.7,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 32,
+      "triangles": 396,
+      "xMinMm": 2269.4,
+      "xMaxMm": 2274.3,
+      "maxRadiusMm": 47.7,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 33,
+      "triangles": 1066,
+      "xMinMm": 2271.3,
+      "xMaxMm": 2276.9,
+      "maxRadiusMm": 43.6,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 34,
+      "triangles": 1066,
+      "xMinMm": 2271.3,
+      "xMaxMm": 2276.9,
+      "maxRadiusMm": 47.4,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 35,
+      "triangles": 1066,
+      "xMinMm": 2271.3,
+      "xMaxMm": 2276.9,
+      "maxRadiusMm": 41.4,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 36,
+      "triangles": 1066,
+      "xMinMm": 2271.3,
+      "xMaxMm": 2276.9,
+      "maxRadiusMm": 37,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 37,
+      "triangles": 1816,
+      "xMinMm": 2266.8,
+      "xMaxMm": 2281.8,
+      "maxRadiusMm": 48.1,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 38,
+      "triangles": 396,
+      "xMinMm": 2269.4,
+      "xMaxMm": 2274.3,
+      "maxRadiusMm": 45,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 39,
+      "triangles": 396,
+      "xMinMm": 2269.4,
+      "xMaxMm": 2274.3,
+      "maxRadiusMm": 39.3,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 40,
+      "triangles": 1066,
+      "xMinMm": 2271.3,
+      "xMaxMm": 2276.9,
+      "maxRadiusMm": 34.3,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 41,
+      "triangles": 1066,
+      "xMinMm": 2271.3,
+      "xMaxMm": 2276.9,
+      "maxRadiusMm": 39,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 42,
+      "triangles": 1066,
+      "xMinMm": 2271.3,
+      "xMaxMm": 2276.9,
+      "maxRadiusMm": 44.7,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 43,
+      "triangles": 1066,
+      "xMinMm": 2271.3,
+      "xMaxMm": 2276.9,
+      "maxRadiusMm": 40.7,
+      "kept": false,
+      "reason": "inside airframe",
+      "region": null
+    },
+    {
+      "id": 44,
+      "triangles": 432,
+      "xMinMm": 2578.1,
+      "xMaxMm": 2612.4,
+      "maxRadiusMm": 62.9,
+      "kept": true,
+      "reason": "visible",
+      "region": "hardware"
+    }
+  ]
+}

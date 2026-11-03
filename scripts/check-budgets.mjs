@@ -34,4 +34,15 @@ for (const { name, bytes, limit } of rows) {
   failed ||= over
   console.log(`${over ? 'FAIL' : 'ok  '}  ${name.padEnd(20)} ${(bytes / KB).toFixed(1).padStart(7)} KB / ${limit / KB} KB`)
 }
+
+// Dev tools and test hooks must never ship
+const FORBIDDEN = ['RocketLab', '__bearo']
+for (const f of js) {
+  const text = readFileSync(join(assets, f), 'utf8')
+  for (const word of FORBIDDEN)
+    if (text.includes(word)) {
+      failed = true
+      console.log(`FAIL  ${f} contains "${word}" (dev/test code in a production build)`)
+    }
+}
 if (failed) process.exit(1)
