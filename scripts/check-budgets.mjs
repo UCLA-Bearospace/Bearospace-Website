@@ -21,8 +21,19 @@ const js = readdirSync(assets).filter((f) => f.endsWith('.js'))
 const gz = (path) => gzipSync(readFileSync(path)).length
 const sum = (files) => files.reduce((n, f) => n + gz(join(assets, f)), 0)
 
+// "Main" = what any page loads before it is interactive: the entry script and the chunks
+// it preloads, plus that page's own lazy chunk. Measured against the largest page chunk.
+const html = readFileSync(join(DIST, 'index.html'), 'utf8')
+const initial = [...html.matchAll(/(?:src|href)="\/assets\/([^"]+\.js)"/g)].map((m) => m[1])
+// Lazy chunks named after a page module are pages; the rest are helpers pages share
+// (counted in full, as the worst case).
+const PAGE = /^(About|Competitions|Discipline|Engineering|Gallery|History|Join|NotFound|Projects|Sponsors|Team)-/
+const lazyChunks = js.filter((f) => !isScene(f) && !initial.includes(f))
+const largestPage = lazyChunks.filter((f) => PAGE.test(f)).reduce((max, f) => Math.max(max, gz(join(assets, f))), 0)
+const shared = sum(lazyChunks.filter((f) => !PAGE.test(f)))
+
 const rows = [
-  { name: 'Main JS (gz)', bytes: sum(js.filter((f) => !isScene(f))), limit: 110 * KB },
+  { name: 'Main JS (gz)', bytes: sum(initial) + shared + largestPage, limit: 110 * KB },
   { name: 'Scene chunk (gz)', bytes: sum(js.filter(isScene)), limit: 190 * KB },
 ]
 const model = join(DIST, 'models', 'rocket.jvm2')

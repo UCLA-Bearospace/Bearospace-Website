@@ -1,0 +1,75 @@
+/* The flying-rocket scene and its static poster, fixed behind every page */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.scene-host {
+  position: absolute;
+  inset: 0;
+}
+
+.scene-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.backdrop[data-live] .scene-canvas {
+  opacity: 1;
+}
+
+/* Static poster: CSS starfield + the rocket's real outline */
+.poster {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(1px 1px at 12% 18%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 72% 12%, #cfe0ff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 33% 64%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 86% 58%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 82%, #cfe0ff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 8% 76%, #ffe08a 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 30%, #fff 50%, transparent 51%),
+    radial-gradient(ellipse 70% 40% at 60% 30%, rgb(59 31 115 / 0.55), transparent 70%),
+    linear-gradient(to bottom, var(--ink), var(--night));
+  transition: opacity 0.6s ease;
+}
+
+.poster[data-hidden] {
+  opacity: 0;
+}
+
+.poster-rocket {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  height: min(56svh, 120vw);
+  transform: translate(-50%, -50%) rotate(4deg);
+}
+
+/* Match the 3D framing: portrait screens put the rocket in the upper half */
+@media (max-aspect-ratio: 1/1) {
+  .poster-rocket {
+    top: 34%;
+    height: min(42svh, 120vw);
+  }
+}
+
+.poster-ink {
+  stroke: #c9d8ff;
+}
+
+.poster-body,
+.poster-fin {
+  fill: #1a1c24;
+}
+
+.poster-nose {
+  fill: #2f6bd1;
+}

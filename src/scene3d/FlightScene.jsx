@@ -6,7 +6,7 @@ import meta from '../generated/rocket.meta.json'
  * Thin React host for the Three.js flight scene (lazy-loaded chunk).
  * The engine lives for the component's lifetime; later changes flow through setters.
  */
-export default function FlightScene({ motion, onStatus, onEngine }) {
+export default function FlightScene({ motion, dimmed = false, onStatus, onEngine }) {
   const hostRef = useRef(null)
   const engineRef = useRef(null)
 
@@ -34,6 +34,11 @@ export default function FlightScene({ motion, onStatus, onEngine }) {
   useEffect(() => {
     engineRef.current?.setMotion(motion)
   }, [motion])
+
+  useEffect(() => {
+    // Behind a content page the scene doesn't need 60 fps
+    engineRef.current?.setFps(dimmed ? 30 : 60)
+  }, [dimmed])
 
   return <div className="scene-host" ref={hostRef} aria-hidden="true" />
 }

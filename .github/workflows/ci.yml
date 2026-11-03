@@ -18,14 +18,18 @@ jobs:
       - run: npm run lint
       - run: npm run assets:verify
       - run: npm test
-      # `prebuild` runs content validation first.
+      # `prebuild` validates content and generates images, then pages are prerendered
       - run: npm run build
       - run: npm run budgets
+      # Lighthouse on mobile settings: LCP, layout shift, blocking time, accessibility, SEO
+      - run: npm run lhci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
-          path: playwright-report
+          name: reports
+          path: |
+            playwright-report
+            .lighthouseci
           retention-days: 7

@@ -1,0 +1,28 @@
+{
+  "ci": {
+    "collect": {
+      "startServerCommand": "npx vite preview --port 4175 --strictPort",
+      "startServerReadyPattern": "4175",
+      "url": [
+        "http://localhost:4175/?scene=0",
+        "http://localhost:4175/engineering",
+        "http://localhost:4175/engineering/structures",
+        "http://localhost:4175/team",
+        "http://localhost:4175/about"
+      ],
+      "numberOfRuns": 1,
+      "settings": { "formFactor": "mobile", "throttlingMethod": "simulate", "onlyCategories": ["performance", "accessibility", "seo"] }
+    },
+    "assert": {
+      "assertions": {
+        "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }],
+        "first-contentful-paint": ["error", { "maxNumericValue": 1800 }],
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }],
+        "total-blocking-time": ["error", { "maxNumericValue": 200 }],
+        "categories:accessibility": ["error", { "minScore": 1 }],
+        "categories:seo": ["error", { "minScore": 1 }]
+      }
+    },
+    "upload": { "target": "filesystem", "outputDir": ".lighthouseci" }
+  }
+}

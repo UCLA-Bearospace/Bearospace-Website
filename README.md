@@ -9,8 +9,8 @@ The website for Bearospace, UCLA's student rocketry team and the technical proje
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Start the dev server |
-| `npm run build` | Validate content, then build to `dist/` |
+| `npm run dev` | Start the dev server (generates images first) |
+| `npm run build` | Validate content, generate images, build, and prerender every page to static HTML in `dist/` |
 | `npm run preview` | Serve the production build |
 | `npm run lint` | ESLint |
 | `npm test` | Unit tests (`node --test`) |
@@ -20,7 +20,15 @@ The website for Bearospace, UCLA's student rocketry team and the technical proje
 | `npm run assets:verify` | Check supplied originals against `assets-src/MANIFEST.json` |
 | `npm run budgets` | Check built bundle sizes against the plan's budgets, and that no dev/test code shipped |
 | `npm run models` | Rebuild `public/models/rocket.jvm2` from `assets-src/models/rocket.stl` |
-| `npm run images` | Generate web-ready images (slice 2) |
+| `npm run images` | Generate web-ready images from `assets-src/images/` into `public/media/` |
+| `npm run validate` | Check every content file (runs before each build) |
+| `npm run lhci` | Lighthouse CI on mobile settings against the built site |
+
+## Content
+
+All text, people, results, sponsors, and photos live in `src/content/`. See [CONTENT.md](CONTENT.md) for how to edit them and recipes for common changes (new sponsor, new season, new member).
+
+Every page is prerendered to static HTML (`scripts/prerender.mjs`), so the site works and is fully readable without JavaScript or WebGL. Add `?scene=0` to any URL to see it without the 3D scene.
 
 ## 3D scene
 
