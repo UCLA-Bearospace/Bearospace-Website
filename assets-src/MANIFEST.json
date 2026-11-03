@@ -1,0 +1,237 @@
+{
+  "description": "Supplied originals. Never edit these files; generated derivatives go to public/ and src/generated/.",
+  "recorded": "2026-11-02",
+  "files": [
+    {
+      "path": "models/rocket.stl",
+      "original": "public/3d-models/rocket.STL",
+      "sha256": "99c733c0be60ba63508e44db9f50b05a7de9b84a664f823e067dfb297f8a09c9",
+      "bytes": 1687484,
+      "note": "Rocket STL, 2025-26 launch vehicle (binary, mm, nose at X=0)"
+    },
+    {
+      "path": "images/logos/bearospace-logo.png",
+      "original": "public/Logos/BearospaceLogo.png",
+      "sha256": "3b15d493f6661fae15d7bbabcc0e450d7127f162a4c842684134a99bb97cc339",
+      "bytes": 344948,
+      "note": "Bearospace badge, 512x487 RGBA"
+    },
+    {
+      "path": "images/logos/anduril-logo.svg",
+      "original": "public/Logos/Anduril_Industries_Logo.svg",
+      "sha256": "fcdf6ed0f6f58d5eacdeddc77a48712369d9fcefb3397cad3976579fc552bea8",
+      "bytes": 4491,
+      "note": "Anduril wordmark + symbol, no fill"
+    },
+    {
+      "path": "images/logos/unidentified-icon.jpeg",
+      "original": "public/Logos/Icon.jpeg",
+      "sha256": "12531dabe73c0a99919bca629c7660a6391ee3e1277081127069d52ba16b3704",
+      "bytes": 6497,
+      "note": "Unidentified black line mark, 200x200 (see checklist M3)"
+    },
+    {
+      "path": "images/logos/ucla-samueli-block.png",
+      "original": "public/Logos/UCLA_Samueli_Engineering_block-1.png",
+      "sha256": "9cd185f7ee40d3b7b49ec574cccfcc72098fb76638568a8f66bbb3e08dad845e",
+      "bytes": 14924,
+      "note": "UCLA Samueli School of Engineering block lockup, 929x180"
+    },
+    {
+      "path": "images/logos/ucla-henry-samueli-legacy.svg",
+      "original": "public/Logos/UCLA_Henry_Samueli_School_of_Engineering_and_Applied_Science_logo.svg",
+      "sha256": "612e529b563d2f7c5a7986d1dfaa7c48c84c4e7939a09889463cd13f4a426390",
+      "bytes": 50895,
+      "note": "Outdated institutional name; source only, do not publish"
+    },
+    {
+      "path": "images/team/alan-alfaro.png",
+      "original": "public/Team Headshots/Alan alfaro.png",
+      "sha256": "0f04d613b2e523310b3123229d9cfa43155f3bc0ccc5412cdcb6e9ee96402b85",
+      "bytes": 1140394,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/alexander-astorga.png",
+      "original": "public/Team Headshots/alexander astorga.png",
+      "sha256": "ba05f5f722fd51161b0a011669a1187c0ded82b121fd44a6adfdb6e92491acb6",
+      "bytes": 1201217,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/angel-iglesias.png",
+      "original": "public/Team Headshots/angel iglesias.png",
+      "sha256": "08d4de9c7ab6cc03ae5010681e6d6e508c8a4cfc1487f03beaee6dd6647f3305",
+      "bytes": 1466632,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/azad-aghdam.png",
+      "original": "public/Team Headshots/azad aghdam.png",
+      "sha256": "d61e383da6d8c87d0e54ba51c8fa7bdf6b813e8d5dc6449c0616f024a89863b5",
+      "bytes": 1350091,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/bianca-vasquez.png",
+      "original": "public/Team Headshots/Bianca Vasquez.png",
+      "sha256": "a871fe479924797a534edf22fdad574607042369bcf1a60b78543bdbfeb44989",
+      "bytes": 1325787,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/brandon-aguilar.png",
+      "original": "public/Team Headshots/brandon aguilar.png",
+      "sha256": "d909ee49a867cfe4e4aeed51b4866baeb459f024562e033c878e0b48f5c0ae6d",
+      "bytes": 1476756,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/brian-sierra.png",
+      "original": "public/Team Headshots/brian sierra.png",
+      "sha256": "e8f341fd7f2572b1edbbc8de82a95ee29c364e0cd245eb6489809b38f63f10c3",
+      "bytes": 236863,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/emmanuel-jaimes.png",
+      "original": "public/Team Headshots/Emmanuel Jaimes.png",
+      "sha256": "f5945677c41ff2b6424187bdd9e97d01364b22d5cb2b092f860f009c2c2744b4",
+      "bytes": 223798,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/joel-venegas.png",
+      "original": "public/Team Headshots/joel venegas.png",
+      "sha256": "60d4c75b31f06e3bcbdec51b9028097d1aaf819cc9c761bc39be9d9ff5fef7bb",
+      "bytes": 1582288,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/jonathan-nguyen.png",
+      "original": "public/Team Headshots/johnathan nguyen.png",
+      "sha256": "a14ae7501422f4f83034efc10e840a9a1927d4688873a139ea2731071085fb52",
+      "bytes": 1509079,
+      "note": "Headshot (filename spelled \"johnathan\"; site spells \"Jonathan\")"
+    },
+    {
+      "path": "images/team/juan-ventura-romero.png",
+      "original": "public/Team Headshots/Juan Ventura-Romero.png",
+      "sha256": "bbcf02f45a6fe47a46d7666273e64e75410a2cb927b2c7e9eb1a5e9f0841f078",
+      "bytes": 2260743,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/natalie-lopez.png",
+      "original": "public/Team Headshots/natlie lopezx.png",
+      "sha256": "cb26a645b2dde8a7ecf87ee8735cc90dc132b6d716c474fe0523877202edfec1",
+      "bytes": 953055,
+      "note": "Headshot (filename typo \"natlie lopezx\")"
+    },
+    {
+      "path": "images/team/nicholas-equihua.png",
+      "original": "public/Team Headshots/Nicholas Equihua.png",
+      "sha256": "97f414752e5f5de5ce0ff3daf72b2ab367ac075e8f11d733047958c21fd07719",
+      "bytes": 1449191,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/team/noah-hernandez.png",
+      "original": "public/Team Headshots/Noah Hernandez.png",
+      "sha256": "4c1cacfbd1c2283851348b4481316a564be6d9b8f23d05121f2bab131f392d37",
+      "bytes": 981345,
+      "note": "Headshot (mapped by filename)"
+    },
+    {
+      "path": "images/gallery/team-at-launch-tower.png",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 1.png",
+      "sha256": "81e1db7ec6db3e4c65d4f47f062ad323e217c7287c39b9e5a8682793bcc0fe1e",
+      "bytes": 1690343,
+      "note": "Team beside launch tower, white fiberglass rocket"
+    },
+    {
+      "path": "images/gallery/dog-beside-launch-rail.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 2.jpg",
+      "sha256": "79597dd0c588f80d82de09080b47d9c5eb894bc9e7d1d34b93dd553c40de680c",
+      "bytes": 262658,
+      "note": "Dog beside the rail, rocket loaded"
+    },
+    {
+      "path": "images/gallery/rocket-on-tower-wide.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 3.jpg",
+      "sha256": "deb58218ef7b7586172f6a14bc39949260525c027811e08c25390c71a8af2883",
+      "bytes": 360269,
+      "note": "Wide shot, rocket on tower in desert"
+    },
+    {
+      "path": "images/gallery/team-walking-to-pad.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 4.jpg",
+      "sha256": "7fda7ae4b43b960446eb35de2c1bf80750471817f04293795ceecb65aa82690b",
+      "bytes": 172144,
+      "note": "Team walking out to the pad"
+    },
+    {
+      "path": "images/gallery/three-member-selfie.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 5.jpg",
+      "sha256": "b5dbb14c58d072456a8233239ee42bfed2f216c1386d92355d8877c009cb21f3",
+      "bytes": 106137,
+      "note": "Three-member selfie at the launch site"
+    },
+    {
+      "path": "images/gallery/member-posing-with-airframe.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 6.jpg",
+      "sha256": "0e820a217bc9088dddb6184e3fe11ae660efdca095c5f1d03123eb3cddab6868",
+      "bytes": 333298,
+      "note": "Member posing with an airframe (EXIF 2026-01-24)"
+    },
+    {
+      "path": "images/gallery/igniter-installation.png",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 7.png",
+      "sha256": "def60c335833991e9ed7c0f6611201287fe01dfebc2f9a38315a110c4d3991b9",
+      "bytes": 2420468,
+      "note": "Igniter installation, team watching"
+    },
+    {
+      "path": "images/gallery/team-carrying-carbon-rocket.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 8.jpg",
+      "sha256": "afca2d11bca5da3cd76d40ec5b50004fda872c177157771531a719d673ae0076",
+      "bytes": 225468,
+      "note": "Team carrying the carbon-fiber rocket"
+    },
+    {
+      "path": "images/gallery/wiring-electronics-sled.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 9.jpg",
+      "sha256": "56dd13a3737c1cfdc39eed132dfdaed05e1e37410ab436801764dc9f5d0b3cda",
+      "bytes": 377061,
+      "note": "Members wiring an electronics sled in the field"
+    },
+    {
+      "path": "images/gallery/carbon-rocket-carried-on-tarmac.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 10.jpg",
+      "sha256": "6ccbe6195d71f6200a35caf95bcf63806b00c4190ab3e15017b56a12fd5965b5",
+      "bytes": 284540,
+      "note": "Carbon rocket with blue nose carried on tarmac"
+    },
+    {
+      "path": "images/gallery/composite-layup-lab.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 11.jpg",
+      "sha256": "ae3e2b5523ad11ad857fb826c17fb9a103f90b2ba1648a84ecd42a2eceb105fc",
+      "bytes": 302640,
+      "note": "Composite layup in the lab"
+    },
+    {
+      "path": "images/gallery/preflight-briefing.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 12.jpg",
+      "sha256": "d0bdcda31be3c78c64830d3ea7b3d990c790d54e626badb5c86bd32fe0a584f2",
+      "bytes": 327069,
+      "note": "Pre-flight briefing around the rocket (EXIF 2026-01-24)"
+    },
+    {
+      "path": "images/gallery/sunset-campsite.jpg",
+      "original": "public/Bearospace Media Gallery Images/Bearospace Media 13.jpg",
+      "sha256": "47900e666ebb4e96b750aae66b171b6768225d2d6c0aa78fc5be867a63927b93",
+      "bytes": 107254,
+      "note": "Sunset at the campsite"
+    }
+  ]
+}
