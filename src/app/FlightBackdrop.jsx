@@ -2,7 +2,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import RocketPoster from './RocketPoster'
 import SceneBoundary from './SceneBoundary'
 import { setSceneStatus, useSceneStatus } from './sceneStatus'
-import { disableScene, useSceneAllowed } from '../lib/webgl'
+import { disableScene, hasWebGL, useSceneAllowed } from '../lib/webgl'
 import { useMediaQuery } from '../lib/useMediaQuery'
 import { reportProgress } from '../intro/progress'
 import { introMode } from '../intro/introStore'
@@ -32,6 +32,8 @@ export default function FlightBackdrop({ motion, dimmed = false, onEngine }) {
   // On phone-width content pages the page panel covers the scene: skip the GPU and battery cost
   const narrow = useMediaQuery('(max-width: 62rem)')
   const wanted = allowed && !(dimmed && narrow)
+  // Probe WebGL only now (slow without a GPU); no support turns `allowed` off, then status 'off'
+  const load = wanted && idle && hasWebGL()
 
   useEffect(() => {
     if (!allowed) setSceneStatus('off', null)
@@ -66,7 +68,7 @@ export default function FlightBackdrop({ motion, dimmed = false, onEngine }) {
   return (
     <div className="backdrop" data-live={live || undefined} data-dimmed={dimmed || undefined}>
       <RocketPoster hidden={live} />
-      {wanted && idle && (
+      {load && (
         <SceneBoundary onError={() => setSceneStatus('failed', null)}>
           <Suspense fallback={null}>
             <FlightScene key={generation} motion={motion} dimmed={dimmed} onStatus={handleStatus} onEngine={onEngine} />

@@ -6,6 +6,7 @@ import { pages } from './routes/pages.eager.js'
 import { allPaths, getMeta } from './site/meta.js'
 import { org } from './content/index.js'
 import { decideIntroMode, readIntroEnv } from './intro/introMode'
+import { PAGE_MODULES, pageKeyFor } from './routes/pageModule.js'
 
 // Used by scripts/prerender.mjs to write static HTML for every route.
 export function render(url) {
@@ -18,4 +19,4 @@ export function render(url) {
   )
 }
 
-export { allPaths, getMeta, org, decideIntroMode, readIntroEnv }
+export { allPaths, getMeta, org, decideIntroMode, readIntroEnv, PAGE_MODULES as pageModules, pageKeyFor }

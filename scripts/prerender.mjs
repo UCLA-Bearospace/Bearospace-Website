@@ -12,7 +12,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const outDir = join(ROOT, process.argv[2] ?? 'dist')
 const ssrEntry = join(ROOT, 'dist-ssr', 'entry-server.js')
-const { render, allPaths, getMeta, org, decideIntroMode, readIntroEnv } = await import(pathToFileURL(ssrEntry).href)
+const { render, allPaths, getMeta, org, decideIntroMode, readIntroEnv, pageModules, pageKeyFor } = await import(
+  pathToFileURL(ssrEntry).href
+)
 
 // Decides before first paint whether the opening sequence plays (src/intro/introMode.js,
 // serialized), so the overlay is on screen from the first frame and deep links never see it
@@ -47,6 +49,24 @@ const scripts = template.match(/\s*<script type="module"[^>]*><\/script>|\s*<lin
 for (const s of scripts) template = template.replace(s, '')
 const lowPriority = (tag) => tag.trim().replace(/^<(script|link)/, '<$1 fetchpriority="low"')
 template = template.replace('</body>', `${scripts.map(lowPriority).join('\n    ')}\n  </body>`)
+// Each page's own chunks (from Vite's manifest), listed in its HTML as low-priority
+// modulepreloads: they download alongside the main bundle instead of waiting for it to run
+const manifestFile = join(outDir, '.vite', 'manifest.json')
+const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'))
+function pageChunks(path) {
+  const files = new Set()
+  const visit = (key) => {
+    const entry = manifest[key]
+    if (!entry || entry.isEntry || files.has(entry.file)) return
+    files.add(entry.file)
+    for (const k of entry.imports ?? []) visit(k)
+  }
+  const source = `src/pages/${pageModules[pageKeyFor(path)]}.jsx`
+  if (!manifest[source]) throw new Error(`prerender: ${source} is not in the build manifest`)
+  visit(source)
+  return [...files].map((f) => `<link rel="modulepreload" fetchpriority="low" crossorigin href="/${f}" />`).join('\n    ')
+}
+
 const escape = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
 
 function page(path) {
@@ -79,6 +99,7 @@ function page(path) {
     .replace(/<meta\s+name="description"[^>]*>\s*/, '')
     .replace('</head>', `    ${head}\n  </head>`)
     .replace('<div id="root"></div>', `<div id="root">${render(path)}</div>`)
+    .replace('</body>', `  ${pageChunks(path)}\n  </body>`)
 }
 
 // Flat files (about.html, team/joel-venegas.html): Vercel's cleanUrls and `vite preview`
@@ -104,4 +125,5 @@ if (org.siteUrl) {
 }
 
 rmSync(join(ROOT, 'dist-ssr'), { recursive: true, force: true })
+rmSync(join(outDir, '.vite'), { recursive: true, force: true }) // build manifest: not for serving
 console.log(`prerender: ${paths.length} pages + 404.html → ${process.argv[2] ?? 'dist'}/`)
