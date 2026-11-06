@@ -51,9 +51,12 @@ const COMPOSITE = /* glsl */ `
     float skyEdge = abs(s0 - isSky(vUv + ox)) + abs(s0 - isSky(vUv - ox)) + abs(s0 - isSky(vUv + oy)) + abs(s0 - isSky(vUv - oy));
 
     float d0 = viewZ(vUv);
+    float dxp = viewZ(vUv + ox), dxm = viewZ(vUv - ox), dyp = viewZ(vUv + oy), dym = viewZ(vUv - oy);
+    // No ink where far-off ground meets the sky: distant edges dissolve into haze
+    float dmin = min(min(d0, dxp), min(dxm, min(dyp, dym)));
+    skyEdge *= 1.0 - smoothstep(250.0, 500.0, dmin);
     float w0 = 1.0 / d0;
-    float lap = abs(1.0 / viewZ(vUv + ox) + 1.0 / viewZ(vUv - ox) - 2.0 * w0)
-              + abs(1.0 / viewZ(vUv + oy) + 1.0 / viewZ(vUv - oy) - 2.0 * w0);
+    float lap = abs(1.0 / dxp + 1.0 / dxm - 2.0 * w0) + abs(1.0 / dyp + 1.0 / dym - 2.0 * w0);
     float depthEdge = smoothstep(0.035, 0.09, lap / w0) * (1.0 - s0);
 
     vec3 n0 = nrm(vUv);

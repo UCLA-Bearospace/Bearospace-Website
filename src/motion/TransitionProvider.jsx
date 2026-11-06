@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router'
 import { TransitionContext } from './transitionContext'
 import { DirectorContext } from './director'
 import { useMotionAllowed } from './useMotionPref'
-import { EASE, PAGE_FADE, REDUCED, WIPE } from './timing'
+import { EASE, PAGE_FADE, REDUCED, TRAVEL_CAP, WIPE } from './timing'
 import WipeLayer from './WipeLayer'
 import { BODY_IDS, labelFor, parentOf, targetFor } from '../site/targets.js'
 import { setLastDestination } from '../menu/menuState'
@@ -134,7 +134,9 @@ export default function TransitionProvider({ children, preload }) {
       fade = main?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: PAGE_FADE, easing: EASE.fade, fill: 'forwards' })
       const travel = director.travel(t)
       const stop = hurry(travel)
+      const cap = setTimeout(() => travel.finish(), TRAVEL_CAP)
       await play(travel)
+      clearTimeout(cap)
       stop()
       // The URL moved on while we flew: land on the newest page instead
       target = latest.current

@@ -4,8 +4,16 @@ import SceneBoundary from './SceneBoundary'
 import { setSceneStatus, useSceneStatus } from './sceneStatus'
 import { disableScene, useSceneAllowed } from '../lib/webgl'
 import { useMediaQuery } from '../lib/useMediaQuery'
+import { reportProgress } from '../intro/progress'
+import { introMode } from '../intro/introStore'
 
-const FlightScene = lazy(() => import('../scene3d/FlightScene.jsx'))
+// The 3D chunk is the biggest download: its arrival is 40% of the intro's progress bar
+const FlightScene = lazy(() =>
+  import('../scene3d/FlightScene.jsx').then((m) => {
+    reportProgress('chunk', 1)
+    return m
+  }),
+)
 
 const LOSS_WINDOW_MS = 60_000
 
@@ -17,7 +25,8 @@ const LOSS_WINDOW_MS = 60_000
 export default function FlightBackdrop({ motion, dimmed = false, onEngine }) {
   const allowed = useSceneAllowed()
   const [generation, setGeneration] = useState(0)
-  const [idle, setIdle] = useState(false)
+  // Load right away when the opening sequence is about to play (it needs the scene by shot C)
+  const [idle, setIdle] = useState(() => typeof document !== 'undefined' && introMode() !== 'off')
   const lastLoss = useRef(0)
   const status = useSceneStatus()
   // On phone-width content pages the page panel covers the scene: skip the GPU and battery cost
@@ -29,15 +38,16 @@ export default function FlightBackdrop({ motion, dimmed = false, onEngine }) {
     else if (!wanted) setSceneStatus('none', null)
   }, [allowed, wanted])
 
-  // Page content first: start loading the 3D scene once the browser is idle
+  // Otherwise page content first: start loading the 3D scene once the browser is idle
   useEffect(() => {
+    if (idle) return
     if (window.requestIdleCallback) {
       const id = requestIdleCallback(() => setIdle(true), { timeout: 2000 })
       return () => cancelIdleCallback(id)
     }
     const id = setTimeout(() => setIdle(true), 800)
     return () => clearTimeout(id)
-  }, [])
+  }, [idle])
 
   function handleStatus(next, model) {
     if (next === 'lost') {

@@ -35,6 +35,7 @@ Every page is prerendered to static HTML (`scripts/prerender.mjs`), so the site 
 The flying rocket lives in `src/scene3d/` and loads as its own chunk. The page never depends on it: a static poster drawn from the real rocket's outline shows while it loads, and stays if WebGL is unavailable, the scene fails, or the GPU context is lost twice. Visitors can pause the motion, and reduced-motion settings get a still frame.
 
 - **Model pipeline:** `npm run models` drops the STL's internal parts (see `assets-src/models/rocket.report.json`), converts it to metres with the nose up, tags each triangle as nose, body, fin, or hardware, and writes `rocket.jvm2` plus `src/generated/rocket.meta.json`. Overrides go in `assets-src/models/rocket.config.json`. A unit test fails if the model is older than the STL.
+- **Opening sequence:** first visits to `/` play a ~10 s launch (logo, sponsors, liftoff, ascent) that lands on the Flight Deck; returning visitors get 2.4 s. It never plays on deep links, with reduced or paused motion, without WebGL, or on slow connections. Add `?intro=1` to force it, `?intro=0` to skip it, or set `localStorage['bearo:intro'] = 'off'` to turn it off in a browser. Sponsors shown in it come from `src/content/sponsors.js` (`showInIntro`).
 - **Tuning:** `npm run dev`, then open `/lab/rocket` for live sliders (speed, plume, camera, ink, quality tier). The lab never ships in production builds.
 
 ## Assets

@@ -5,6 +5,8 @@ import { SponsorStrip } from '../components/bits'
 import { isLandingLocation } from '../app/landing'
 import { getLastDestination } from '../menu/menuState'
 import OrbitNav from '../menu/OrbitNav'
+import ReplayLaunch from '../intro/ReplayLaunch'
+import IntroGate from '../intro/IntroGate'
 
 /** The Flight Deck: title, calls to action, and the eight destinations. */
 export default function Home() {
@@ -40,7 +42,11 @@ export default function Home() {
 
       <div className="deck__sponsors">
         <SponsorStrip />
+        <ReplayLaunch className="button button--ghost deck__replay" />
       </div>
+
+      {/* The opening sequence lives with the Flight Deck (and in its chunk) */}
+      <IntroGate />
     </div>
   )
 }
