@@ -3,6 +3,7 @@ import { useLocation } from 'react-router'
 import { createEngine } from './engine'
 import { useDirector } from '../motion/director'
 import { targetFor } from '../site/targets.js'
+import { reportProgress } from '../intro/progress'
 import meta from '../generated/rocket.meta.json'
 
 /**
@@ -19,7 +20,14 @@ export default function FlightScene({ motion, dimmed = false, onStatus, onEngine
   const report = useEffectEvent((status, model) => onStatus?.(status, model))
   const onMount = useEffectEvent((host) => {
     report('loading')
-    const engine = createEngine(host, { meta, onStatus: (s, m) => report(s, m) })
+    const engine = createEngine(host, {
+      meta,
+      onProgress: (v) => reportProgress('model', v),
+      onStatus: (s, m) => {
+        if (s === 'ready') reportProgress('compile', 1)
+        report(s, m)
+      },
+    })
     engine.setMotion(motion)
     // Deep link (or a scene that loaded late): open on the current page's shot
     engine.place(targetFor(pathname))
@@ -32,6 +40,7 @@ export default function FlightScene({ motion, dimmed = false, onStatus, onEngine
         attachLabels: (map) => engine.attachLabels(map),
         highlight: (id) => engine.highlight(id),
         showBodies: (on) => engine.showBodies(on),
+        intro: (mode, options) => engine.intro(mode, options),
       }
     }
     onEngine?.(engine)
@@ -75,5 +84,13 @@ function exposeTestHooks(engine) {
     setTier: (t) => engine.setTier(t),
     loseContext: () => lose?.loseContext(),
     restoreContext: () => lose?.restoreContext(),
+    /** The running (or last) intro's controls: hold(seconds | label), skip(), … */
+    intro: () => engine.introControls,
+    /** The scene state that the Flight Deck depends on (to check nothing is left over) */
+    state: () => {
+      const s = engine.state
+      const pick = ['follow', 'target', 'altitude', 'dusk', 'speed', 'thrust', 'vacuum', 'lines', 'groundLock', 'shake', 'flash', 'appear']
+      return Object.fromEntries(pick.map((k) => [k, s[k]]))
+    },
   }
 }

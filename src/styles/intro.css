@@ -1,0 +1,218 @@
+/* Opening sequence (slice 4). html[data-intro] is set before first paint by the head
+   script; html[data-intro-phase] (dom | hold | scene) while it plays. */
+
+.intro {
+  display: none;
+}
+
+html[data-intro='full'] .intro,
+html[data-intro='short'] .intro {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--ink);
+  visibility: visible; /* it sits inside the hidden page while it plays */
+  transition: background-color 0.45s ease;
+  /* Failsafe: if JavaScript never takes over, get out of the way after 7 s */
+  animation: intro-failsafe 0.3s ease 7s forwards;
+}
+
+html[data-intro-phase] .intro {
+  animation: none;
+}
+
+/* Shots C–F happen in the 3D scene behind: the overlay turns transparent */
+html[data-intro-phase='scene'] .intro {
+  background-color: transparent;
+  pointer-events: none;
+}
+
+@keyframes intro-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* The page waits underneath (same failsafe), then fades in when the intro lands */
+html[data-intro='full'] .stage,
+html[data-intro='short'] .stage,
+html[data-intro='full'] .skip-link,
+html[data-intro='short'] .skip-link {
+  visibility: hidden;
+  animation: stage-failsafe 0s linear 7s forwards;
+}
+
+html[data-intro='full'][data-intro-phase] .stage,
+html[data-intro='short'][data-intro-phase] .stage {
+  animation: none;
+}
+
+@keyframes stage-failsafe {
+  to {
+    visibility: visible;
+  }
+}
+
+html[data-intro-ended] .stage {
+  animation: stage-in 0.6s var(--ease) both;
+}
+
+@keyframes stage-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* --- Shots A and B --------------------------------------------------------- */
+
+.intro__art {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.intro__art > * {
+  grid-area: 1 / 1;
+}
+
+.intro__constellation {
+  width: min(78vw, 36rem);
+  overflow: visible;
+}
+
+.intro__line {
+  stroke: var(--glow);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.intro__star {
+  fill: #fff;
+  transform: scale(0);
+  transform-box: fill-box;
+  transform-origin: center;
+  filter: drop-shadow(0 0 6px var(--bear));
+}
+
+.intro__badge {
+  position: relative;
+  width: min(62vw, 22rem);
+  aspect-ratio: 512 / 487;
+  overflow: hidden;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.intro__badge img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.intro__sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 38%, rgb(255 255 255 / 0.6) 50%, transparent 62%);
+  transform: translateX(-140%);
+  mix-blend-mode: screen;
+}
+
+.intro__sponsor {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  opacity: 0;
+}
+
+.intro__sponsor .kicker {
+  margin: 0;
+  font-size: clamp(0.85rem, 0.7rem + 0.5vw, 1.1rem);
+  letter-spacing: 0.24em;
+}
+
+/* Logos keep their proportions: width set, height follows.
+   Lead sponsor ≥ 40% of the viewport on desktop, ≥ 70% on phones. */
+.intro__logo img {
+  display: block;
+  width: max(40vw, min(70vw, 26rem));
+  height: auto;
+}
+
+.intro__logo--invert img {
+  filter: invert(1);
+}
+
+.intro__sponsor--institutional .intro__logo img {
+  width: max(30vw, min(62vw, 22rem));
+}
+
+.intro__logo--plate {
+  padding: clamp(0.6rem, 0.4rem + 1vw, 1.1rem) clamp(0.8rem, 0.5rem + 1.4vw, 1.5rem);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.intro__flash {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Real loading progress, shown only while the intro waits for the scene */
+.intro__progress {
+  position: absolute;
+  left: 50%;
+  bottom: 14vh;
+  width: min(60vw, 20rem);
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+html[data-intro-phase='hold'] .intro__progress {
+  opacity: 1;
+}
+
+.intro__progress span {
+  display: block;
+  height: 3px;
+  background: var(--gold);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.intro__progress p {
+  margin: 0.6rem 0 0;
+  color: var(--mute);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.intro__skip {
+  position: absolute;
+  right: max(1.25rem, env(safe-area-inset-right));
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  pointer-events: auto;
+}
+
+/* Deck utility row */
+.deck__replay {
+  margin-top: 1rem;
+  font-size: var(--step--1);
+  min-height: 44px;
+}
+
+.site-footer__replay {
+  align-self: start;
+}

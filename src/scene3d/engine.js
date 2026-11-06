@@ -1,6 +1,8 @@
 import gsap from 'gsap'
 import {
+  Color,
   DirectionalLight,
+  Fog,
   Group,
   HemisphereLight,
   PerspectiveCamera,
@@ -17,6 +19,8 @@ import { createPlume } from './plume'
 import { createBodies } from './bodies'
 import { SLOTS, SLOT_DEPTH } from './menuSlots'
 import { buildTravel } from './travel'
+import { createPad } from './pad'
+import { DEFAULTS as INTRO_END, buildIntro } from './introTimeline'
 import { LOW_TIER, createGovernor, initialTier, pixelRatioFor } from './quality'
 
 // Adapted from the portfolio's src/scene3d/engine.js: one imperative Three.js world that
@@ -35,6 +39,15 @@ const UP = new Vector3(0, 1, 0)
 const ROCKET_CENTER = new Vector3(0, 1.3, 0)
 const LABEL_INSET = 24 // px kept clear of the viewport edge
 
+// Light and ink at dusk over the desert (opening sequence) vs in space
+const LIGHT = {
+  key: [new Color('#ffffff'), new Color('#FFB27A')],
+  hemiSky: [new Color('#3D5BA8'), new Color('#7A4E9C')],
+  hemiGround: [new Color('#120A2A'), new Color('#4A2E2A')],
+  ink: [new Color(INK.light), new Color(INK.dark)],
+  fog: [new Color('#11143A'), new Color('#9A4E7A')], // space (matches the sky's lower half), dusk haze
+}
+
 export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {}) {
   const renderer = new WebGLRenderer({ antialias: false, powerPreference: 'high-performance' })
   renderer.outputColorSpace = SRGBColorSpace
@@ -43,7 +56,7 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
   host.appendChild(canvas)
 
   const scene = new Scene()
-  const camera = new PerspectiveCamera(30, 1, 0.1, 600)
+  const camera = new PerspectiveCamera(30, 1, 0.1, 2500)
   const outline = createOutline(renderer, camera)
 
   const key = new DirectionalLight('#ffffff', 2.4)
@@ -52,6 +65,11 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
   back.position.set(4, 2, -5)
   const hemi = new HemisphereLight('#3D5BA8', '#120A2A', 0.7)
   scene.add(key, back, hemi)
+  // Always present (so materials never recompile mid-intro). Nothing in the Flight Deck is
+  // farther than ~25 m, so only the desert, mesas, and clouds are ever fogged.
+  const fog = new Fog(LIGHT.fog[1], 150, 1700)
+  scene.fog = fog
+  let pad = null // the desert, tower, smoke, and clouds: built on the first intro
 
   const sky = createSky(scene)
   const stars = createStarfield(scene)
@@ -84,7 +102,17 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
     fov: 30,
     rim: 1.1,
     inkStrength: 0.9,
+    // Opening sequence (introTimeline.js); these defaults are the Flight Deck
+    altitude: INTRO_END.altitude, // metres climbed: sinks the ground below the fixed rocket
+    dusk: 0, // 1 = sunset over the desert, 0 = space
+    groundLock: 0, // 1 = camera rides with the ground (launch-pad view)
+    shake: 0,
+    flash: 0, // impact flash
+    appear: 1, // the destination bodies' entrance
   }
+  let ignitedAt = null
+  let introTl = null // the opening sequence, while it plays
+  let introControls = null
   outline.setInk(INK.light)
   outline.uniforms.uDir.value.set(0, -1)
 
@@ -217,9 +245,10 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
     if (state.follow) setCamera(restShot())
     const s = state.sway
     const d = Math.hypot(state.cam.x, state.cam.z)
+    const k = state.shake * 0.03
     camera.position.set(
-      state.cam.x + Math.sin(time * 0.11) * d * 0.05 * s,
-      state.cam.y + Math.sin(time * 0.17) * 0.12 * s,
+      state.cam.x + Math.sin(time * 0.11) * d * 0.05 * s + Math.sin(time * 61) * k,
+      state.cam.y + Math.sin(time * 0.17) * 0.12 * s - state.altitude * state.groundLock + Math.sin(time * 53 + 1) * k,
       state.cam.z,
     )
     camera.lookAt(state.look.x, state.look.y, state.look.z)
@@ -236,10 +265,20 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
 
     rocket.uniforms.uRim.value = state.rim
     plume.update(time, state.thrust, state.vacuum)
-    stars.update(time, scroll, state.speed)
-    sky.update(scroll)
-    bodies.update(time, motion ? dt : 0)
+    stars.update(time, scroll, state.speed, 1 - state.dusk)
+    sky.update(scroll, state.dusk)
+    bodies.update(time, motion ? dt : 0, state.appear)
+    if (pad) pad.update(state.altitude, ignitedAt === null ? -1 : time - ignitedAt, state.dusk)
 
+    // Sunset light and dark ink over the desert, cool light and pale ink in space
+    const dusk = state.dusk
+    key.color.lerpColors(LIGHT.key[0], LIGHT.key[1], dusk)
+    hemi.color.lerpColors(LIGHT.hemiSky[0], LIGHT.hemiSky[1], dusk)
+    hemi.groundColor.lerpColors(LIGHT.hemiGround[0], LIGHT.hemiGround[1], dusk)
+    outline.uniforms.uInk.value.lerpColors(LIGHT.ink[0], LIGHT.ink[1], dusk)
+    fog.color.lerpColors(LIGHT.fog[0], LIGHT.fog[1], dusk)
+
+    outline.uniforms.uFlash.value = state.flash
     outline.uniforms.uStrength.value = state.inkStrength
     outline.uniforms.uAmount.value = state.lines * Math.min(1, state.speed)
     outline.uniforms.uTime.value = time
@@ -305,6 +344,8 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
 
   /** Stop a travel in flight where it is; whoever awaits it carries on. */
   function interrupt() {
+    // Anything that moves the camera ends a running intro first (it lands on the deck)
+    if (introTl) introTl.progress(1)
     if (!travel) return
     const { tl, done } = travel
     travel = null
@@ -396,6 +437,9 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
       }
     },
     framing: () => state.target,
+    get introControls() {
+      return introControls
+    },
     attachLabels(map) {
       labels = map
       map?.forEach((el) => {
@@ -411,8 +455,48 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
       if (!raf) frame(0)
     },
     showBodies(on) {
-      bodies.group.visible = on
+      bodies.show(on)
       if (!raf) frame(0)
+    },
+    /** Exhaust smoke starts rolling now (engine clock). */
+    ignite() {
+      ignitedAt = time
+    },
+    /**
+     * Play the 3D part of the opening sequence ('full' or 'short'). Returns controls;
+     * `finished` resolves when it lands on the Flight Deck (or is skipped).
+     */
+    intro(mode, { onLiftoff } = {}) {
+      interrupt()
+      if (!pad) pad = createPad(scene)
+      ignitedAt = null
+      boost = true
+      let done
+      const finished = new Promise((r) => (done = r))
+      const tl = buildIntro(api, mode, {
+        onLiftoff,
+        onComplete: () => {
+          boost = false
+          ignitedAt = null
+          if (introTl === tl) introTl = null
+          done()
+        },
+      })
+      introTl = tl
+      tl.play(0)
+      start()
+      // (Each control returns nothing: handing out the gsap timeline invites misuse)
+      introControls = {
+        finished,
+        skip: () => void tl.progress(1),
+        pause: () => void tl.pause(),
+        resume: () => void tl.resume(),
+        seekSettle: () => void tl.seek('settle'),
+        /** Jump to a time (seconds) or label and hold there (visual review, tests) */
+        hold: (at) => void tl.pause(at),
+        progress: () => tl.progress(),
+      }
+      return introControls
     },
     /** Deterministic still frame at time t (visual tests). */
     freeze(t) {

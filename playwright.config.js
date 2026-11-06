@@ -13,6 +13,8 @@ if (perfRun) process.env.BEARO_PERF = '1'
 export default defineConfig({
   testDir: 'tests/e2e',
   forbidOnly: !!process.env.CI,
+  // Timing probes share one GPU: run them one at a time
+  workers: perfRun ? 1 : undefined,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   // The 3D scene runs in every test (software WebGL on CI), so allow generous time
@@ -20,6 +22,9 @@ export default defineConfig({
   expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.02 } },
   use: {
     baseURL: 'http://localhost:4173',
+    // Most tests start on the Flight Deck without the opening sequence (the intro's own
+    // tests opt back in with an empty storage state)
+    storageState: 'tests/e2e/storage/no-intro.json',
     trace: 'retain-on-failure',
   },
   projects: [

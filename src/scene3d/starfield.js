@@ -40,6 +40,7 @@ const VERT = /* glsl */ `
 const FRAG = /* glsl */ `
   uniform float uTime;
   uniform float uOpacity;
+  uniform float uFade;
   varying vec2 vUv;
   varying float vSeed;
   void main() {
@@ -47,7 +48,8 @@ const FRAG = /* glsl */ `
     float a = 1.0 - smoothstep(0.2, 1.0, d);
     a *= 0.75 + 0.25 * sin(uTime * (1.5 + vSeed * 3.0) + vSeed * 60.0);
     vec3 col = vSeed > 0.93 ? vec3(1.0, 0.86, 0.35) : mix(vec3(1.0), vec3(0.66, 0.78, 1.0), fract(vSeed * 7.0));
-    gl_FragColor = vec4(col * a * uOpacity, a * uOpacity);
+    float o = uOpacity * uFade;
+    gl_FragColor = vec4(col * a * o, a * o);
   }
 `
 
@@ -63,7 +65,7 @@ export function createStarfield(parent, { seed = 7 } = {}) {
   parent.add(group)
   const rand = seeded(seed)
   const quad = new PlaneGeometry(1, 1)
-  const shared = { uScroll: { value: 0 }, uSpeed: { value: 0 }, uTime: { value: 0 } }
+  const shared = { uScroll: { value: 0 }, uSpeed: { value: 0 }, uTime: { value: 0 }, uFade: { value: 1 } }
 
   const layers = LAYERS.map((L) => {
     const geo = new InstancedBufferGeometry()
@@ -107,10 +109,12 @@ export function createStarfield(parent, { seed = 7 } = {}) {
 
   return {
     group,
-    update(time, scroll, speed) {
+    /** fade 0–1: stars are hidden by the dusk sky and appear in space */
+    update(time, scroll, speed, fade = 1) {
       shared.uTime.value = time
       shared.uScroll.value = scroll
       shared.uSpeed.value = speed
+      shared.uFade.value = fade
     },
     /** 0–1 share of each layer drawn (quality tiers). */
     setDensity(f) {

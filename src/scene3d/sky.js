@@ -1,4 +1,4 @@
-import { BackSide, Color, Mesh, ShaderMaterial, SphereGeometry } from 'three'
+import { BackSide, Color, Mesh, ShaderMaterial, SphereGeometry, Vector3 } from 'three'
 
 // Deep-space dome in the logo's palette: ink to night, with posterised nebula clouds
 // (purple, with blue wisps) drifting slowly downward as the rocket climbs.
@@ -21,6 +21,13 @@ const FRAG = /* glsl */ `
   uniform vec3 uWisp;
   uniform float uScroll;
   uniform float uStrength;
+  uniform float uDusk;
+  uniform vec3 uSunDir;
+  uniform vec3 uDuskGround;
+  uniform vec3 uDuskHorizon;
+  uniform vec3 uDuskMid;
+  uniform vec3 uDuskHigh;
+  uniform vec3 uDuskTop;
   varying vec3 vDir;
   float hash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
   float noise(vec3 x) {
@@ -48,6 +55,17 @@ const FRAG = /* glsl */ `
     float wisp = pow(ridge, 8.0) * cloud;
     col = mix(col, uNebula, bands(cloud, 3.0) * 0.7 * uStrength);
     col += uWisp * wisp * 0.35 * uStrength;
+    // Dusk over the desert (opening sequence): a banded sunset gradient that gives way
+    // to the nebula as the rocket climbs
+    if (uDusk > 0.001) {
+      float h = d.y;
+      vec3 dusk = h < 0.0 ? uDuskGround : mix(uDuskHorizon, uDuskMid, bands(smoothstep(0.0, 0.14, h), 3.0));
+      dusk = mix(dusk, uDuskHigh, smoothstep(0.1, 0.42, h));
+      dusk = mix(dusk, uDuskTop, smoothstep(0.38, 0.95, h));
+      float sun = max(dot(d, normalize(uSunDir)), 0.0);
+      dusk += vec3(1.0, 0.72, 0.42) * (step(0.9985, sun) * 0.9 + pow(sun, 7.0) * 0.32) * step(0.0, h + 0.01);
+      col = mix(col, dusk, uDusk);
+    }
     gl_FragColor = vec4(col, 1.0);
     #include <colorspace_fragment>
   }
@@ -61,6 +79,13 @@ export function createSky(parent, { octaves = 4 } = {}) {
     uWisp: { value: new Color('#3D7BFF') },
     uScroll: { value: 0 },
     uStrength: { value: 1 },
+    uDusk: { value: 0 },
+    uSunDir: { value: new Vector3(-0.45, 0.035, -1) },
+    uDuskGround: { value: new Color('#9A4E7A') }, // = the dusk fog, so the desert's edge vanishes
+    uDuskHorizon: { value: new Color('#FF8A4C') },
+    uDuskMid: { value: new Color('#C2547A') },
+    uDuskHigh: { value: new Color('#3B2A78') },
+    uDuskTop: { value: new Color('#141A48') },
   }
   const dome = new Mesh(
     new SphereGeometry(500, 32, 16),
@@ -81,9 +106,11 @@ export function createSky(parent, { octaves = 4 } = {}) {
   return {
     dome,
     uniforms,
-    update(scroll) {
+    /** dusk 1 = sunset over the desert, 0 = deep space */
+    update(scroll, dusk = 0) {
       // Very slow: the nebula is far away
       uniforms.uScroll.value = scroll * 0.0015
+      uniforms.uDusk.value = dusk
     },
   }
 }

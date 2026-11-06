@@ -23,6 +23,13 @@ export function setSceneStatus(next, nextModel = model) {
   emit()
 }
 
+/** Current status and change subscription, for code outside React (the intro). */
+export const getSceneStatus = () => status
+export function subscribeSceneStatus(cb) {
+  listeners.add(cb)
+  return () => listeners.delete(cb)
+}
+
 export function useSceneStatus() {
   return useSyncExternalStore(
     (cb) => {
