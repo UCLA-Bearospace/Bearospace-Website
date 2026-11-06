@@ -1,17 +1,22 @@
 import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router'
-import { destinations } from '../site/destinations.js'
 import { mailto, org } from '../content/index.js'
 import { SponsorStrip } from '../components/bits'
 import { isLandingLocation } from '../app/landing'
+import { getLastDestination } from '../menu/menuState'
+import OrbitNav from '../menu/OrbitNav'
 
-/** The Flight Deck in its list layout (slice 3 adds the 3D orbit layout). */
+/** The Flight Deck: title, calls to action, and the eight destinations. */
 export default function Home() {
   const h1 = useRef(null)
   const { key } = useLocation()
+  const landing = isLandingLocation(key)
+  const returning = !landing && Boolean(getLastDestination())
+
+  // After navigating here, focus the heading, or the destination they came back from
   useEffect(() => {
-    if (!isLandingLocation(key)) h1.current?.focus({ preventScroll: true })
-  }, [key])
+    if (!landing && !returning) h1.current?.focus({ preventScroll: true })
+  }, [landing, returning])
 
   return (
     <div className="deck">
@@ -31,18 +36,7 @@ export default function Home() {
         </div>
       </section>
 
-      <nav className="deck__destinations" aria-label="Destinations">
-        <ul>
-          {destinations.map((d) => (
-            <li key={d.id}>
-              <Link to={d.path} className="destination">
-                <span className="destination__label">{d.label}</span>
-                <span className="destination__descriptor">{d.descriptor}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <OrbitNav focusOnMount={returning} />
 
       <div className="deck__sponsors">
         <SponsorStrip />
