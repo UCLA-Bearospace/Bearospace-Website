@@ -51,7 +51,7 @@ export function SponsorLogo({ sponsor, height = 40 }) {
   if (logo.onDark) {
     return (
       <span className={`sponsor-logo${logo.invertOnDark ? ' sponsor-logo--invert' : ''}`}>
-        <Img src={logo.onDark} alt={sponsor.name} style={{ height }} />
+        <Img src={logo.onDark} alt={sponsor.name} sizes="320px" style={{ height }} />
       </span>
     )
   }

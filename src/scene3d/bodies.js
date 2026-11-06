@@ -23,6 +23,7 @@ import {
 import { toon } from './toon'
 import { createRocketMaterial } from './rocketMaterial'
 import { buildPlaceholderGeometry } from './rocket'
+import { BEAR_LINES, BEAR_STARS } from '../site/constellation.js'
 
 // The eight Flight Deck destinations as small toon/ink celestial bodies. Each is built
 // at unit radius and scaled to its slot size. Solid parts sit on layer 0 (ink outlines);
@@ -57,11 +58,8 @@ const solid = (geo, color) => new Mesh(geo, toon(color))
 // Ursa: the logo's constellation bear, as stars joined by lines
 function ursa() {
   const g = new Group()
-  const stars = [
-    [-0.95, 0.25], [-0.55, 0.42], [-0.15, 0.35], [0.25, 0.4], [0.6, 0.15], [0.95, 0.22],
-    [0.5, -0.35], [0.05, -0.4], [-0.45, -0.38], [0.85, -0.45], [-0.85, -0.5],
-  ]
-  const lines = [0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 4, 6, 6, 9, 3, 7, 7, 8, 8, 10, 2, 8]
+  const stars = BEAR_STARS
+  const lines = BEAR_LINES.flat()
   for (const [x, y] of stars) {
     const s = sprite('#A9C6FF', 0.32)
     s.position.set(x, y, 0)
@@ -226,9 +224,14 @@ export function createBodies(parent, { slots, meta }) {
   })
 
   let highlighted = null
+  let shown = true
   return {
     group,
     bodies,
+    /** Hide the bodies (the Flight Deck's list layout) */
+    show(on) {
+      shown = on
+    },
     highlight(id) {
       highlighted = id
     },
@@ -238,7 +241,9 @@ export function createBodies(parent, { slots, meta }) {
       b.home = v.clone()
       b.node.position.copy(v)
     },
-    update(time, dt) {
+    /** appear 0–1: the bodies' entrance at the end of the opening sequence */
+    update(time, dt, appear = 1) {
+      group.visible = appear > 0.01 && shown
       for (const b of bodies.values()) {
         if (!b.home) continue
         // Spin on their own axes and bob gently; never leave their slot
@@ -247,7 +252,7 @@ export function createBodies(parent, { slots, meta }) {
         b.node.position.y = b.home.y + Math.sin(time * 0.6 + b.phase) * b.size * 0.08
         const target = highlighted === b.id ? 1 : 0
         b.emphasis += (target - b.emphasis) * Math.min(1, dt * 10 || 1)
-        b.node.scale.setScalar(b.size * (1 + 0.12 * b.emphasis))
+        b.node.scale.setScalar(b.size * (1 + 0.12 * b.emphasis) * appear)
       }
     },
   }

@@ -7,6 +7,7 @@ import './styles/tokens.css'
 import './styles/base.css'
 import './styles/backdrop.css'
 import './styles/site.css'
+import './styles/intro.css'
 import App from './App.jsx'
 import { pages } from './routes/pages.lazy.js'
 

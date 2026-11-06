@@ -5,20 +5,43 @@
 //
 // Output: <outDir>/<path>.html for every path in allPaths() (index.html for /), 404.html,
 // and sitemap.xml + robots.txt when org.siteUrl is set.
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const outDir = join(ROOT, process.argv[2] ?? 'dist')
 const ssrEntry = join(ROOT, 'dist-ssr', 'entry-server.js')
-const { render, allPaths, getMeta, org } = await import(pathToFileURL(ssrEntry).href)
+const { render, allPaths, getMeta, org, decideIntroMode, readIntroEnv } = await import(pathToFileURL(ssrEntry).href)
+
+// Decides before first paint whether the opening sequence plays (src/intro/introMode.js,
+// serialized), so the overlay is on screen from the first frame and deep links never see it
+const introScript =
+  `<script>try{document.documentElement.dataset.intro=(${decideIntroMode})((${readIntroEnv})())}` +
+  `catch(e){document.documentElement.dataset.intro='off'}` +
+  // While it plays, Skip has focus from the first frame, and a key press or tap before the
+  // Flight Deck's chunk arrives still counts (src/intro/sequence.js picks it up)
+  `if(document.documentElement.dataset.intro!=='off'){var w=window,f=function(e){` +
+  `if(e.type!=='keydown'||!/^(Shift|Control|Alt|Meta)$/.test(e.key))w.__introSkip=1};` +
+  `w.__introEarly=f;addEventListener('keydown',f,true);addEventListener('pointerdown',f,true);` +
+  `document.addEventListener('DOMContentLoaded',function(){var b=document.querySelector('.intro__skip');` +
+  `b&&b.focus({preventScroll:true})})}</script>`
 
 // Inline the (small) stylesheet so first paint doesn't wait on a second request, and move
 // the app script after the content so the browser treats the page text as the priority
 let template = readFileSync(join(outDir, 'index.html'), 'utf8').replace(
   /<link rel="stylesheet" crossorigin href="\/assets\/([^"]+\.css)">/,
   (_, file) => `<style>${readFileSync(join(outDir, 'assets', file), 'utf8')}</style>`,
+)
+// Fetch the two Latin text fonts with the HTML instead of after the CSS is parsed, so text
+// rarely paints in a fallback font first and reflows when they arrive (layout shift)
+const fonts = readdirSync(join(outDir, 'assets')).filter((f) =>
+  /^(saira|atkinson-hyperlegible-next)-latin-wght-normal-[\w-]+\.woff2$/.test(f),
+)
+if (fonts.length !== 2) throw new Error(`prerender: expected 2 fonts to preload, found ${fonts.join(', ') || 'none'}`)
+template = template.replace(
+  '</head>',
+  `${fonts.map((f) => `  <link rel="preload" href="/assets/${f}" as="font" type="font/woff2" crossorigin />`).join('\n  ')}\n  </head>`,
 )
 const scripts = template.match(/\s*<script type="module"[^>]*><\/script>|\s*<link rel="modulepreload"[^>]*>/g) ?? []
 for (const s of scripts) template = template.replace(s, '')
@@ -51,6 +74,7 @@ function page(path) {
       : '',
   ].join('\n    ')
   return template
+    .replace('<head>', path === '/' ? `<head>\n    ${introScript}` : '<head>')
     .replace(/<title>.*?<\/title>\s*/s, '')
     .replace(/<meta\s+name="description"[^>]*>\s*/, '')
     .replace('</head>', `    ${head}\n  </head>`)

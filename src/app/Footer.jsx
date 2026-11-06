@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { destinations } from '../site/destinations.js'
 import { links, org } from '../content/index.js'
 import { SponsorStrip } from '../components/bits'
+import ReplayLaunch from '../intro/ReplayLaunch'
 
 export default function Footer() {
   return (
@@ -43,6 +44,10 @@ export default function Footer() {
       </div>
 
       <SponsorStrip />
+
+      <div className="site-footer__replay">
+        <ReplayLaunch />
+      </div>
 
       <p className="site-footer__fine">
         A student organization at UCLA and the technical project of{' '}

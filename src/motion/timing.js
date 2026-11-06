@@ -12,6 +12,9 @@ export const EASE = {
 
 export const WIPE = { cover: 340, hold: 100, reveal: 360, stagger: 50 }
 export const PAGE_FADE = 250 // the page steps aside while the camera travels
+// A camera travel takes ~0.9 s. On a struggling GPU, GSAP's lag smoothing slows its clock
+// when frames take over half a second, so navigation finishes the travel after this long
+export const TRAVEL_CAP = 2500
 export const REDUCED = { out: 80, in: 150 } // reduced motion: a quick fade instead
 
 // Page entrance after the wipe clears

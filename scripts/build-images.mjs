@@ -3,7 +3,7 @@
 //
 // Output: public/media/<folder>/<name>-<width>.{avif,webp}   (metadata stripped)
 //         public/media/icons/*                               favicons from the logo
-//         src/generated/media.json   { "<folder>/<file>": { width, height, color, lqip, avif, webp } }
+//         src/generated/media.json   { "<folder>/<file>": { width, height, color?, lqip?, avif, webp } }
 //
 // Unchanged originals are skipped (keyed by content hash), so repeat runs are fast.
 import { createHash } from 'node:crypto'
@@ -16,13 +16,14 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const SRC = join(ROOT, 'assets-src', 'images')
 const OUT = join(ROOT, 'public', 'media')
 const MANIFEST = join(ROOT, 'src', 'generated', 'media.json')
-const VERSION = 2 // bump to force a full rebuild after changing settings below
+const VERSION = 3 // bump to force a full rebuild after changing settings below
 
-// Per folder: widths to generate, optional crop aspect (height / width), and which files
+// Per folder: widths to generate, optional crop aspect (height / width), which files, and
+// whether to paint a loading placeholder (not for logos: their transparent areas would show it)
 const RECIPES = {
   gallery: { widths: [480, 960, 1280] },
   team: { widths: [320, 640], aspect: 1.25 }, // 4:5 portraits, cropped from the top
-  logos: { widths: [128, 256, 512, 929], only: ['bearospace-logo.png', 'ucla-samueli-block.png', 'anduril-logo.svg'] },
+  logos: { widths: [128, 256, 512, 929], placeholder: false, only: ['bearospace-logo.png', 'ucla-samueli-block.png', 'ucla-samueli-block-rev.png', 'anduril-logo.svg'] },
 }
 
 const previous = existsSync(MANIFEST) ? JSON.parse(readFileSync(MANIFEST, 'utf8')) : {}
@@ -75,10 +76,12 @@ for (const [folder, recipe] of Object.entries(RECIPES)) {
         entry[format].push({ w, url })
       }
     }
-    const { dominant } = await sharp(input).stats()
-    entry.color = `rgb(${dominant.r} ${dominant.g} ${dominant.b})`
-    const tiny = await base().resize({ width: 16 }).webp({ quality: 40 }).toBuffer()
-    entry.lqip = `data:image/webp;base64,${tiny.toString('base64')}`
+    if (recipe.placeholder !== false) {
+      const { dominant } = await sharp(input).stats()
+      entry.color = `rgb(${dominant.r} ${dominant.g} ${dominant.b})`
+      const tiny = await base().resize({ width: 16 }).webp({ quality: 40 }).toBuffer()
+      entry.lqip = `data:image/webp;base64,${tiny.toString('base64')}`
+    }
     manifest[key] = entry
     built++
   }
