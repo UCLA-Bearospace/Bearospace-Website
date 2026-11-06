@@ -31,14 +31,19 @@ function paint(geometry, faceRegions) {
   return geometry
 }
 
-/** Instant stand-in built from the build-time profile: a lathe body plus fins. */
-export function buildPlaceholderGeometry(meta) {
-  const profile = meta.profile.map(([r, h]) => new Vector2(Math.max(r, 0.0005), h)).reverse()
+/**
+ * Stand-in built from the build-time profile: a lathe body plus fins. `detail` < 1 thins
+ * the profile and the lathe segments (the escort rocket is drawn tiny).
+ */
+export function buildPlaceholderGeometry(meta, detail = 1) {
+  const every = Math.max(1, Math.round(1 / detail))
+  const points = meta.profile.filter((_, i, all) => i % every === 0 || i === all.length - 1)
+  const profile = points.map(([r, h]) => new Vector2(Math.max(r, 0.0005), h)).reverse()
   const noseFrom = meta.lengthM - meta.noseLengthM
   const parts = []
   const faces = []
 
-  const lathe = new LatheGeometry(profile, 32).toNonIndexed()
+  const lathe = new LatheGeometry(profile, Math.max(8, Math.round(32 * detail))).toNonIndexed()
   const p = lathe.attributes.position.array
   for (let f = 0; f < p.length / 9; f++) {
     const y = (p[f * 9 + 1] + p[f * 9 + 4] + p[f * 9 + 7]) / 3
@@ -67,33 +72,32 @@ export function buildPlaceholderGeometry(meta) {
 }
 
 /**
- * The rocket: shows the placeholder immediately, swaps in the real mesh when it
- * loads, and keeps the placeholder if loading fails.
+ * The rocket: the real mesh once it loads, or the placeholder if loading fails. Nothing
+ * is drawn before then (the scene stays hidden until ready), so the placeholder is only
+ * built when needed, and decoding yields between steps to keep the page responsive.
  */
 export function createRocket(parent, { meta, url = meta.file.path, signal, onProgress }) {
   const { material, uniforms } = createRocketMaterial()
   const group = new Group()
   parent.add(group)
 
-  let mesh = new Mesh(buildPlaceholderGeometry(meta), material)
-  group.add(mesh)
   let kind = 'placeholder'
+  const breathe = () => new Promise((r) => setTimeout(r))
 
   const loaded = fetchMesh(url, { signal, expectedBytes: meta.file.bytes, onProgress })
-    .then((buf) => {
+    .then(async (buf) => {
       const { geometry, regions } = decodeJVM2(buf)
+      await breathe()
       const creased = toCreasedNormals(geometry, CREASE)
       geometry.dispose()
-      const real = new Mesh(paint(creased, regions), material)
-      group.remove(mesh)
-      mesh.geometry.dispose()
-      mesh = real
-      group.add(mesh)
+      await breathe()
+      group.add(new Mesh(paint(creased, regions), material))
       kind = 'real'
       return kind
     })
     .catch((err) => {
-      if (err?.name !== 'AbortError') console.warn('[rocket] model failed to load; keeping the placeholder', err)
+      if (err?.name !== 'AbortError') console.warn('[rocket] model failed to load; using the placeholder', err)
+      group.add(new Mesh(buildPlaceholderGeometry(meta), material))
       return kind
     })
 

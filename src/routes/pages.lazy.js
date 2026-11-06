@@ -1,4 +1,5 @@
 import { lazy } from 'react'
+import { pageKeyFor } from './pageModule.js'
 
 // Browser: each page loads as its own chunk. While a chunk loads during hydration, React
 // keeps the prerendered HTML on screen, so there is no flash or mismatch. Route changes
@@ -35,10 +36,8 @@ export const pages = {
   Sponsors: page('sponsors'),
   Join: page('join'),
   NotFound: page('notFound'),
-  /** Start fetching the chunk for a URL (best effort; unknown paths load nothing). */
+  /** Start fetching the chunk for a URL (best effort; unknown paths load the 404 page). */
   preload(pathname) {
-    const [section = 'home', sub] = pathname.split('/').filter(Boolean)
-    const key = section === 'engineering' && sub ? 'discipline' : section
-    load[key]?.().catch(() => {})
+    load[pageKeyFor(pathname)]?.().catch(() => {})
   },
 }

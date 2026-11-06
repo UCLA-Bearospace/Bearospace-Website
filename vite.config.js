@@ -10,5 +10,6 @@ export default defineConfig({
   ],
   // The lazy three.js scene chunk is ~560 kB raw; scripts/check-budgets.mjs enforces
   // the real (gzipped) budgets from docs/PLAN.md §9.5.
-  build: { chunkSizeWarningLimit: 650 },
+  // The manifest tells the prerender which chunks each page needs (it deletes the file after).
+  build: { chunkSizeWarningLimit: 650, manifest: true },
 })
