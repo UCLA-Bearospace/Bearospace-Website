@@ -22,10 +22,12 @@ const js = readdirSync(assets).filter((f) => f.endsWith('.js'))
 const gz = (path) => gzipSync(readFileSync(path)).length
 const sum = (files) => files.reduce((n, f) => n + gz(join(assets, f)), 0)
 
-// "Main" = what any page loads before it is interactive: the entry script and the chunks
-// it preloads, plus that page's own lazy chunk. Measured against the largest page chunk.
+// "Main" = what any page loads before it is interactive: the entry script, plus that page's
+// own chunks. Measured against the largest page. (Each page's HTML also preloads its own
+// chunks; those are counted per page below, not as shared.)
 const html = readFileSync(join(DIST, 'index.html'), 'utf8')
-const initial = [...html.matchAll(/(?:src|href)="\/assets\/([^"]+\.js)"/g)].map((m) => m[1])
+const initial = [...html.matchAll(/<script[^>]*\ssrc="\/assets\/([^"]+\.js)"/g)].map((m) => m[1])
+if (initial.length !== 1) throw new Error(`budgets: expected one entry script in index.html, found ${initial.length}`)
 // Each page chunk plus the helper chunks it imports (followed through the built files),
 // measured for the heaviest page.
 const PAGE = /^(Home|About|Competitions|Discipline|Engineering|Gallery|History|Join|NotFound|Projects|Sponsors|Team)-/

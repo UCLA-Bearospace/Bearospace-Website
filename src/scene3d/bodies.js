@@ -187,7 +187,7 @@ function nebula() {
 function escortRocket(meta) {
   const g = new Group()
   const { material } = createRocketMaterial()
-  const r = new Mesh(buildPlaceholderGeometry(meta), material)
+  const r = new Mesh(buildPlaceholderGeometry(meta, 0.35), material)
   const k = 2 / meta.lengthM
   r.scale.setScalar(k)
   r.position.y = -1

@@ -128,6 +128,7 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
   let height = 1
   let dpr = 1
   let disposed = false
+  let live = false
   let labels = null // Map<id, HTMLElement> pinned to the bodies
   let travel = null
   const labelCache = new WeakMap()
@@ -238,6 +239,9 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
   }
 
   function frame(dt) {
+    // Nothing is drawn until shaders are compiled (asynchronously) and the scene is ready:
+    // the canvas is hidden until then, and drawing early compiles them on the main thread
+    if (!live) return
     if (motion) {
       time += dt
       scroll += dt * state.speed * CLIMB_RATE
@@ -288,6 +292,7 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
 
   function loop(now) {
     raf = requestAnimationFrame(loop)
+    if (!live) return // not drawing yet: don't feed the quality governor empty frames
     const dt = last ? Math.min((now - last) / 1000, 1 / 15) : 0
     const raw = last ? now - last : 0
     last = now
@@ -359,12 +364,12 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
     if (disposed) return kind
     await renderer.compileAsync(scene, camera).catch(() => {})
     if (disposed) return kind
+    live = true
     frame(0)
     start()
     onStatus('ready', kind)
     return kind
   })
-  frame(0)
 
   const api = {
     state,
