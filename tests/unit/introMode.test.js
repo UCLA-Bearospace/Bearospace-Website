@@ -45,3 +45,19 @@ test('no intro on slow or data-saving connections, without WebGL, or on Back/For
   assert.equal(mode({ sceneOff: true }), 'off')
   assert.equal(mode({ restored: true }), 'off')
 })
+
+test('WebGL is only probed when nothing else rules the intro out (it runs before first paint)', () => {
+  let probes = 0
+  const lazy = (over) => {
+    const env = { ...base, ...over }
+    delete env.webgl
+    Object.defineProperty(env, 'webgl', { get: () => (probes++, true) })
+    return decideIntroMode(env)
+  }
+  for (const over of [{ pathname: '/team' }, { search: '?scene=0' }, { reducedMotion: true }, { saveData: true }, { restored: true }]) {
+    assert.equal(lazy(over), 'off')
+  }
+  assert.equal(probes, 0)
+  assert.equal(lazy({}), 'full')
+  assert.equal(probes, 1)
+})
