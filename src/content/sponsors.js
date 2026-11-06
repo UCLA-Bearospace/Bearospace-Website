@@ -31,8 +31,8 @@ export const sponsors = [
     relationship: 'institutional',
     label: 'Home institution',
     url: 'https://samueli.ucla.edu/',
-    // The block lockup is designed for light backgrounds; shown on a light plate
-    logo: { onDark: null, onLight: 'logos/ucla-samueli-block.png' },
+    // Reversed (white text) lockup on dark backgrounds, the standard block on light ones
+    logo: { onDark: 'logos/ucla-samueli-block-rev.png', onLight: 'logos/ucla-samueli-block.png' },
     showInIntro: true,
     introOrder: 2,
     introKicker: 'Built at',
