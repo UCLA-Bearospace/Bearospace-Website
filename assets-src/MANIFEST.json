@@ -38,6 +38,13 @@
       "note": "UCLA Samueli School of Engineering block lockup, 929x180"
     },
     {
+      "path": "images/logos/ucla-samueli-block-rev.png",
+      "original": "assets-src/images/logos/UCLA_Samueli_Engineering_block_rev.png",
+      "sha256": "751dabe228c37c99c0be9ebe1a97150bd5b7e5c76e9a09de33b065e65e161985",
+      "bytes": 14091,
+      "note": "UCLA Samueli School of Engineering block lockup, reversed (white text) for dark backgrounds, 929x180; supplied 2026-11-05"
+    },
+    {
       "path": "images/logos/ucla-henry-samueli-legacy.svg",
       "original": "public/Logos/UCLA_Henry_Samueli_School_of_Engineering_and_Applied_Science_logo.svg",
       "sha256": "612e529b563d2f7c5a7986d1dfaa7c48c84c4e7939a09889463cd13f4a426390",

@@ -25,7 +25,7 @@ export default function Img({ src, alt, sizes = '100vw', className, eager = fals
         height={m.height}
         loading={eager ? 'eager' : 'lazy'}
         decoding="async"
-        style={{ backgroundColor: m.color, backgroundImage: `url("${m.lqip}")`, backgroundSize: 'cover' }}
+        style={m.lqip ? { backgroundColor: m.color, backgroundImage: `url("${m.lqip}")`, backgroundSize: 'cover' } : undefined}
         {...rest}
       />
     </picture>

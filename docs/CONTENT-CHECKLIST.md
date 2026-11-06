@@ -51,7 +51,7 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 | # | Item | Needed for | Owner | Status |
 |---|---|---|---|---|
 | M1 | Vector or ≥2048 px Bearospace logo (current PNG is 512×487) | Hero, social preview images, favicon | | Open |
-| M2 | White/reversed UCLA Samueli School of Engineering lockup or vector | Intro, Sponsors on dark backgrounds | | Open |
+| M2 | White/reversed UCLA Samueli School of Engineering lockup or vector | Intro, Sponsors on dark backgrounds | Juan | Done 2026-11-05 (`ucla-samueli-block-rev.png`) |
 | M3 | Identify `Icon.jpeg` (200×200 black line mark) | — | | Open |
 | M4 | Headshots: Jonathan Mendez Aguilar, Daniel Montano | Team | | Open |
 | M5 | Full-resolution gallery originals with captions, dates, locations, photographer credit | Gallery | | Open |
