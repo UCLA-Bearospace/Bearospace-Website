@@ -5,7 +5,7 @@
 //
 // Output: <outDir>/<path>.html for every path in allPaths() (index.html for /), 404.html,
 // and sitemap.xml + robots.txt when org.siteUrl is set.
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
@@ -32,6 +32,16 @@ const introScript =
 let template = readFileSync(join(outDir, 'index.html'), 'utf8').replace(
   /<link rel="stylesheet" crossorigin href="\/assets\/([^"]+\.css)">/,
   (_, file) => `<style>${readFileSync(join(outDir, 'assets', file), 'utf8')}</style>`,
+)
+// Fetch the two Latin text fonts with the HTML instead of after the CSS is parsed, so text
+// rarely paints in a fallback font first and reflows when they arrive (layout shift)
+const fonts = readdirSync(join(outDir, 'assets')).filter((f) =>
+  /^(saira|atkinson-hyperlegible-next)-latin-wght-normal-[\w-]+\.woff2$/.test(f),
+)
+if (fonts.length !== 2) throw new Error(`prerender: expected 2 fonts to preload, found ${fonts.join(', ') || 'none'}`)
+template = template.replace(
+  '</head>',
+  `${fonts.map((f) => `  <link rel="preload" href="/assets/${f}" as="font" type="font/woff2" crossorigin />`).join('\n  ')}\n  </head>`,
 )
 const scripts = template.match(/\s*<script type="module"[^>]*><\/script>|\s*<link rel="modulepreload"[^>]*>/g) ?? []
 for (const s of scripts) template = template.replace(s, '')

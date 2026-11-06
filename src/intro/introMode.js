@@ -11,7 +11,9 @@ export function decideIntroMode(env) {
   if (/[?&]intro=0\b/.test(env.search) || /[?&]scene=0\b/.test(env.search)) return 'off'
   if (env.reducedMotion || env.motionPaused || env.introPref === 'off') return 'off'
   if (env.saveData || /(^|-)2g$/.test(env.effectiveType || '')) return 'off'
-  if (env.sceneOff || !env.webgl || env.restored) return 'off'
+  if (env.sceneOff || env.restored) return 'off'
+  // Last: probing WebGL creates a context before first paint, which is slow on software GL
+  if (!env.webgl) return 'off'
   if (/[?&]intro=1\b/.test(env.search)) return 'full'
   return env.seen ? 'short' : 'full'
 }
@@ -29,14 +31,6 @@ export function readIntroEnv() {
       return null
     }
   }
-  let webgl
-  try {
-    const gl = document.createElement('canvas').getContext('webgl2')
-    webgl = Boolean(gl)
-    if (gl) gl.getExtension('WEBGL_lose_context')?.loseContext()
-  } catch {
-    webgl = false
-  }
   const conn = navigator.connection || {}
   const nav = performance.getEntriesByType?.('navigation')?.[0]
   return {
@@ -49,7 +43,16 @@ export function readIntroEnv() {
     sceneOff: get('sessionStorage', 'bearo:scene-off') !== null,
     saveData: Boolean(conn.saveData),
     effectiveType: conn.effectiveType || '',
-    webgl,
     restored: nav?.type === 'back_forward',
+    // A getter, so the (slow) probe only runs if nothing else has ruled the intro out
+    get webgl() {
+      try {
+        const gl = document.createElement('canvas').getContext('webgl2')
+        if (gl) gl.getExtension('WEBGL_lose_context')?.loseContext()
+        return Boolean(gl)
+      } catch {
+        return false
+      }
+    },
   }
 }
