@@ -114,7 +114,15 @@ for (const [width, height] of [
     await page.setViewportSize({ width, height })
     await page.goto('/')
     await expect(html(page)).toHaveAttribute('data-scene', 'ready', { timeout: 20_000 })
-    await page.evaluate(() => window.__bearo.freeze(2))
+    // Wait out the poster → canvas crossfade, and for the deck to hydrate (it decides
+    // whether the bodies show), so the frame is stable
+    await expect(page.locator('.scene-canvas')).toHaveCSS('opacity', '1')
+    await expect(page.locator('.deck__destinations a[tabindex="0"]')).toHaveCount(1)
+    // Pin the quality tier: under load the governor may have lowered resolution and stars
+    await page.evaluate(() => {
+      window.__bearo.setTier(1)
+      window.__bearo.freeze(2)
+    })
     // The rocket is thin: a small pixel share is a big visual change
     await expect(page).toHaveScreenshot(`rocket-${width}x${height}.png`, { maxDiffPixelRatio: 0.004 })
   })

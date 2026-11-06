@@ -754,3 +754,200 @@ main {
   margin: 0;
   color: var(--mute);
 }
+
+/* --- Route transitions (slice 3) --------------------------------------------- */
+
+/* Three bands on the ascent axis; animated by TransitionProvider (Web Animations) */
+.wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.wipe-rot {
+  position: absolute;
+  inset: -40% -25%;
+  display: grid;
+  grid-template-rows: 1fr 1.15fr 1fr;
+  transform: rotate(-14deg);
+}
+
+.wipe-band {
+  position: relative;
+  transform: translateX(-118%);
+}
+
+.wipe-band--a {
+  background: var(--night);
+}
+
+.wipe-band--b {
+  background: var(--bear);
+  box-shadow:
+    0 -6px 0 var(--ink),
+    0 6px 0 var(--ink);
+  z-index: 1;
+}
+
+.wipe-band--c {
+  background: var(--nebula);
+}
+
+.wipe-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: 0 -50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  color: var(--star);
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-shadow: 6px 6px 0 var(--ink);
+}
+
+/* While the camera travels, the page has stepped aside; don't let it catch clicks */
+html[data-transition='travel'] main {
+  pointer-events: none;
+}
+
+/* Pages rise in as the wipe clears (not on the landing page: first paint stays instant) */
+.page--enter {
+  animation: page-enter 420ms var(--ease) 120ms both;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/* Wide screens: the panel sits left so the framed destination shows on the right */
+@media (min-width: 75rem) {
+  .page:not(.page--wide) {
+    margin-left: clamp(2rem, 6vw, 7rem);
+  }
+}
+
+/* --- Flight Deck orbit layout (slice 3) ---------------------------------------- */
+
+.destination__hit {
+  display: none;
+}
+
+.deck__destinations[data-layout='orbit'] {
+  /* The links leave the grid and are pinned to the bodies by the 3D engine */
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.deck__destinations[data-layout='orbit'] ul {
+  position: absolute;
+  inset: 0;
+}
+
+.deck__destinations[data-layout='orbit'] .destination-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  will-change: transform;
+}
+
+/* Not yet positioned by the engine */
+.deck__destinations[data-layout='orbit'] .destination-item:not([style*='transform']) {
+  visibility: hidden;
+}
+
+.deck__destinations[data-layout='orbit'] .destination {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  transform: translate(-50%, calc(-1 * var(--r, 30px)));
+  pointer-events: auto;
+}
+
+.deck__destinations[data-layout='orbit'] .destination:hover,
+.deck__destinations[data-layout='orbit'] .destination:focus-visible {
+  transform: translate(-50%, calc(-1 * var(--r, 30px)));
+  outline: none;
+  box-shadow: none;
+}
+
+.deck__destinations[data-layout='orbit'] .destination__hit {
+  display: block;
+  width: calc(2 * var(--r, 30px));
+  height: calc(2 * var(--r, 30px));
+  min-width: 44px;
+  min-height: 44px;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  transition: border-color var(--fast) var(--ease);
+}
+
+.deck__destinations[data-layout='orbit'] .destination:hover .destination__hit {
+  border-color: var(--line);
+}
+
+.deck__destinations[data-layout='orbit'] .destination:focus-visible .destination__hit {
+  border-color: var(--glow);
+  box-shadow: 0 0 0 3px var(--ink);
+}
+
+.deck__destinations[data-layout='orbit'] .destination__label {
+  margin-top: 4px;
+  padding: 0.15rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgb(7 8 26 / 0.78);
+  font-size: var(--step-0);
+  white-space: nowrap;
+  transition: border-color var(--fast) var(--ease);
+}
+
+.deck__destinations[data-layout='orbit'] .destination:hover .destination__label,
+.deck__destinations[data-layout='orbit'] .destination:focus-visible .destination__label {
+  border-color: var(--gold);
+}
+
+.deck__destinations[data-layout='orbit'] .destination:focus-visible .destination__label {
+  outline: 3px solid var(--glow);
+  outline-offset: 2px;
+}
+
+/* The one-line descriptor appears under the label on hover/focus */
+.deck__destinations[data-layout='orbit'] .destination__descriptor {
+  position: absolute;
+  top: 100%;
+  margin-top: 4px;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  background: rgb(7 8 26 / 0.9);
+  color: var(--star);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--fast) var(--ease);
+}
+
+.deck__destinations[data-layout='orbit'] .destination:hover .destination__descriptor,
+.deck__destinations[data-layout='orbit'] .destination:focus-visible .destination__descriptor {
+  opacity: 1;
+}

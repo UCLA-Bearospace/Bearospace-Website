@@ -68,9 +68,12 @@ test('Back restores the scroll position', async ({ page }) => {
   expect(y).toBeGreaterThan(200)
   await page.getByRole('link', { name: 'Alexander Astorga' }).click()
   await expect(page).toHaveURL(/alexander-astorga$/)
-  expect(await page.evaluate(() => window.scrollY)).toBe(0)
+  // The page swaps under the transition wipe, then starts at the top
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Alexander Astorga')
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0)
   await page.goBack()
   await expect(page).toHaveURL(/\/team\?scene=0$/)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('2026–27 leadership')
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(y - 5)
 })
 

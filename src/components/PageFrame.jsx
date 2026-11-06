@@ -4,18 +4,20 @@ import { isLandingLocation } from '../app/landing'
 
 // Shared page chrome (adapted from the portfolio's SectionFrame): kicker, heading, lede.
 // After an in-site navigation, focus moves to the h1 so screen readers announce the new
-// page; the landing page keeps the browser's default focus.
+// page, and the panel rises in as the wipe clears. The landing page keeps the browser's
+// default focus and paints immediately (no entrance animation delaying first paint).
 
 export default function PageFrame({ kicker, title, lede, wide = false, children }) {
   const h1 = useRef(null)
   const { key } = useLocation()
+  const landing = isLandingLocation(key)
 
   useEffect(() => {
-    if (!isLandingLocation(key)) h1.current?.focus({ preventScroll: true })
-  }, [key])
+    if (!landing) h1.current?.focus({ preventScroll: true })
+  }, [landing, key])
 
   return (
-    <article className={`page${wide ? ' page--wide' : ''}`}>
+    <article className={`page${wide ? ' page--wide' : ''}${landing ? '' : ' page--enter'}`}>
       <header className="page__header">
         {kicker && <p className="kicker">{kicker}</p>}
         <h1 ref={h1} tabIndex={-1}>

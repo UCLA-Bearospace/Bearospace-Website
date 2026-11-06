@@ -15,11 +15,11 @@ const SLIDERS = [
   ['lines', 'Speed lines', 0, 1, 0.05],
   ['rim', 'Rim light', 0, 2, 0.05],
   ['inkStrength', 'Ink strength', 0, 1, 0.05],
-  ['cam.dist', 'Camera distance', 4, 16, 0.1],
-  ['cam.yaw', 'Camera yaw (deg)', -90, 90, 1],
-  ['cam.height', 'Camera height', -2, 4, 0.05],
-  ['cam.lookY', 'Look-at height', 0, 2.6, 0.02],
-  ['cam.fov', 'Field of view', 15, 60, 0.5],
+  ['rest.dist', 'Camera distance', 4, 16, 0.1],
+  ['rest.yaw', 'Camera yaw (deg)', -90, 90, 1],
+  ['rest.height', 'Camera height', -2, 4, 0.05],
+  ['rest.lookY', 'Look-at height', 0, 2.6, 0.02],
+  ['rest.fov', 'Field of view', 15, 60, 0.5],
 ]
 
 const get = (o, path) => path.split('.').reduce((v, k) => v[k], o)
