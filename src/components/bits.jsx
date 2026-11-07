@@ -22,6 +22,12 @@ export function Sources({ items }) {
   )
 }
 
+/** A link to a fact's source: a URL, or plain text when the source isn't online. */
+export function SourceLink({ source, label = 'Source' }) {
+  if (!isUrl(source)) return <span className="note">({source})</span>
+  return <a href={source}>{label}</a>
+}
+
 function hostOf(url) {
   try {
     const u = new URL(url)
