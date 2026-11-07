@@ -87,6 +87,10 @@ export function validateContent(content, { mediaRoot = join(ROOT, 'assets-src', 
     d.divisionIds?.forEach((id, k) => ref('disciplines', d, i, `divisionIds[${k}]`, id, divisions, 'divisions.js'))
     if (d.divisionIds && !d.divisionIds.includes(d.primaryDivisionId))
       report('disciplines', d, i, 'primaryDivisionId', 'must be one of divisionIds')
+    d.worksWith?.forEach((w, k) => {
+      if (!content.roles?.some((r) => r.title === w.roleTitle))
+        report('disciplines', d, i, `worksWith[${k}].roleTitle`, `no role in roles.js is titled "${w.roleTitle}"`)
+    })
   })
   content.people?.forEach((p, i) => media('people', p, i, 'headshot', p.headshot))
   for (const collection of ['roles', 'openRoles']) {

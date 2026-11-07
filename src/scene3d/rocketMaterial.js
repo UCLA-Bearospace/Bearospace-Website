@@ -1,4 +1,4 @@
-import { Color } from 'three'
+import { Color, Vector4 } from 'three'
 import { toon } from './toon'
 
 // Region colours, sampled from launch photos of the carbon-fibre rocket.
@@ -12,13 +12,17 @@ export const ROCKET_COLORS = {
 /**
  * Toon material for the rocket. Vertex colours carry the region colour; a per-vertex
  * `aRegion` lets the shader add a subtle carbon twill to the airframe. A fresnel rim
- * keeps a black rocket readable against a black sky.
+ * keeps a black rocket readable against a black sky. Up to two height bands (metres above
+ * the tail, `uBands` = from/to, from/to) glow for the Engineering system map.
  */
 export function createRocketMaterial() {
   const uniforms = {
     uRimColor: { value: new Color('#3D7BFF') },
     uRim: { value: 0.9 },
     uTwill: { value: 0.07 },
+    uBands: { value: new Vector4(-1, -1, -1, -1) },
+    uBandOn: { value: 0 },
+    uBandColor: { value: new Color('#A9C6FF') },
   }
   const material = toon('#ffffff', { vertexColors: true })
   material.onBeforeCompile = (shader) => {
@@ -44,6 +48,9 @@ export function createRocketMaterial() {
         uniform vec3 uRimColor;
         uniform float uRim;
         uniform float uTwill;
+        uniform vec4 uBands;
+        uniform float uBandOn;
+        uniform vec3 uBandColor;
         varying float vRegion;
         varying vec3 vObjPos;`,
       )
@@ -64,7 +71,12 @@ export function createRocketMaterial() {
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
         float fres = 1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0);
-        totalEmissiveRadiance += uRimColor * pow(fres, 3.0) * uRim;`,
+        totalEmissiveRadiance += uRimColor * pow(fres, 3.0) * uRim;
+        float inBand = max(
+          step(uBands.x, vObjPos.y) * step(vObjPos.y, uBands.y),
+          step(uBands.z, vObjPos.y) * step(vObjPos.y, uBands.w)
+        );
+        totalEmissiveRadiance += uBandColor * inBand * uBandOn * (0.3 + 0.3 * fres);`,
       )
   }
   return { material, uniforms }

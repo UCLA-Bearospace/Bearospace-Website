@@ -46,7 +46,7 @@ export function OpenRoleCard({ role }) {
       <span className="person-card__text">
         <strong className="person-card__name">{role.title}</strong>
         <span className="person-card__role">
-          Open position · <Link to="/join">Get involved</Link>
+          Open position · <Link to={role.disciplineSlug ? `/join?interest=${role.disciplineSlug}` : '/join'}>Get involved</Link>
         </span>
       </span>
     </li>

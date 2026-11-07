@@ -5,7 +5,7 @@ export const PAGE_MODULES = {
   home: 'Home',
   about: 'About',
   engineering: 'Engineering',
-  discipline: 'Discipline',
+  discipline: 'Engineering', // the overview's module exports Discipline too
   projects: 'Projects',
   competitions: 'Competitions',
   history: 'History',

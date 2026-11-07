@@ -27,7 +27,8 @@ That means: in `projects.js`, the entry `2018-19-fnl-rocket`, field `contributor
 | `org.js` | Name, mission, current season, location, website address (`siteUrl`) |
 | `links.js` | Email, Instagram, LinkedIn, interest form, meeting times |
 | `divisions.js` | The four divisions |
-| `disciplines.js` | The seven disciplines: what they do, work, tools, skills |
+| `disciplines.js` | The seven disciplines: what they do, work, tools, skills, where they sit on the rocket (`zones`), teams they work with |
+| `systemMap.js` | The rocket's sections for the Engineering map. When the team confirms where the payload, recovery, and avionics bays really are, update their positions and set `approximate: false` |
 | `people.js` | Each person once: name, headshot, links, consent |
 | `roles.js` | Who did what in each season, plus open positions |
 | `projects.js` | Project pages |

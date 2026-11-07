@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useRef } from 'react'
 import { useLocation } from 'react-router'
 import { createEngine } from './engine'
-import { useDirector } from '../motion/director'
+import { requestedRocketZones, useDirector } from '../motion/director'
 import { targetFor } from '../site/targets.js'
 import { reportProgress } from '../intro/progress'
 import meta from '../generated/rocket.meta.json'
@@ -42,10 +42,13 @@ export default function FlightScene({ motion, active = true, dimmed = false, onS
         visible: () => engine.active,
         attachLabels: (map) => engine.attachLabels(map),
         highlight: (id) => engine.highlight(id),
+        highlightZones: (segments) => engine.highlightZones(segments),
         showBodies: (on) => engine.showBodies(on),
         intro: (mode, options) => engine.intro(mode, options),
       }
     }
+    // A page may already have asked for rocket sections to be lit (Engineering)
+    engine.highlightZones(requestedRocketZones())
     onEngine?.(engine)
     if (import.meta.env.DEV || import.meta.env.VITE_TEST_HOOKS === '1') exposeTestHooks(engine)
     return engine
