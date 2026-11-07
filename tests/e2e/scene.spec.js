@@ -120,6 +120,7 @@ for (const [width, height] of [
     await expect(page.locator('.deck__destinations a[tabindex="0"]')).toHaveCount(1)
     // Pin the quality tier: under load the governor may have lowered resolution and stars
     await page.evaluate(() => {
+      window.__bearo.setPixelCap(false) // compare full-resolution frames on software WebGL
       window.__bearo.setTier(1)
       window.__bearo.freeze(2)
     })

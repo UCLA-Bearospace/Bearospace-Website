@@ -21,7 +21,14 @@ import { SLOTS, SLOT_DEPTH } from './menuSlots'
 import { buildTravel } from './travel'
 import { createPad } from './pad'
 import { DEFAULTS as INTRO_END, buildIntro } from './introTimeline'
-import { LOW_TIER, createGovernor, initialTier, pixelRatioFor } from './quality'
+import { LOW_TIER, createGovernor, initialTier, isSoftwareRenderer, pixelRatioFor } from './quality'
+
+// GSAP's default lag smoothing advances animations by only 33 ms after any frame longer than
+// 500 ms. On a slow device (or software WebGL) every frame can be that long, and the intro
+// and camera travels would crawl for minutes. Follow the wall clock instead: a slow device
+// drops frames but finishes on time. Hidden tabs are handled separately (the engine stops
+// drawing, the intro pauses, and transitions jump to their end).
+gsap.ticker.lagSmoothing(0)
 
 // Adapted from the portfolio's src/scene3d/engine.js: one imperative Three.js world that
 // React only mounts. Animation code tweens the plain `state` object; frame() reads it.
@@ -137,21 +144,26 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
   const tmp2 = new Vector3()
   const layoutCam = new PerspectiveCamera()
 
+  const gl = renderer.getContext()
+  const rendererInfo = gl.getExtension('WEBGL_debug_renderer_info')
+  const software = isSoftwareRenderer(gl.getParameter(rendererInfo ? rendererInfo.UNMASKED_RENDERER_WEBGL : gl.RENDERER))
+  let pixelCap = software // draw at most SOFTWARE_PIXELS (quality.js)
+  let tier = 0
   const governor = createGovernor(
     initialTier({
       coarsePointer: window.matchMedia('(pointer: coarse)').matches,
       cores: navigator.hardwareConcurrency || 8,
       memoryGb: navigator.deviceMemory || 8,
       width: window.innerWidth,
+      software,
     }),
     applyTier,
   )
 
-  function applyTier(tier) {
-    dpr = pixelRatioFor(tier, window.devicePixelRatio || 1)
-    renderer.setPixelRatio(dpr)
+  function applyTier(next) {
+    tier = next
     stars.setDensity(tier >= LOW_TIER ? 0.5 : 1)
-    resize()
+    resize() // sets the pixel ratio, which can depend on the canvas size
   }
 
   /** The Flight Deck shot for the current aspect ratio, without the idle sway. */
@@ -322,6 +334,8 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
   function resize() {
     width = host.clientWidth || window.innerWidth
     height = host.clientHeight || window.innerHeight
+    dpr = pixelRatioFor(tier, window.devicePixelRatio || 1, { width, height, software: pixelCap })
+    renderer.setPixelRatio(dpr)
     renderer.setSize(width, height, false)
     outline.setSize(width, height, dpr)
     camera.aspect = width / height
@@ -383,6 +397,11 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
     },
     setTier(t) {
       governor.set(t)
+    },
+    /** Software renderers' pixel cap on or off (screenshot tests compare full-resolution frames). */
+    setPixelCap(on) {
+      pixelCap = on && software
+      resize()
     },
     setInk(which) {
       outline.setInk(INK[which] ?? which)
@@ -527,6 +546,7 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
         fps: mean ? 1000 / mean : 0,
         running: Boolean(raf),
         tier: governor.tier,
+        software,
         dpr,
         target: state.target,
         traveling: Boolean(travel),

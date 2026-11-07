@@ -1,4 +1,4 @@
-import { StrictMode, Suspense, lazy } from 'react'
+import { StrictMode, Suspense, lazy, startTransition } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import '@fontsource-variable/saira/wght.css'
@@ -34,6 +34,8 @@ if (import.meta.env.DEV && location.pathname.startsWith('/lab')) {
     </StrictMode>
   )
   // Built pages are prerendered (scripts/prerender.mjs); the dev server serves an empty shell
-  if (container.firstElementChild) hydrateRoot(container, app)
+  // As a transition, hydration runs in short slices instead of one long task, so the page
+  // stays responsive while it becomes interactive (and Lighthouse sees no blocking time)
+  if (container.firstElementChild) startTransition(() => hydrateRoot(container, app))
   else createRoot(container).render(app)
 }
