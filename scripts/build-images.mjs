@@ -16,18 +16,19 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const SRC = join(ROOT, 'assets-src', 'images')
 const OUT = join(ROOT, 'public', 'media')
 const MANIFEST = join(ROOT, 'src', 'generated', 'media.json')
-const VERSION = 4 // bump to force a full rebuild after changing settings below
+const VERSION = 6 // bump to force a full rebuild after changing settings below
 
 // Per folder: widths to generate, optional crop aspect (height / width), which files,
 // whether to paint a loading placeholder (not for logos: their transparent areas would show
-// it), and an optional `panel` colour to flatten transparency onto.
+// it), an optional `panel` colour to flatten transparency onto, and an optional `maxBytes`
+// per file (quality steps down until each file fits; docs/PLAN.md §8.9: ≤180 KB at 1280 w).
 //
 // Portraits: some originals are transparent cut-outs, most have a white background. All are
 // flattened onto the same light panel (the white of the white-background photos), so every
 // card matches; cutting the backgrounds out instead would risk clipping white shirts.
 export const PORTRAIT_PANEL = { r: 248, g: 248, b: 248 }
 const RECIPES = {
-  gallery: { widths: [480, 960, 1280] },
+  gallery: { widths: [480, 640, 960, 1280], maxBytes: 180 * 1024 },
   team: { widths: [320, 480, 640], aspect: 1.25, panel: PORTRAIT_PANEL }, // 4:5, cropped from the top
   logos: { widths: [128, 256, 512, 929], placeholder: false, only: ['bearospace-logo.png', 'ucla-samueli-block.png', 'ucla-samueli-block-rev.png', 'anduril-logo.svg'] },
 }
@@ -78,7 +79,12 @@ for (const [folder, recipe] of Object.entries(RECIPES)) {
         ['webp', { quality: 74 }],
       ]) {
         const url = `/media/${folder}/${name}-${w}.${format}`
-        await base().resize({ width: w }).toFormat(format, options).toFile(join(ROOT, 'public', url))
+        let out
+        for (let quality = options.quality; ; quality -= 8) {
+          out = await base().resize({ width: w }).toFormat(format, { ...options, quality }).toBuffer()
+          if (!recipe.maxBytes || out.length <= recipe.maxBytes || quality <= 30) break
+        }
+        writeFileSync(join(ROOT, 'public', url), out)
         entry[format].push({ w, url })
       }
     }

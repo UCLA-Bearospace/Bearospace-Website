@@ -111,6 +111,8 @@ Add a row to `results` in `competitions.js` with the organizer's category wordin
 1. Put the original in `assets-src/images/gallery/` with a descriptive file name (`2027-04-launch-pad.jpg`).
 2. Add it to `gallery.js` with alt text that describes what's in the photo. Only add a date, caption, or names you know.
 
+The file name is also the photo's shareable address (`/gallery?photo=2027-04-launch-pad`), so don't rename a photo once it's live: links people have shared would stop opening it. A category's filter button appears once it has two or more photos.
+
 ## Checking your work locally
 
 ```bash

@@ -75,6 +75,16 @@ export const publishedProjects = () => projects.filter((p) => p.publish)
 export const publishedResults = () => results.filter((r) => r.publish)
 export const publishedMilestones = () => milestones.filter((m) => m.publish)
 
+/** A photo's address on the gallery page (/gallery?photo=<slug>): its file name. */
+export const photoSlug = (photo) => photo.src.split('/').pop().replace(/\.\w+$/, '')
+
+/** Gallery categories with at least two photos, in the order photos first use them. */
+export const galleryCategories = () => {
+  const counts = new Map()
+  for (const g of gallery) counts.set(g.category, (counts.get(g.category) ?? 0) + 1)
+  return [...counts].filter(([, n]) => n >= 2).map(([id]) => id)
+}
+
 /** People who may have a profile page. */
 export const profilePeople = () => people.filter((p) => p.consent)
 export const getProfile = (slug) => {

@@ -48,6 +48,15 @@ const rows = [
 const model = join(DIST, 'models', 'rocket.jvm2')
 if (existsSync(model)) rows.push({ name: 'Rocket model (gz)', bytes: gz(model), limit: 60 * KB })
 
+// Gallery: the largest 1280-wide photo, in either format (docs/PLAN.md §8.9: ≤180 KB)
+const galleryDir = join(DIST, 'media', 'gallery')
+if (existsSync(galleryDir)) {
+  const sizes = readdirSync(galleryDir)
+    .filter((f) => /-1280\.(avif|webp)$/.test(f))
+    .map((f) => readFileSync(join(galleryDir, f)).length)
+  if (sizes.length) rows.push({ name: 'Gallery photo 1280w', bytes: Math.max(...sizes), limit: 180 * KB })
+}
+
 // Headshots: the largest 480-wide AVIF portrait (docs/PLAN.md §9.5: ≤25 KB)
 const team = join(DIST, 'media', 'team')
 if (existsSync(team)) {
