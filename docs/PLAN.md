@@ -824,3 +824,15 @@ Decisions made while building, recorded so later slices start from what is actua
 - **New season:** roles for the new season plus `org.currentSeason` (CONTENT.md recipe); no person records change. The validator now fails if `currentSeason` has no published roles, so the team page can never come up empty.
 - **Motion:** arriving by navigation, roster cards wipe up in role order (50 ms apart, capped at 14 steps); a linked card lifts 4 px under the pointer. None of it on the landing page (first paint stays instant) or with reduced motion.
 - **/team LCP stays at 2.7 s:** the largest paint is now the intro paragraph, not a photo, but Lighthouse's simulated slow connection still counts the 14 small portraits (~5–7 KB each) as competing for bandwidth (2.56 s; other pages ~2.2 s). Lazy-loading the first row made no difference. They are the page's content, so the limit stays; profile pages measure 2.26 s.
+
+### Slice 7 (projects, competitions, history)
+
+- **Already in place from slice 2:** the project template (empty sections omitted, contributors with specific contributions, sources, last verified), the competition explainers with review gates, the mission-log table of `publish: true` results with verbatim categories, and the `<details>` timeline. Slice 7 filled the gaps below.
+- **Every claim links to its source:** project results and the History page's results now carry their own source links, like the mission log rows. Report awards are tagged "Report award" in both places (flight awards "Flight award"), so 2024–25 reads "Mars Challenge oral reports — 3rd, Report award", never a third place overall.
+- **Projects:** grouped by season, newest first; the testing log is a dated list (`<time>`). Only one project is published (2018–19). The 2025–26 launch vehicle stays a draft until its status and contributors are confirmed (checklist C3, D8). Season and discipline filters wait until there are enough projects to need them.
+- **History:** gaps are computed from the data (`src/lib/seasons.js`), not written by hand ("2019–20 through 2022–23" today). The season list stays in view on wider screens.
+- **Motion:**
+  - **Mission log:** types itself in, row by row (20 ms a character, at most 0.6 s a row, CSS `steps()`), the first time a visitor arrives by navigation in a session. Never on the landing page or with reduced motion.
+  - **History comet trail:** draws down the timeline with page scroll (CSS scroll-driven animation, where supported), with a comet head leading it. Elsewhere, or with reduced motion, the trail is simply there.
+  - **No shared-element animation:** the plan's card-to-detail transition was skipped, because the route wipe already covers the change between pages.
+- **Phones:** results become labelled cards; the category cell wraps its contents so an award tag stays beside the category.

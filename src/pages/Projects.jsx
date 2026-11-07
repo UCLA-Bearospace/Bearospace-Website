@@ -1,12 +1,15 @@
 import { Link, useParams } from 'react-router'
 import PageFrame from '../components/PageFrame'
-import { Sources, StatusBadge } from '../components/bits'
+import { SourceLink, Sources, StatusBadge } from '../components/bits'
 import Img from '../components/Img'
 import { getCompetition, getDiscipline, getPerson, getProject, publishedProjects, seasonLabel } from '../content/index.js'
 import NotFound from './NotFound'
 
 export function Projects() {
   const projects = publishedProjects().sort((a, b) => b.season.localeCompare(a.season))
+  // Grouped by season, newest first. (Season and discipline filters can join once there
+  // are enough projects to need them.)
+  const seasons = [...new Set(projects.map((p) => p.season))]
   return (
     <PageFrame
       kicker="Projects"
@@ -14,19 +17,26 @@ export function Projects() {
       lede="Each project page covers the objective, the hardware and software, how it was tested, what happened, and who did what."
     >
       {projects.length ? (
-        <ul className="cards">
-          {projects.map((p) => (
-            <li key={p.slug} className="card card--link">
-              <p className="kicker">
-                {seasonLabel(p.season)} <StatusBadge status={p.status} />
-              </p>
-              <h2 className="card__title">
-                <Link to={`/projects/${p.slug}`}>{p.title}</Link>
-              </h2>
-              <p>{p.summary}</p>
-            </li>
-          ))}
-        </ul>
+        seasons.map((season) => (
+          <section key={season} aria-labelledby={`projects-${season}`}>
+            <h2 id={`projects-${season}`}>{seasonLabel(season)}</h2>
+            <ul className="cards">
+              {projects
+                .filter((p) => p.season === season)
+                .map((p) => (
+                  <li key={p.slug} className="card card--link">
+                    <p className="kicker">
+                      {p.competitionSlug ? getCompetition(p.competitionSlug).name : 'Project'} <StatusBadge status={p.status} />
+                    </p>
+                    <h3 className="card__title">
+                      <Link to={`/projects/${p.slug}`}>{p.title}</Link>
+                    </h3>
+                    <p>{p.summary}</p>
+                  </li>
+                ))}
+            </ul>
+          </section>
+        ))
       ) : (
         <p>Project write-ups are on their way.</p>
       )}
@@ -80,8 +90,30 @@ export function Project() {
       <Section title="Approach" items={p.approach} />
       <Section title="Hardware" items={p.hardware} />
       <Section title="Software" items={p.software} />
-      <Section title="Testing" items={p.testing.map((t) => (t.date ? `${t.date}: ${t.text}` : t.text))} />
-      <Section title="Results" items={p.results} />
+      {p.testing.length > 0 && (
+        <>
+          <h2>Testing</h2>
+          <ol className="test-log">
+            {p.testing.map((t) => (
+              <li key={t.text}>
+                {t.date && <time dateTime={t.date}>{t.date}</time>} {t.text}
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+      {p.results.length > 0 && (
+        <>
+          <h2>Results</h2>
+          <ul>
+            {p.results.map((r) => (
+              <li key={r.text}>
+                {r.text} <SourceLink source={r.source} />
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
       <Section title="Lessons learned" items={p.lessons} />
 
       {p.contributors.length > 0 && (

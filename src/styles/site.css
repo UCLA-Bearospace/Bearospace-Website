@@ -569,6 +569,27 @@ main {
   overflow-x: auto;
 }
 
+/* Mission log, first visit by navigation: each row types itself in (src/pages/Competitions.jsx) */
+.log--type tbody tr {
+  animation: log-type min(calc(var(--chars) * 20ms), 600ms) steps(var(--chars), end) both;
+  animation-delay: calc(300ms + var(--row) * 140ms);
+}
+
+@keyframes log-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log--type tbody tr {
+    animation: none;
+  }
+}
+
 /* Narrow screens: each result becomes a small labelled card */
 @media (max-width: 40rem) {
   .log thead {
@@ -774,6 +795,86 @@ main {
 /* History */
 .season-jump {
   margin-bottom: 1rem;
+}
+
+/* On wider screens the season list stays in reach while reading */
+@media (min-width: 40rem) {
+  .season-jump {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-inline: -0.5rem;
+    padding: 0.5rem;
+    border-radius: 0 0 var(--radius) var(--radius);
+    background: var(--panel);
+  }
+}
+
+/* The comet's trail runs down the timeline. Where the browser supports scroll-driven
+   animation, it draws itself as the page scrolls and a comet head leads it; elsewhere
+   (or with reduced motion) the trail is simply there. Decorative only. */
+.timeline {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  left: 0.35rem;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, var(--glow), rgb(169 198 255 / 0.15));
+  transform-origin: top;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .timeline::before {
+      animation: trail-draw linear both;
+      animation-timeline: scroll(root);
+    }
+    .timeline::after {
+      content: '';
+      position: absolute;
+      left: calc(0.35rem - 5px);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--star);
+      box-shadow:
+        0 0 10px 3px var(--glow),
+        0 -14px 18px 2px rgb(169 198 255 / 0.35);
+      animation: comet-fall linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+@keyframes trail-draw {
+  from {
+    transform: scaleY(0.04);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes comet-fall {
+  from {
+    top: 0.5rem;
+  }
+  to {
+    top: calc(100% - 1rem);
+  }
+}
+
+/* A dated testing log on project pages */
+.test-log time {
+  font-family: var(--font-mono);
+  color: var(--mute);
 }
 
 .season {

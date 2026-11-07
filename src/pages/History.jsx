@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import PageFrame from '../components/PageFrame'
+import { SourceLink } from '../components/bits'
 import {
   getCompetition,
   getPerson,
@@ -11,6 +12,7 @@ import {
   seasonLabel,
 } from '../content/index.js'
 import { ordinal } from '../lib/format'
+import { gaps } from '../lib/seasons'
 
 /** Every season with something documented, newest first. */
 function seasons() {
@@ -24,6 +26,7 @@ function seasons() {
 
 export default function History() {
   const list = seasons()
+  const missing = gaps(list)
   return (
     <PageFrame
       kicker="History"
@@ -40,6 +43,7 @@ export default function History() {
         </ul>
       </nav>
 
+      <div className="timeline">
       {list.map((season, i) => {
         const milestones = publishedMilestones().filter((m) => m.season === season)
         const results = publishedResults().filter((r) => r.season === season)
@@ -69,6 +73,8 @@ export default function History() {
                   {results.map((r) => (
                     <li key={r.category}>
                       {ordinal(r.placement)}, {r.category} — {getCompetition(r.competitionSlug).name}
+                      {r.awardType === 'report' && <span className="tag">Report award</span>}{' '}
+                      <SourceLink source={r.sourceUrl} label={<>Source<span className="sr-only">: {r.category}</span></>} />
                     </li>
                   ))}
                 </ul>
@@ -99,11 +105,16 @@ export default function History() {
           </details>
         )
       })}
+      </div>
 
-      <p className="note">
-        No public record has been found yet for 2019–20 through 2022–23. Have photos or stories from those seasons?{' '}
-        <Link to="/join">Tell us.</Link>
-      </p>
+      {missing.length > 0 && (
+        <p className="note">
+          No public record has been found yet for{' '}
+          {missing.map(([from, to]) => (from === to ? seasonLabel(from) : `${seasonLabel(from)} through ${seasonLabel(to)}`)).join(', ')}.
+          Have photos or stories from {missing.length > 1 || missing[0][0] !== missing[0][1] ? 'those seasons' : 'that season'}?{' '}
+          <Link to="/join">Tell us.</Link>
+        </p>
+      )}
     </PageFrame>
   )
 }

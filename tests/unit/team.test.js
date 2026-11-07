@@ -49,3 +49,15 @@ test('profiles describe the person for search engines, without unconfirmed photo
   assert.equal(alum.alumniOf.name, 'Bearospace at UCLA')
   assert.equal(alum.memberOf, undefined)
 })
+
+test('gaps in the season record are found from the data', async () => {
+  const { gaps, nextSeason } = await import('../../src/lib/seasons.js')
+  assert.equal(nextSeason('2018-19'), '2019-20')
+  assert.equal(nextSeason('2099-00'), '2100-01')
+  assert.deepEqual(gaps(['2016-17', '2017-18', '2018-19', '2023-24', '2024-25']), [['2019-20', '2022-23']])
+  assert.deepEqual(gaps(['2016-17', '2018-19', '2020-21']), [
+    ['2017-18', '2017-18'],
+    ['2019-20', '2019-20'],
+  ])
+  assert.deepEqual(gaps(['2026-27']), [])
+})
