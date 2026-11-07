@@ -33,6 +33,15 @@ main {
   font-size: var(--step--1);
 }
 
+/* A note that needs to be seen first (alumni profiles) */
+.note--banner {
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--glow);
+  border-radius: 6px;
+  background: rgb(169 198 255 / 0.08);
+  color: var(--star);
+}
+
 /* --- Buttons ------------------------------------------------------------------ */
 
 .button {
@@ -648,13 +657,17 @@ main {
 }
 
 /* People */
+/* Every portrait sits on the same light panel (the image pipeline flattens photos onto it) */
 .portrait {
   display: block;
   width: 100%;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: var(--radius);
-  background: var(--night);
+  background: rgb(248 248 248);
+  transition:
+    transform var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease);
 }
 
 .portrait img {
@@ -670,8 +683,35 @@ main {
   font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 800;
-  color: var(--glow);
-  border: 1px dashed var(--line);
+  color: var(--night);
+}
+
+/* A card that links to a profile lifts a little under the pointer */
+.person-card:has(a):hover .portrait {
+  transform: translateY(-4px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+/* Arriving by navigation, cards rise in role order, each wiped up from the bottom */
+.page--enter .person-card {
+  animation: card-in 420ms var(--ease) both;
+  animation-delay: calc(160ms + min(var(--i, 0), 14) * 50ms);
+}
+
+@keyframes card-in {
+  from {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(12px);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page--enter .person-card {
+    animation: none;
+  }
 }
 
 .people-grid {

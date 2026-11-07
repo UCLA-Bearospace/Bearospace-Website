@@ -34,6 +34,8 @@ function SeasonNav({ current }) {
 
 function Roster({ season }) {
   const groups = roster(season)
+  // Cards reveal in role order across the whole page, group after group
+  const starts = groups.reduce((acc, g, i) => [...acc, i ? acc[i - 1] + groups[i - 1].members.length + groups[i - 1].open.length : 0], [])
   const sources = [...new Set(groups.flatMap((g) => g.members.map((m) => m.role.source)))]
   return (
     <>
@@ -42,11 +44,11 @@ function Roster({ season }) {
         <section key={group.id} aria-labelledby={`group-${group.id}`}>
           <h2 id={`group-${group.id}`}>{group.label}</h2>
           <ul className="people-grid">
-            {members.map(({ role, person }) => (
-              <PersonCard key={`${role.personSlug}-${role.title}`} person={person} role={role} eager={g === 0} />
+            {members.map(({ role, person }, i) => (
+              <PersonCard key={`${role.personSlug}-${role.title}`} person={person} role={role} eager={g === 0} index={starts[g] + i} />
             ))}
-            {open.map((r) => (
-              <OpenRoleCard key={r.title} role={r} />
+            {open.map((r, i) => (
+              <OpenRoleCard key={r.title} role={r} index={starts[g] + members.length + i} />
             ))}
           </ul>
         </section>
@@ -94,6 +96,11 @@ export function Member() {
       kicker={current ? `${current.title} · ${seasonLabel(current.season)}` : latest ? `Alumni · ${seasonLabel(latest.season)}` : 'Team'}
       title={person.name}
     >
+      {!current && latest && (
+        <p className="note note--banner">
+          Alumni: on the team until {seasonLabel(latest.season)}. This page stays at the same address.
+        </p>
+      )}
       <div className="profile">
         <Portrait person={person} sizes="240px" eager />
         <div>

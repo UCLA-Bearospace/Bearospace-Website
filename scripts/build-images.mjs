@@ -16,13 +16,19 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const SRC = join(ROOT, 'assets-src', 'images')
 const OUT = join(ROOT, 'public', 'media')
 const MANIFEST = join(ROOT, 'src', 'generated', 'media.json')
-const VERSION = 3 // bump to force a full rebuild after changing settings below
+const VERSION = 4 // bump to force a full rebuild after changing settings below
 
-// Per folder: widths to generate, optional crop aspect (height / width), which files, and
-// whether to paint a loading placeholder (not for logos: their transparent areas would show it)
+// Per folder: widths to generate, optional crop aspect (height / width), which files,
+// whether to paint a loading placeholder (not for logos: their transparent areas would show
+// it), and an optional `panel` colour to flatten transparency onto.
+//
+// Portraits: some originals are transparent cut-outs, most have a white background. All are
+// flattened onto the same light panel (the white of the white-background photos), so every
+// card matches; cutting the backgrounds out instead would risk clipping white shirts.
+export const PORTRAIT_PANEL = { r: 248, g: 248, b: 248 }
 const RECIPES = {
   gallery: { widths: [480, 960, 1280] },
-  team: { widths: [320, 640], aspect: 1.25 }, // 4:5 portraits, cropped from the top
+  team: { widths: [320, 480, 640], aspect: 1.25, panel: PORTRAIT_PANEL }, // 4:5, cropped from the top
   logos: { widths: [128, 256, 512, 929], placeholder: false, only: ['bearospace-logo.png', 'ucla-samueli-block.png', 'ucla-samueli-block-rev.png', 'anduril-logo.svg'] },
 }
 
@@ -60,7 +66,7 @@ for (const [folder, recipe] of Object.entries(RECIPES)) {
     const srcW = meta.width
     const outH = (w) => (recipe.aspect ? Math.round(w * recipe.aspect) : Math.round((w * meta.height) / meta.width))
     const base = () => {
-      const img = sharp(input).rotate()
+      const img = recipe.panel ? sharp(input).rotate().flatten({ background: recipe.panel }) : sharp(input).rotate()
       return recipe.aspect ? img.resize({ width: srcW, height: Math.round(srcW * recipe.aspect), fit: 'cover', position: 'top' }) : img
     }
     const widths = [...new Set(recipe.widths.filter((w) => w < srcW).concat(Math.min(srcW, Math.max(...recipe.widths))))].sort((a, b) => a - b)
@@ -77,7 +83,7 @@ for (const [folder, recipe] of Object.entries(RECIPES)) {
       }
     }
     if (recipe.placeholder !== false) {
-      const { dominant } = await sharp(input).stats()
+      const { dominant } = await base().toBuffer().then((b) => sharp(b).stats())
       entry.color = `rgb(${dominant.r} ${dominant.g} ${dominant.b})`
       const tiny = await base().resize({ width: 16 }).webp({ quality: 40 }).toBuffer()
       entry.lqip = `data:image/webp;base64,${tiny.toString('base64')}`
