@@ -53,7 +53,7 @@ test('in-site navigation updates the title and moves focus to the new heading', 
   await expect(page).toHaveTitle(getMeta('/engineering').title)
   await expect(page.getByRole('heading', { level: 1 })).toBeFocused()
 
-  await page.getByRole('link', { name: 'Recovery' }).click()
+  await page.locator('.cards').getByRole('link', { name: 'Recovery' }).click()
   await expect(page).toHaveTitle(getMeta('/engineering/recovery').title)
   await expect(page.getByRole('heading', { level: 1, name: 'Recovery' })).toBeFocused()
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Engineering')

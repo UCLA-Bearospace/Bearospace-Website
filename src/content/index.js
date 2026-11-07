@@ -12,6 +12,7 @@ import { competitions, results } from './competitions.js'
 import { milestones } from './milestones.js'
 import { sponsors } from './sponsors.js'
 import { gallery } from './gallery.js'
+import { zones } from './systemMap.js'
 
 export {
   org,
@@ -32,6 +33,7 @@ export {
   milestones,
   sponsors,
   gallery,
+  zones,
 }
 
 export const content = {
@@ -113,6 +115,22 @@ export const leadsFor = (disciplineSlug, season = org.currentSeason) =>
     .filter((r) => r.season === season && (r.disciplineSlug === disciplineSlug || r.also?.includes(disciplineSlug)))
     .sort((a, b) => a.order - b.order)
     .map((role) => ({ role, person: personMap.get(role.personSlug) }))
+
+/** The rocket sections a discipline works on (system map), nose to tail. */
+export const zonesFor = (disciplineSlug) => {
+  const ids = disciplines.find((d) => d.slug === disciplineSlug)?.zones ?? []
+  return zones.filter((z) => ids.includes(z.id))
+}
+
+/** Disciplines that work on a rocket section. */
+export const disciplinesInZone = (zoneId) => disciplines.filter((d) => d.zones.includes(zoneId))
+
+/** Teams a discipline works closely with, each with whoever holds the lead role this season. */
+export const worksWithFor = (disciplineSlug, season = org.currentSeason) =>
+  (disciplines.find((d) => d.slug === disciplineSlug)?.worksWith ?? []).map((w) => {
+    const role = publishedRoles().find((r) => r.season === season && r.title === w.roleTitle)
+    return { ...w, role, person: role ? personMap.get(role.personSlug) : null }
+  })
 
 export const openRolesFor = (disciplineSlug, season = org.currentSeason) =>
   openRoles.filter((r) => r.season === season && r.disciplineSlug === disciplineSlug)

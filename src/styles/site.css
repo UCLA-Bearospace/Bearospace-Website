@@ -337,6 +337,151 @@ main {
   border-color: var(--glow);
 }
 
+.card--link:focus-within {
+  border-color: var(--glow);
+}
+
+/* --- Engineering system map (slice 5) ------------------------------------------ */
+
+.system-map {
+  margin: 1.5rem 0 2.25rem;
+}
+
+.system-map__title {
+  margin-bottom: 0.75rem;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+}
+
+/* The picture's viewBox is 1040 × 280 */
+.system-map__frame {
+  aspect-ratio: 1040 / 280;
+}
+
+.system-map__drawing {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.system-map__body {
+  fill: #23262f; /* carbon fibre, as on the 3D rocket */
+}
+
+/* Line widths are screen pixels, so the outline stays crisp from phone to desktop */
+.zone {
+  vector-effect: non-scaling-stroke;
+  transition:
+    fill var(--fast) var(--ease),
+    stroke var(--fast) var(--ease),
+    opacity var(--fast) var(--ease);
+}
+
+.zone--nose {
+  fill: #2f6bd1;
+}
+
+/* Internal sections: a faint tint, with dashed edges where the position is approximate */
+.zone--payload,
+.zone--recovery,
+.zone--avionics {
+  fill: rgb(169 198 255 / 0.1);
+}
+
+.zone--approx {
+  stroke: rgb(169 198 255 / 0.55);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.zone--fins {
+  fill: #121319;
+  stroke: #c9d8ff;
+  stroke-width: 1.5;
+}
+
+.zone--airframe {
+  fill: none;
+  stroke: #c9d8ff;
+  stroke-width: 1.5;
+}
+
+.zone--ground {
+  stroke: var(--line);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+/* One section lit, the rest stepped back */
+.system-map[data-active] .zone:not(.is-on, .zone--airframe) {
+  opacity: 0.45;
+}
+
+.zone.is-on {
+  fill: var(--glow);
+  opacity: 1;
+}
+
+.zone--airframe.is-on {
+  fill: none;
+  stroke: var(--glow);
+  stroke-width: 3;
+}
+
+.zone--ground.is-on {
+  stroke: var(--glow);
+}
+
+.system-map__num {
+  fill: var(--mute);
+  font: 700 28px var(--font-mono);
+  text-anchor: middle;
+}
+
+.system-map__legend {
+  display: grid;
+  gap: 0.35rem;
+  margin: 1rem 0 0;
+  padding-left: 1.75rem;
+}
+
+.system-map__legend li {
+  padding: 0.15rem 0.35rem;
+  border-radius: 6px;
+}
+
+.system-map__legend li.is-on {
+  background: rgb(169 198 255 / 0.12);
+}
+
+.system-map__legend li::marker {
+  color: var(--mute);
+  font-family: var(--font-mono);
+}
+
+.system-map__name {
+  font-weight: 700;
+}
+
+.system-map__approx,
+.system-map__note {
+  color: var(--mute);
+  font-size: var(--step--1);
+}
+
+.system-map__note {
+  margin: 0.75rem 0 0;
+}
+
+/* Too small to read on phones; the numbered legend still matches the drawing's order */
+@media (max-width: 40rem) {
+  .system-map__num {
+    display: none;
+  }
+}
+
 .steps {
   padding-left: 1.25rem;
 }

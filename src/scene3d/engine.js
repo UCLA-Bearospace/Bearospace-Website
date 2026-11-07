@@ -136,6 +136,7 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
   let dpr = 1
   let disposed = false
   let live = false
+  let zoneSegments = null // rocket sections lit for the system map
   let active = true // false while hidden behind a phone-width page: kept, but not drawing
   let labels = null // Map<id, HTMLElement> pinned to the bodies
   let travel = null
@@ -195,6 +196,8 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
   function resolveShot(target) {
     if (target === 'rest') return restShot()
     if (target === 'join') return framingShot(ROCKET_CENTER, 6.5)
+    // Engineering frames the rocket itself, so the system map's sections can light up on it
+    if (target === 'engineering') return framingShot(ROCKET_CENTER, 5.6)
     const b = bodies.bodies.get(target)
     return b?.home ? framingShot(b.home, b.size * 7.5) : restShot()
   }
@@ -495,6 +498,24 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
       bodies.highlight(id)
       if (!raf) frame(0)
     },
+    /**
+     * Light up sections of the rocket: up to two [fromNose, toNose] fractions of its length
+     * (src/content/systemMap.js), or null to clear. Fades in and out.
+     */
+    highlightZones(segments) {
+      const L = meta?.lengthM ?? 2.6124
+      const [a = [2, 2], b = [2, 2]] = segments ?? []
+      // fraction from the nose → metres above the tail (the model's y axis)
+      const y = (f) => L * (1 - f)
+      if (segments) rocket.uniforms.uBands.value.set(y(a[1]), y(a[0]), y(b[1]), y(b[0]))
+      zoneSegments = segments
+      gsap.to(rocket.uniforms.uBandOn, {
+        value: segments ? 1 : 0,
+        duration: 0.35,
+        overwrite: true,
+        onUpdate: () => !raf && frame(0),
+      })
+    },
     showBodies(on) {
       bodies.show(on)
       if (!raf) frame(0)
@@ -564,6 +585,7 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
         running: Boolean(raf),
         tier: governor.tier,
         software,
+        zones: zoneSegments,
         dpr,
         target: state.target,
         traveling: Boolean(travel),

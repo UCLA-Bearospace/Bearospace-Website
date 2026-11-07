@@ -1,5 +1,6 @@
 // Shapes of every content collection (docs/PLAN.md §10). Dev-only: zod never ships.
 import { z } from 'zod'
+import { ZONE_IDS } from '../src/content/systemMap.js'
 
 const season = z
   .string()
@@ -22,10 +23,12 @@ export const schemas = {
     summary: text,
     lede: text,
     responsibilities: z.array(text).min(1),
-    work: z.array(text),
-    tools: z.array(text),
-    skills: z.array(text),
-    regionId: z.enum(['nose', 'body', 'fin', 'hardware']).nullable(),
+    work: z.array(text), // may be empty: Safety & Operations lists responsibilities only
+    tools: z.array(text), // may be empty: not every program page lists tools
+    skills: z.array(text).min(1),
+    // Where it sits on the rocket (system map); at least one section
+    zones: z.array(z.enum(ZONE_IDS)).min(1),
+    worksWith: z.array(z.object({ team: text, roleTitle: text }).strict()).optional(),
     source,
   }),
 

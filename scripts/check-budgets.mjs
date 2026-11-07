@@ -49,6 +49,16 @@ const model = join(DIST, 'models', 'rocket.jvm2')
 if (existsSync(model)) rows.push({ name: 'Rocket model (gz)', bytes: gz(model), limit: 60 * KB })
 
 let failed = false
+
+// The entry must be one file. When page code imports a module that a lazy chunk also
+// imports, Rolldown splits React, the router and the content into shared chunks the entry
+// pulls in: more requests before first paint (docs/PLAN.md, slice 5 notes).
+const entryDeps = importsOf(initial[0])
+if (entryDeps.length) {
+  failed = true
+  console.log(`FAIL  entry script imports ${entryDeps.join(', ')}; it should be a single file (see docs/PLAN.md slice 5 notes)`)
+}
+
 for (const { name, bytes, limit } of rows) {
   const over = bytes > limit
   failed ||= over

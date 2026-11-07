@@ -45,6 +45,7 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 | C13 | Spelling of "Isrrael Sumano" (2025–26 roster) | Team history | | Open |
 | C14 | Custom domain; whether the old Google Sites redirect or link to the new site | Release | | Open |
 | C15 | Analytics (recommended: none at launch) | Release | | Open |
+| C16 | Real positions of the payload section, recovery bays, and avionics bay on the 2025–26 rocket (the system map shows typical dual-deploy positions, marked approximate) | Engineering system map (`src/content/systemMap.js`) | | Open |
 
 ## Missing materials
 

@@ -1,7 +1,9 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { validateContent } from '../../scripts/validate-content.mjs'
-import { content, leadsFor, roster, rosterSeasons, publishedResults, sponsorList } from '../../src/content/index.js'
+import { readFileSync } from 'node:fs'
+import { content, disciplinesInZone, leadsFor, roster, rosterSeasons, publishedResults, sponsorList, worksWithFor, zones, zonesFor } from '../../src/content/index.js'
+import { FINS, NOSE_END, OUTLINE } from '../../src/content/systemMap.js'
 
 // A deep copy we can break on purpose
 const copy = () => structuredClone(content)
@@ -72,4 +74,45 @@ test('sponsors come back in intro order for the opening sequence', () => {
     sponsorList({ intro: true }).map((s) => s.id),
     ['anduril', 'ucla-samueli'],
   )
+})
+
+test('every discipline sits somewhere on the system map', () => {
+  for (const d of content.disciplines) assert.ok(zonesFor(d.slug).length > 0, d.slug)
+  // Every section of the map belongs to at least one discipline
+  for (const z of zones) assert.ok(disciplinesInZone(z.id).length > 0, z.id)
+})
+
+test('the system map matches the rocket model', () => {
+  const meta = JSON.parse(readFileSync(new URL('../../src/generated/rocket.meta.json', import.meta.url), 'utf8'))
+  const close = (a, b) => Math.abs(a - b) < 0.001
+  assert.ok(close(NOSE_END, meta.noseLengthM / meta.lengthM), `nose ends at ${meta.noseLengthM / meta.lengthM}`)
+  assert.ok(close(FINS[0], 1 - meta.fin.rootToM / meta.lengthM))
+  assert.ok(close(FINS[1], 1 - meta.fin.rootFromM / meta.lengthM))
+  // The outline the map draws is a copy of the model's measurements
+  assert.equal(OUTLINE.lengthM, meta.lengthM)
+  assert.equal(OUTLINE.bodyDiameterM, meta.bodyDiameterM)
+  assert.equal(OUTLINE.finSpanM, meta.finSpanM)
+  assert.deepEqual(OUTLINE.fin, meta.fin)
+  const nose = meta.profile.filter(([r]) => r < meta.bodyDiameterM / 2 - 0.0001).map(([r, y]) => [r, +(meta.lengthM - y).toFixed(4)])
+  assert.deepEqual(OUTLINE.nose, nose)
+  // Sections stay on the rocket and in order; only the model-derived ones are exact
+  for (const z of zones) {
+    for (const [from, to] of z.segments) assert.ok(from >= 0 && to <= 1 && from < to, z.id)
+    if (['payload', 'recovery', 'avionics'].includes(z.id)) assert.equal(z.approximate, true, z.id)
+  }
+})
+
+test('Payload Electronics works with Payload Software, led by this season’s lead', () => {
+  const [w] = worksWithFor('payload-electronics')
+  assert.equal(w.team, 'Payload Software')
+  assert.equal(w.person.slug, 'juan-ventura-romero')
+})
+
+test('a discipline must name real rocket sections and real roles', () => {
+  const c = copy()
+  c.disciplines[0].zones = ['engine-room']
+  c.disciplines[4].worksWith = [{ team: 'Payload Software', roleTitle: 'Chief Wizard' }]
+  const errors = validateContent(c).join('\n')
+  assert.match(errors, /disciplines\.js › "aerodynamics" › zones\[0\]: Invalid option/)
+  assert.match(errors, /disciplines\.js › "payload-electronics" › worksWith\[0\]\.roleTitle: no role in roles\.js is titled "Chief Wizard"/)
 })

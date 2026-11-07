@@ -4,8 +4,9 @@ import { SOURCES } from './org.js'
 // current Google Site (one URL per discipline). A discipline can belong to more than one
 // division: Payload Electronics is shared by Avionics and Payload.
 //
-// regionId ties a discipline to a part of the rocket model for the system map
-// (nose, body, fin, hardware, or null for ground work).
+// zones place a discipline on the rocket for the system map (systemMap.js).
+// worksWith names a team the discipline works closely with, by the role that leads it,
+// so the page always shows the current season's lead.
 
 const page = (slug) => `https://sites.google.com/view/uclabearospace/technical-programs/${slug}`
 
@@ -33,7 +34,7 @@ export const disciplines = [
     ],
     tools: ['Computational modeling and CFD'],
     skills: ['CFD simulation', 'Aerospace analysis', 'Design validation', 'Flight dynamics', 'Technical research'],
-    regionId: 'nose',
+    zones: ['nose', 'fins'],
     source: page('aerodynamics'),
   },
   {
@@ -65,7 +66,7 @@ export const disciplines = [
       'Mechanical design',
       'Manufacturing processes',
     ],
-    regionId: 'body',
+    zones: ['airframe'],
     source: page('internalexternal-structures'),
   },
   {
@@ -91,7 +92,7 @@ export const disciplines = [
     ],
     tools: [],
     skills: ['Recovery system design', 'Reliability engineering', 'Flight testing', 'Data analysis', 'Systems validation'],
-    regionId: 'body',
+    zones: ['recovery'],
     source: page('recovery-systems'),
   },
   {
@@ -117,7 +118,7 @@ export const disciplines = [
     ],
     tools: [],
     skills: ['PCB design', 'Embedded programming', 'Sensor integration', 'Electrical testing', 'Data systems engineering'],
-    regionId: 'body',
+    zones: ['avionics'],
     source: page('electronics'),
   },
   {
@@ -142,7 +143,13 @@ export const disciplines = [
     ],
     tools: [],
     skills: ['PCB design', 'Electronics architecture', 'Power systems', 'Sensor networks', 'Hardware integration'],
-    regionId: 'body',
+    zones: ['payload'],
+    worksWith: [
+      {
+        team: 'Payload Software',
+        roleTitle: 'Payload Software Lead',
+      },
+    ],
     source: page('payload-electronics'),
   },
   {
@@ -168,7 +175,7 @@ export const disciplines = [
     ],
     tools: [],
     skills: ['Systems engineering', 'CAD design', 'FEA', 'Mechanical integration', 'Project management'],
-    regionId: 'body',
+    zones: ['payload'],
     source: page('payload-development'),
   },
   {
@@ -191,7 +198,7 @@ export const disciplines = [
     work: [],
     tools: [],
     skills: ['Technical leadership', 'Engineering documentation', 'Operational management', 'Risk management'],
-    regionId: null,
+    zones: ['ground'],
     source: page('safety-operations'),
   },
 ]
