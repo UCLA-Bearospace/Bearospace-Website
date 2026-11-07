@@ -82,6 +82,7 @@ function exposeTestHooks(engine) {
     stats: () => engine.stats(),
     freeze: (t) => engine.freeze(t),
     setTier: (t) => engine.setTier(t),
+    setPixelCap: (on) => engine.setPixelCap(on),
     loseContext: () => lose?.loseContext(),
     restoreContext: () => lose?.restoreContext(),
     /** The running (or last) intro's controls: hold(seconds | label), skip(), … */

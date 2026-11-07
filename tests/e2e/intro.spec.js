@@ -172,9 +172,23 @@ test('a long hidden tab resumes at the settle', async ({ page }) => {
 test('axe: the intro overlay', async ({ page }) => {
   await page.goto('/')
   await expect(skip(page)).toBeFocused()
-  const { violations } = await new AxeBuilder({ page }).include('.intro').analyze()
-  const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
-  expect(serious, serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`).join('\n')).toEqual([])
+  // Mid-fade text has low contrast by design, so check each shot fully on screen. Every DOM
+  // shot runs on the Web Animations API, timed by one "clock" animation on the overlay
+  // (src/intro/sequence.js): pausing them all freezes the sequence at a chosen moment.
+  await page.evaluate(async () => {
+    const overlay = document.querySelector('.intro')
+    while (!overlay.getAnimations().length) await new Promise((r) => setTimeout(r, 10))
+    for (const a of overlay.getAnimations({ subtree: true })) a.pause()
+  })
+  // The badge, then each of the two sponsor cards, fully faded in (timings in sequence.js)
+  for (const ms of [1300, 2240, 3000]) {
+    await page.evaluate((ms) => {
+      for (const a of document.querySelector('.intro').getAnimations({ subtree: true })) a.currentTime = ms
+    }, ms)
+    const { violations } = await new AxeBuilder({ page }).include('.intro').analyze()
+    const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
+    expect(serious, `at ${ms} ms: ${serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`).join('\n')}`).toEqual([])
+  }
 })
 
 test('the intro leaves no intro state behind', async ({ page }) => {
@@ -205,6 +219,7 @@ test('@visual the intro ends on exactly the Flight Deck shot', async ({ page }) 
   await expect(page.locator('.deck__destinations a[tabindex="0"]')).toHaveCount(1)
   await page.waitForTimeout(700) // the page's fade-in
   await page.evaluate(() => {
+    window.__bearo.setPixelCap(false) // compare full-resolution frames on software WebGL
     window.__bearo.setTier(1)
     window.__bearo.freeze(2)
   })

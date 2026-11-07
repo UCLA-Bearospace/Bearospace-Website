@@ -14,16 +14,29 @@ const FAST_FOR_MS = 10000
 const SETTLE_MS = 1000
 const MAX_UPS = 2
 
+// Software renderers (no GPU: SwiftShader, llvmpipe, Windows' basic driver) fill every pixel
+// on the CPU, so a full-screen frame can take half a second or more. They draw at most this
+// many pixels, upscaled; the image is softer but the scene keeps moving.
+export const SOFTWARE_PIXELS = 360_000
+
+/** Whether a WebGL renderer name is a CPU (software) implementation. */
+export const isSoftwareRenderer = (name = '') => /swiftshader|llvmpipe|softpipe|software|basic render/i.test(name)
+
 /** A starting tier from what the device tells us. */
-export function initialTier({ coarsePointer = false, cores = 8, memoryGb = 8, width = 1440 } = {}) {
-  if (cores <= 4 || memoryGb <= 2) return 3
+export function initialTier({ coarsePointer = false, cores = 8, memoryGb = 8, width = 1440, software = false } = {}) {
+  if (software || cores <= 4 || memoryGb <= 2) return 3
   if (coarsePointer || width < 900) return 2
   return 1
 }
 
-/** Effective pixel ratio for a tier, never above the screen's own. */
-export function pixelRatioFor(tier, devicePixelRatio = 1) {
-  return Math.min(DPR_STEPS[tier], devicePixelRatio)
+/**
+ * Effective pixel ratio for a tier, never above the screen's own. With `software`, also
+ * small enough that a width × height canvas stays within SOFTWARE_PIXELS.
+ */
+export function pixelRatioFor(tier, devicePixelRatio = 1, { width = 0, height = 0, software = false } = {}) {
+  const ratio = Math.min(DPR_STEPS[tier], devicePixelRatio)
+  if (!software || !width || !height) return ratio
+  return Math.min(ratio, Math.sqrt(SOFTWARE_PIXELS / (width * height)))
 }
 
 export function createGovernor(tier, onChange) {

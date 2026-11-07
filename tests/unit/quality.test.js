@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { DPR_STEPS, createGovernor, initialTier, pixelRatioFor } from '../../src/scene3d/quality.js'
+import { DPR_STEPS, SOFTWARE_PIXELS, createGovernor, initialTier, isSoftwareRenderer, pixelRatioFor } from '../../src/scene3d/quality.js'
 
 const run = (gov, ms, durationMs) => {
   for (let t = 0; t < durationMs; t += ms) gov.sample(ms)
@@ -39,4 +39,16 @@ test('stays put on steady 60 fps', () => {
   const gov = createGovernor(1, (t) => changes.push(t))
   run(gov, 16.7, 20000)
   assert.deepEqual(changes, [])
+})
+
+test('software renderers draw a capped number of pixels', () => {
+  assert.equal(isSoftwareRenderer('ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero)), SwiftShader driver)'), true)
+  assert.equal(isSoftwareRenderer('llvmpipe (LLVM 15.0.7, 256 bits)'), true)
+  assert.equal(isSoftwareRenderer('ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)'), false)
+  const ratio = pixelRatioFor(1, 1, { width: 1920, height: 1080, software: true })
+  assert.ok(Math.abs(1920 * 1080 * ratio * ratio - SOFTWARE_PIXELS) < 1)
+  // Small canvases keep the tier's ratio; GPUs are never capped by size
+  assert.equal(pixelRatioFor(3, 1, { width: 400, height: 300, software: true }), 1)
+  assert.equal(pixelRatioFor(1, 1, { width: 1920, height: 1080 }), 1)
+  assert.equal(initialTier({ software: true }), 3)
 })
