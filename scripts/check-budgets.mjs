@@ -48,6 +48,15 @@ const rows = [
 const model = join(DIST, 'models', 'rocket.jvm2')
 if (existsSync(model)) rows.push({ name: 'Rocket model (gz)', bytes: gz(model), limit: 60 * KB })
 
+// Headshots: the largest 480-wide AVIF portrait (docs/PLAN.md §9.5: ≤25 KB)
+const team = join(DIST, 'media', 'team')
+if (existsSync(team)) {
+  const sizes = readdirSync(team)
+    .filter((f) => f.endsWith('-480.avif'))
+    .map((f) => readFileSync(join(team, f)).length)
+  if (sizes.length) rows.push({ name: 'Headshot 480w AVIF', bytes: Math.max(...sizes), limit: 25 * KB })
+}
+
 let failed = false
 
 // The entry must be one file. When page code imports a module that a lazy chunk also

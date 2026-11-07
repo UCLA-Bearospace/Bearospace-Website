@@ -43,6 +43,10 @@ export function validateContent(content, { mediaRoot = join(ROOT, 'assets-src', 
   // Shapes
   const org = orgSchema.safeParse(content.org)
   if (!org.success) for (const issue of org.error.issues) errors.push(`org.js › ${fieldPath(issue.path)}: ${issue.message}`)
+  // Starting a new season (CONTENT.md): add its roles, then point currentSeason at it
+  const season = content.org?.currentSeason
+  if (season && !(content.roles ?? []).some((r) => r.season === season && r.publish !== false))
+    errors.push(`org.js › currentSeason: "${season}" has no published roles in roles.js, so /team would be empty`)
   for (const [collection, schema] of Object.entries(schemas)) {
     const list = content[collection] ?? []
     list.forEach((item, i) => {

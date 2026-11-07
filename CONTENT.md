@@ -88,7 +88,7 @@ Add to `people.js`:
 person('maria-garcia', 'Maria Garcia', { ...shot('maria-garcia'), source: 'https://…' }),
 ```
 
-- Put their photo at `assets-src/images/team/maria-garcia.png` (any size; it's cropped to a 4:5 portrait from the top). No photo? Leave out `...shot(...)`; the site shows initials.
+- Put their photo at `assets-src/images/team/maria-garcia.png` (any size; it's cropped to a 4:5 portrait from the top, and a transparent or white background ends up on the same light panel as everyone else's). Keep `headshotVerified: false` until they confirm it's them: until then the photo is shown but not offered to search engines. No photo? Leave out `...shot(...)`; the site shows initials.
 - Profile links are optional: `links: { linkedin: 'https://www.linkedin.com/in/…' }`.
 - Ask before publishing a profile. Use `consent: false` for people who should only be named in history.
 

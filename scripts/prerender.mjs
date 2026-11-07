@@ -82,6 +82,7 @@ function page(path) {
     `<meta property="og:site_name" content="${escape(org.name)}" />`,
     `<meta property="og:title" content="${escape(meta.title)}" />`,
     `<meta property="og:description" content="${escape(meta.description)}" />`,
+    meta.jsonLd ? `<script type="application/ld+json">${JSON.stringify(meta.jsonLd).replace(/</g, '\u003c')}</script>` : '',
     path === '/'
       ? `<script type="application/ld+json">${JSON.stringify({
           '@context': 'https://schema.org',

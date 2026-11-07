@@ -46,13 +46,34 @@ const STATIC = {
   },
 }
 
-const page = (path, { label, description, parent = HOME, title, noindex = false }) => ({
+const page = (path, { label, description, parent = HOME, title, noindex = false, jsonLd = null }) => ({
   path,
   title: title ?? `${label} · ${SITE}`,
   description,
   crumbs: [...(parent === HOME ? [HOME] : [HOME, parent]), { label, path }],
   noindex,
+  jsonLd, // structured data for search engines, written into the prerendered <head>
 })
+
+/**
+ * schema.org Person for a profile page. Profiles exist only for people who agreed to one
+ * (consent), and the photo is left out until they confirm it is theirs (headshotVerified).
+ */
+function personJsonLd(person, latest, current) {
+  const links = Object.values(person.links ?? {})
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: person.name,
+    ...(latest ? { jobTitle: latest.title } : {}),
+    [current ? 'memberOf' : 'alumniOf']: { '@type': 'Organization', name: SITE },
+    ...(org.siteUrl ? { url: `${org.siteUrl}/team/${person.slug}` } : {}),
+    ...(org.siteUrl && person.headshot && person.headshotVerified
+      ? { image: `${org.siteUrl}/media/${person.headshot.replace(/.w+$/, '-640.webp')}` }
+      : {}),
+    ...(links.length ? { sameAs: links } : {}),
+  }
+}
 
 export const notFound = (path) => ({
   path,
@@ -91,8 +112,14 @@ export function getMeta(pathname) {
     const person = getProfile(slug)
     if (person) {
       const [latest] = rolesFor(slug)
+      const current = latest?.season === org.currentSeason
       const role = latest ? `${latest.title}, ${seasonLabel(latest.season)}` : 'Bearospace member'
-      return page(path, { label: person.name, description: `${person.name} — ${role}, Bearospace at UCLA.`, parent })
+      return page(path, {
+        label: person.name,
+        description: `${person.name} — ${role}, Bearospace at UCLA.`,
+        parent,
+        jsonLd: personJsonLd(person, latest, current),
+      })
     }
   }
   return notFound(path)

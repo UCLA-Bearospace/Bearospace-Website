@@ -1,0 +1,51 @@
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import { validateContent } from '../../scripts/validate-content.mjs'
+import { content, getProfile, profilePeople, roster, rolesFor } from '../../src/content/index.js'
+import { allPaths, getMeta } from '../../src/site/meta.js'
+
+// People and seasons (slice 6).
+
+const copy = () => structuredClone(content)
+
+test('starting a new season takes role rows and one org change, no person edits', () => {
+  const c = copy()
+  const people = JSON.stringify(c.people)
+  c.roles.push({ personSlug: 'juan-ventura-romero', season: '2027-28', title: 'Payload Director', group: 'payload', order: 1, disciplineSlug: 'payload', source: 'test' })
+  c.org.currentSeason = '2027-28'
+  assert.deepEqual(validateContent(c), [])
+  assert.equal(JSON.stringify(c.people), people)
+})
+
+test('a current season with no roles is caught (the team page would be empty)', () => {
+  const c = copy()
+  c.org.currentSeason = '2027-28'
+  assert.match(validateContent(c).join('\n'), /org\.js › currentSeason: "2027-28" has no published roles/)
+})
+
+test('role history runs newest season first', () => {
+  const seasons = rolesFor('emmanuel-jaimes').map((r) => r.season)
+  assert.deepEqual(seasons, [...seasons].sort().reverse())
+  assert.ok(seasons.includes('2026-27') && seasons.includes('2025-26'))
+})
+
+test('people without consent are named in rosters but get no profile page', () => {
+  assert.equal(getProfile('lucia-gonzalez'), undefined)
+  assert.ok(!allPaths().includes('/team/lucia-gonzalez'))
+  assert.ok(!profilePeople().some((p) => p.slug === 'lucia-gonzalez'))
+  const named = roster('2018-19').flatMap((g) => g.members.map((m) => m.person.slug))
+  assert.ok(named.includes('lucia-gonzalez'))
+  assert.equal(getMeta('/team/lucia-gonzalez').notFound, true)
+})
+
+test('profiles describe the person for search engines, without unconfirmed photos', () => {
+  const juan = getMeta('/team/juan-ventura-romero').jsonLd
+  assert.equal(juan['@type'], 'Person')
+  assert.equal(juan.jobTitle, 'Payload Software Lead')
+  assert.equal(juan.memberOf.name, 'Bearospace at UCLA')
+  assert.equal(juan.image, undefined) // headshotVerified is still false (checklist C12)
+
+  const alum = getMeta('/team/isrrael-sumano').jsonLd
+  assert.equal(alum.alumniOf.name, 'Bearospace at UCLA')
+  assert.equal(alum.memberOf, undefined)
+})
