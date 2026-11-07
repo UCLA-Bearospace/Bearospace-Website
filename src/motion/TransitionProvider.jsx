@@ -4,6 +4,9 @@ import { TransitionContext } from './transitionContext'
 import { DirectorContext } from './director'
 import { useMotionAllowed } from './useMotionPref'
 import { EASE, PAGE_FADE, REDUCED, TRAVEL_CAP, WIPE } from './timing'
+
+// No single step of a transition may take longer than this (the longest wipe step is ~0.5 s)
+const SAFETY_MS = 2000
 import WipeLayer from './WipeLayer'
 import { BODY_IDS, labelFor, parentOf, targetFor } from '../site/targets.js'
 import { setLastDestination } from '../menu/menuState'
@@ -58,12 +61,27 @@ export default function TransitionProvider({ children, preload }) {
     motionRef.current = motion
   }, [motion])
 
-  /** Track an animation (or travel) so it can be finished early; resolves when done. */
-  function play(item) {
+  /**
+   * Track an animation (or travel) so it can be finished early; resolves when done. A
+   * transition must never hang half-way (the page would stay covered or faded out), so
+   * anything still running `maxMs` after it started is finished, and the wait gives up
+   * shortly after that even if the animation never reports back.
+   */
+  function play(item, maxMs = SAFETY_MS) {
     live.current.add(item)
     if (document.hidden) item.finish()
-    const done = item.finished.catch(() => {})
-    done.then(() => live.current.delete(item))
+    const guard = setTimeout(() => {
+      try {
+        item.finish()
+      } catch {
+        /* already gone */
+      }
+    }, maxMs)
+    const done = Promise.race([item.finished.catch(() => {}), new Promise((r) => setTimeout(r, maxMs + 500))])
+    done.then(() => {
+      clearTimeout(guard)
+      live.current.delete(item)
+    })
     return done
   }
 
@@ -81,7 +99,11 @@ export default function TransitionProvider({ children, preload }) {
     const t = targetFor(target.pathname)
     const director = directorRef.current
     // No travel happened (reduced motion, a queued run, a late scene): cut the camera under the cover
-    if (director && director.framing() !== t) director.place(t)
+    try {
+      if (director && director.framing() !== t) director.place(t)
+    } catch (error) {
+      console.error(error) // a broken scene must not stop the page from changing
+    }
     // Returning to the Flight Deck: focus goes back to the destination they came from
     if (target.pathname === '/') {
       const from = targetFor(shownPath.current)
@@ -109,6 +131,31 @@ export default function TransitionProvider({ children, preload }) {
   async function run(queued) {
     running.current = true
     const main = document.getElementById('main')
+    // Whatever happens below, the run ends on the newest page, visible, with the wipe gone
+    const cleanup = { swapped: false, anims: [] }
+    try {
+      await transition(queued, main, cleanup)
+    } catch (error) {
+      console.error('Route transition failed; showing the page without it', error)
+    } finally {
+      if (!cleanup.swapped) swap(latest.current)
+      for (const a of cleanup.anims) a?.cancel()
+      if (wipeRef.current) wipeRef.current.style.visibility = 'hidden'
+      done()
+    }
+  }
+
+  async function transition(queued, main, cleanup) {
+    // Every animation started here is cancelled when the run ends (run's `finally`)
+    const animate = (el, keyframes, options) => {
+      const a = el?.animate(keyframes, options) ?? null
+      cleanup.anims.push(a)
+      return a
+    }
+    const doSwap = (target) => {
+      swap(target)
+      cleanup.swapped = true
+    }
     let target = latest.current
     const director = directorRef.current
     preload?.(target.pathname)
@@ -116,28 +163,30 @@ export default function TransitionProvider({ children, preload }) {
     // Reduced or paused motion: fade out, swap, fade in
     if (!motionRef.current || !wipeRef.current) {
       setPhase('fade')
-      const out = main?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: REDUCED.out, fill: 'forwards' })
+      const out = animate(main, [{ opacity: 1 }, { opacity: 0 }], { duration: REDUCED.out, fill: 'forwards' })
       if (out) await play(out)
       target = latest.current
-      swap(target)
+      doSwap(target)
       out?.cancel()
-      const back = main?.animate([{ opacity: 0 }, { opacity: 1 }], { duration: REDUCED.in })
+      const back = animate(main, [{ opacity: 0 }, { opacity: 1 }], { duration: REDUCED.in })
       if (back) await play(back)
-      return done()
+      return
     }
 
     // 1. Travel to the new page's body while the old page steps aside
     let fade = null
     const t = targetFor(target.pathname)
-    if (!queued && director && director.framing() !== t) {
+    // (A scene hidden behind a phone-width page has nothing to show: cut under the cover instead)
+    if (!queued && director && director.visible?.() !== false && director.framing() !== t) {
       setPhase('travel')
-      fade = main?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: PAGE_FADE, easing: EASE.fade, fill: 'forwards' })
+      fade = animate(main, [{ opacity: 1 }, { opacity: 0 }], { duration: PAGE_FADE, easing: EASE.fade, fill: 'forwards' })
       const travel = director.travel(t)
       const stop = hurry(travel)
-      const cap = setTimeout(() => travel.finish(), TRAVEL_CAP)
-      await play(travel)
-      clearTimeout(cap)
-      stop()
+      try {
+        await play(travel, TRAVEL_CAP)
+      } finally {
+        stop()
+      }
       // The URL moved on while we flew: land on the newest page instead
       target = latest.current
       preload?.(target.pathname)
@@ -152,39 +201,37 @@ export default function TransitionProvider({ children, preload }) {
     const bands = [...wipe.querySelectorAll('.wipe-band')]
     wipe.style.visibility = 'visible'
     const total = WIPE.cover + WIPE.hold + WIPE.reveal + WIPE.stagger * 2
-    const drift = labelRef.current.animate(
+    animate(
+      labelRef.current,
       [{ transform: `translateX(${-50 - 12 * dir}%)` }, { transform: `translateX(${-50 + 12 * dir}%)` }],
       { duration: total / rate, fill: 'forwards' },
     )
     // The labelled middle band leads in...
     const cover = bands.map((band, i) =>
-      band.animate([translate(-118 * dir), translate(0)], {
+      animate(band, [translate(-118 * dir), translate(0)], {
         duration: WIPE.cover / rate,
         delay: (i === 1 ? 0 : WIPE.stagger) / rate,
         easing: EASE.sweepIn,
         fill: 'forwards',
       }),
     )
-    await Promise.all(cover.map(play))
+    await Promise.all(cover.map((a) => play(a)))
 
     // 3. Swap under the cover
-    swap(target)
+    doSwap(target)
     fade?.cancel()
 
     // 4. ...and leaves last
     setPhase('reveal')
     const reveal = bands.map((band, i) =>
-      band.animate([translate(0), translate(118 * dir)], {
+      animate(band, [translate(0), translate(118 * dir)], {
         duration: WIPE.reveal / rate,
         delay: (WIPE.hold + (i === 1 ? WIPE.stagger : 0)) / rate,
         easing: EASE.sweepOut,
         fill: 'forwards',
       }),
     )
-    await Promise.all(reveal.map(play))
-    wipe.style.visibility = 'hidden'
-    for (const a of [...cover, ...reveal, drift]) a.cancel()
-    done()
+    await Promise.all(reveal.map((a) => play(a)))
   }
 
   function done() {

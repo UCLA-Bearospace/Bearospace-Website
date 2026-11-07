@@ -136,6 +136,7 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
   let dpr = 1
   let disposed = false
   let live = false
+  let active = true // false while hidden behind a phone-width page: kept, but not drawing
   let labels = null // Map<id, HTMLElement> pinned to the bodies
   let travel = null
   const labelCache = new WeakMap()
@@ -320,7 +321,7 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
   }
 
   function start() {
-    if (raf || !motion || document.hidden || disposed) return
+    if (raf || !motion || !active || document.hidden || disposed) return
     last = 0
     raf = requestAnimationFrame(loop)
   }
@@ -345,7 +346,7 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
     // Holding a framed shot: re-frame for the new size (a travel in flight re-resolves on landing)
     if (!state.follow && !travel) setCamera(resolveShot(state.target))
     governor.reset()
-    if (!motion && !disposed) frame(0)
+    if (!motion && active && !disposed) frame(0)
   }
   const ro = new ResizeObserver(resize)
   ro.observe(host)
@@ -416,6 +417,22 @@ export function createEngine(host, { meta, onStatus = () => {}, onProgress } = {
     },
     setFps(n) {
       fps = n
+    },
+    /**
+     * Hidden (false) or shown. Hidden keeps everything (context, shaders, model) but draws
+     * nothing, so coming back is instant. Tearing the scene down instead (dispose and a
+     * forced context loss on every phone navigation) cost a rebuild each return to the Flight
+     * Deck, and on iPhones it could leave the page blank after a transition.
+     */
+    setActive(on) {
+      if (on === active) return
+      active = on
+      if (!on) stop()
+      else if (motion) start()
+      else if (live) frame(0)
+    },
+    get active() {
+      return active
     },
     setBoost(on) {
       boost = on
