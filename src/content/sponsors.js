@@ -21,8 +21,9 @@ export const sponsors = [
     introKicker: 'Supported by',
     order: 1,
     activeSeasons: ['2026-27'],
-    // Wording decided 2026-11-02; logo-usage approval still to be recorded (checklist C1)
-    verifiedAt: '2026-11-02',
+    // A full sponsor; logo use approved (Juan Ventura-Romero, 2026-11-07; checklist C1).
+    // Public wording decided 2026-11-02.
+    verifiedAt: '2026-11-07',
     source: SOURCES.juan,
   },
   {

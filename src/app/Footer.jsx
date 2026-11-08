@@ -40,6 +40,11 @@ export default function Footer() {
           <li>
             <a href={links.linkedin}>LinkedIn</a>
           </li>
+          {links.discord && (
+            <li>
+              <a href={links.discord}>Discord</a>
+            </li>
+          )}
         </ul>
       </div>
 

@@ -5,10 +5,13 @@ export const links = {
   email: 'ucla.bearospace@gmail.com',
   instagram: 'https://www.instagram.com/uclabearospace/',
   linkedin: 'https://www.linkedin.com/company/bearospace-ucla/',
-  // Interest form, meeting times, Discord, Linktree: unconfirmed (checklist C6, C7)
+  // Meeting and office-hour times are posted in the Discord's announcements channel
+  // (supplied by Juan Ventura-Romero, 2026-11-07), so the site links there rather than
+  // keeping a second list that could go stale.
+  discord: 'https://discord.gg/SUWtpwJ8AB',
+  // Interest form and Linktree: unconfirmed (checklist C6, C7)
   joinForm: null,
   linktree: null,
-  discord: null,
   meetings: null,
 }
 
