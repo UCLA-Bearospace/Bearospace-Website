@@ -122,6 +122,11 @@ export function validateContent(content, { mediaRoot = join(ROOT, 'assets-src', 
   })
   content.gallery?.forEach((g, i) => {
     media('gallery', g, i, 'src', g.src)
+    // The file name is the photo's address (/gallery?photo=<name>), so it must be unique too
+    const fileName = (src) => src?.split('/').pop().replace(/\.\w+$/, '')
+    const name = fileName(g.src)
+    if (content.gallery.findIndex((o) => fileName(o.src) === name) !== i)
+      report('gallery', g, i, 'src', `another photo is also named "${name}"`)
     g.people?.forEach((s, k) => ref('gallery', g, i, `people[${k}]`, s, people, 'people.js'))
   })
 

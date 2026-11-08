@@ -8,7 +8,8 @@
         "http://localhost:4175/engineering",
         "http://localhost:4175/engineering/structures",
         "http://localhost:4175/team",
-        "http://localhost:4175/about"
+        "http://localhost:4175/about",
+        "http://localhost:4175/gallery"
       ],
       "numberOfRuns": 1,
       "settings": {
@@ -59,7 +60,7 @@
           }
         },
         {
-          "matchingUrlPattern": "^(?!.*/team$).*$",
+          "matchingUrlPattern": "^(?!.*/(team|gallery)$).*$",
           "assertions": {
             "largest-contentful-paint": [
               "error",
@@ -76,6 +77,17 @@
               "error",
               {
                 "maxNumericValue": 2700
+              }
+            ]
+          }
+        },
+        {
+          "matchingUrlPattern": "/gallery$",
+          "assertions": {
+            "largest-contentful-paint": [
+              "error",
+              {
+                "maxNumericValue": 3300
               }
             ]
           }
