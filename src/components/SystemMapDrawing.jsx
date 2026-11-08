@@ -3,8 +3,7 @@ import { OUTLINE } from '../content/systemMap.js'
 
 // The system map's picture: a side view of the 2025–26 rocket, drawn to scale from the
 // model's measurements (OUTLINE, copied from rocket.meta.json) and divided into the
-// sections in src/content/systemMap.js. Decorative (the legend in SystemMap carries the meaning),
-// so it loads after the page, as its own chunk.
+// sections in src/content/systemMap.js. Decorative: the legend in SystemMap carries the meaning.
 
 const { lengthM, bodyDiameterM, finSpanM, fin, nose } = OUTLINE
 const W = 1000 // the rocket's length in drawing units

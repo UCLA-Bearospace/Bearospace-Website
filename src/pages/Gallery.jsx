@@ -74,7 +74,16 @@ export default function Gallery() {
       navigate(-1)
     } else setParams({}, { replace: true }) // arrived by deep link: drop the photo, stay here
   }
-  const step = (by) => setParams({ photo: photoSlug(list[(at + by + list.length) % list.length]) }, { replace: true })
+  // From the live URL, not this render's photo (React Router's own params are this render's
+  // too): two quick key presses must move two photos
+  const step = (by) => {
+    const now = new URLSearchParams(window.location.search).get('photo')
+    const from = Math.max(
+      list.findIndex((g) => photoSlug(g) === now),
+      0,
+    )
+    setParams({ photo: photoSlug(list[(from + by + list.length) % list.length]) }, { replace: true })
+  }
 
   // Back (or close) took the photo away: put focus back on the thumbnail it came from
   useEffect(() => {

@@ -848,3 +848,16 @@ Decisions made while building, recorded so later slices start from what is actua
 - **/gallery LCP limit is 3.3 s:** Lighthouse added /gallery (CLS 0, TBT 0). Its largest paint on mobile is the intro text, delayed in the simulation by fonts sharing a slow connection with the thumbnails (3.09 s), the same effect as /team. Deferring thumbnails further would mean replacing the browser's lazy loading with custom JavaScript; every other page keeps 2.5 s.
 - **Motion:** photos fade and scale in by position when arriving by navigation; opening grows the photo from its thumbnail (a FLIP on the Web Animations API, 320 ms). Both off with reduced motion.
 - **Budgets:** main JS 114.3 / 115 KB (Engineering; up 0.6 KB this slice). The photo helpers sit in the content module, and the image list (`src/generated/media.json`, with every photo's sizes and loading placeholder) is bundled into the entry, so each new image size grows every page. Slices 9–10 need a budget decision, or the image list moved out of the entry.
+
+### Slice 9 (sponsors and join)
+
+- **Decided 2026-11-07 (Juan Ventura-Romero):**
+  - Anduril's logo use is approved, and Anduril is a full sponsor (checklist C1).
+  - No AISES membership rule is known, so the site states none (C5).
+  - Joining runs through the team Discord (`discord.gg/SUWtpwJ8AB`, C7): visitors drop by Boelter Hall during meeting or office-hour times announced in its announcements channel (C8).
+  - Mach Industries will be added later as a "past partner", never as a sponsor (C17); not done yet.
+- **Already in place from slice 2:** sponsor records shared by the intro, the "Supported by" strip and the Sponsors page; "What your support builds" with generic, honest copy; the sponsorship email and LinkedIn; routed contact buttons; `?interest=` carried into the membership email.
+- **Join:** the next step is the gold "Join the Bearospace Discord" button, with email as the alternative. A discipline interest carries into both ("…and ask about Recovery"). Discord is also in the footer and the contact line.
+- **No "Upcoming" list:** the plan's manual events list would duplicate the Discord announcements and go stale, the problem the old Google Calendar had.
+- **Sponsor reach:** the deck's "Sponsor a launch" button already opens the sponsorship email (one click); the Sponsors destination is two.
+- **Not built:** the plan's escort-rocket and gold-beacon scene touches for these pages, to keep the scene chunk inside its budget (184.5 / 190 KB).

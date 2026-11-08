@@ -30,14 +30,14 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 
 | # | Item | Blocks | Owner | Status |
 |---|---|---|---|---|
-| C1 | Written approval to use the Anduril logo; active season(s) | Intro, Sponsors | | Open |
+| C1 | Written approval to use the Anduril logo; active season(s) | Intro, Sponsors | Juan Ventura-Romero | Done 2026-11-07: approved; Anduril is a full sponsor |
 | C2 | UCLA Samueli label: "Home institution" / "Built at" vs "Supported by" | Intro, Sponsors | | Open |
 | C3 | Whether the 2025–26 team flew at NASA Student Launch after the reported funding loss | Competitions, Projects | | Open |
 | C4 | Whether 2014–2019 UCLA AISES rocket teams are presented as Bearospace's lineage; any known founding year | History, About | | Open |
-| C5 | Current AISES membership requirement for competing | About, Join | | Open |
+| C5 | Current AISES membership requirement for competing | About, Join | Juan Ventura-Romero | Unknown (2026-11-07): the site states no membership rule |
 | C6 | Recruitment timeline, interest form, meeting times | Join | | Open |
-| C7 | Discord and Linktree (`linktr.ee/bearospaceUCLA`) status | Join, footer | | Open |
-| C8 | Whether Boelter Hall 2817 is open to visitors | Join | | Open |
+| C7 | Discord and Linktree (`linktr.ee/bearospaceUCLA`) status | Join, footer | Juan Ventura-Romero | Discord done 2026-11-07 (`discord.gg/SUWtpwJ8AB`); Linktree open |
+| C8 | Whether Boelter Hall 2817 is open to visitors | Join | Juan Ventura-Romero | Done 2026-11-07: drop in during meeting or office-hour times announced on Discord |
 | C9 | "Payload Software Lead" on the official 2026–27 roster; other software responsibilities | Team, Engineering | | Open |
 | C10 | Safety & Operations lead and Avionics Director status for 2026–27 | Team, Engineering | | Open |
 | C11 | Each member's consent to a public profile, headshot, and links | Team | | Open |
@@ -46,6 +46,7 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 | C14 | Custom domain; whether the old Google Sites redirect or link to the new site | Release | | Open |
 | C15 | Analytics (recommended: none at launch) | Release | | Open |
 | C16 | Real positions of the payload section, recovery bays, and avionics bay on the 2025–26 rocket (the system map shows typical dual-deploy positions, marked approximate) | Engineering system map (`src/content/systemMap.js`) | | Open |
+| C17 | Add Mach Industries as a "past partner" (a meeting collaboration, never a full sponsor): logo, approval, and wording | Sponsors | Juan Ventura-Romero | Later, when Juan asks |
 
 ## Missing materials
 

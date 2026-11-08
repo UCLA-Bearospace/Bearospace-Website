@@ -34,31 +34,42 @@ export default function Join() {
       </ul>
 
       <h2>Your next step</h2>
-      {links.joinForm ? (
-        <p>
-          <a className="button button--gold" href={links.joinForm}>
-            Fill out the interest form
-          </a>
-        </p>
-      ) : (
+      {links.discord && (
         <>
           <p>
-            Email the team and tell us what interests you{interest ? ` — we’ll point you to ${interest.name}` : ''}. We’ll
-            let you know when and where to show up.
+            Join our Discord, then drop by {org.location.building} during one of our meetings or office hours
+            {interest ? ` and ask about ${interest.name}` : ''}. Times are posted in the Discord’s announcements channel.
           </p>
           <p>
-            <a className="button button--gold" href={mailto('membership', interest?.name)}>
-              Email us about joining{interest ? ` ${interest.name}` : ''}
+            <a className="button button--gold" href={links.discord}>
+              Join the Bearospace Discord
             </a>
           </p>
         </>
       )}
+      {links.joinForm && (
+        <p>
+          <a className="button" href={links.joinForm}>
+            Fill out the interest form
+          </a>
+        </p>
+      )}
+      <p>
+        {links.discord ? 'Prefer email? ' : ''}Tell us what interests you{interest ? ` — we’ll point you to ${interest.name}` : ''}.
+      </p>
+      <p>
+        <a className={links.discord ? 'button' : 'button button--gold'} href={mailto('membership', interest?.name)}>
+          Email us about joining{interest ? ` ${interest.name}` : ''}
+        </a>
+      </p>
       {links.meetings && <p>{links.meetings}</p>}
 
       <h2>Find us</h2>
       <p>
         {org.location.building}, Room {org.location.room}, {org.location.campus}.{' '}
-        {!org.location.verifiedAt && 'Email us before stopping by to make sure someone is there.'}
+        {links.discord
+          ? 'Come by during a meeting or office-hour time announced on our Discord.'
+          : 'Email us before stopping by to make sure someone is there.'}
       </p>
       <p>
         <a href="https://www.google.com/maps/search/?api=1&query=Boelter+Hall+UCLA">Boelter Hall on Google Maps</a>
@@ -77,6 +88,12 @@ export default function Join() {
       <p>
         <a href={`mailto:${links.email}`}>{links.email}</a> · <a href={links.instagram}>Instagram</a> ·{' '}
         <a href={links.linkedin}>LinkedIn</a>
+        {links.discord && (
+          <>
+            {' · '}
+            <a href={links.discord}>Discord</a>
+          </>
+        )}
       </p>
     </PageFrame>
   )
