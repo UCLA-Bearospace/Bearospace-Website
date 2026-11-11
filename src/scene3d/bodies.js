@@ -2,6 +2,7 @@ import {
   AdditiveBlending,
   BufferGeometry,
   CanvasTexture,
+  CapsuleGeometry,
   ConeGeometry,
   CylinderGeometry,
   DoubleSide,
@@ -21,8 +22,6 @@ import {
   TorusGeometry,
 } from 'three'
 import { toon } from './toon'
-import { createRocketMaterial } from './rocketMaterial'
-import { buildPlaceholderGeometry } from './rocket'
 import { BEAR_LINES, BEAR_STARS } from '../site/constellation.js'
 
 // The eight Flight Deck destinations as small toon/ink celestial bodies. Each is built
@@ -121,20 +120,21 @@ function redPlanet() {
 function comet() {
   const g = new Group()
   g.add(solid(new IcosahedronGeometry(0.42, 1), '#DDE6FF'))
-  const tail = new Mesh(
-    new ConeGeometry(0.4, 2.6, 24, 1, true),
-    new MeshBasicMaterial({ color: '#7FA2FF', transparent: true, opacity: 0.35, blending: AdditiveBlending, depthWrite: false, side: DoubleSide }),
-  )
-  tail.position.set(0.95, 0.75, 0)
-  tail.rotation.z = Math.PI / 2 + 0.6
-  tail.layers.set(1)
+  // A soft contrail: overlapping glows that thin and fade along a gentle curve, so the tail
+  // reads as vapour streaming off the head rather than a hard cone
+  for (let i = 0; i < 12; i++) {
+    const t = i / 11
+    const puff = sprite(i % 2 ? '#A9C6FF' : '#7FA2FF', 0.95 - t * 0.7, 0.55 - t * 0.47)
+    puff.position.set(0.35 + t * 2.3, 0.25 + t * 1.25 + Math.sin(t * Math.PI) * 0.18, 0)
+    g.add(puff)
+  }
   // A dotted trail: past seasons
   for (let i = 1; i <= 5; i++) {
     const d = sprite('#C9D8FF', 0.16, 0.8 - i * 0.12)
     d.position.set(-0.55 - i * 0.32, -0.3 - i * 0.2, 0)
     g.add(d)
   }
-  g.add(tail, sprite('#A9C6FF', 1.4, 0.5))
+  g.add(sprite('#A9C6FF', 1.4, 0.5))
   return g
 }
 
@@ -184,17 +184,39 @@ function nebula() {
   return g
 }
 
-function escortRocket(meta) {
+// Sponsors: a handshake. Two sleeved forearms meet in clasped hands (toon solids, so they
+// get ink outlines like the other bodies)
+function handshake() {
   const g = new Group()
-  const { material } = createRocketMaterial()
-  const r = new Mesh(buildPlaceholderGeometry(meta, 0.35), material)
-  const k = 2 / meta.lengthM
-  r.scale.setScalar(k)
-  r.position.y = -1
-  const flame = sprite('#FFB060', 0.7)
-  flame.position.y = -1.15
-  g.add(r, flame)
-  g.rotation.z = -0.12
+  const SKIN = '#E8C29C'
+  const capsule = (radius, length, color, from, to) => {
+    const m = solid(new CapsuleGeometry(radius, length, 4, 10), color)
+    m.position.set((from[0] + to[0]) / 2, (from[1] + to[1]) / 2, 0)
+    m.rotation.z = Math.atan2(to[1] - from[1], to[0] - from[0]) - Math.PI / 2
+    return m
+  }
+  // Sleeves come in from below on each side; cuffs mark the wrists
+  g.add(capsule(0.2, 0.7, '#3D7BFF', [-1.15, -0.62], [-0.45, -0.12]))
+  g.add(capsule(0.2, 0.7, '#6E4BD8', [1.15, -0.62], [0.45, -0.12]))
+  g.add(capsule(0.21, 0.04, '#F2F4FF', [-0.5, -0.16], [-0.4, -0.08]))
+  g.add(capsule(0.21, 0.04, '#F2F4FF', [0.5, -0.16], [0.4, -0.08]))
+  // The clasp: two rounded palms, one in front of the other; the front hand's fingers
+  // curl over the back hand, and the back hand's thumb lies across the top
+  const palm = (x, y, z, tilt) => {
+    const p = solid(new CapsuleGeometry(0.17, 0.3, 4, 10), SKIN)
+    p.position.set(x, y, z)
+    p.rotation.z = Math.PI / 2 + tilt
+    p.scale.z = 0.7
+    return p
+  }
+  g.add(palm(0.1, 0.02, -0.1, 0.22), palm(-0.06, 0.02, 0.1, -0.22))
+  for (let i = 0; i < 4; i++) {
+    const y = 0.13 - i * 0.085
+    g.add(capsule(0.05, 0.1, SKIN, [0.16, y + 0.02], [0.3, y - 0.02]))
+    g.children.at(-1).position.z = 0.17
+  }
+  g.add(capsule(0.06, 0.2, SKIN, [0.2, 0.17], [-0.06, 0.23]))
+  g.add(sprite('#FFD100', 1.2, 0.18))
   return g
 }
 
@@ -206,7 +228,7 @@ const BUILDERS = {
   history: comet,
   team: station,
   gallery: nebula,
-  sponsors: escortRocket,
+  sponsors: handshake,
 }
 
 /** All eight bodies, keyed by destination id. */

@@ -40,13 +40,27 @@ for (const d of disciplines) {
   })
 }
 
-test('Payload Electronics is shared, led by Nicholas Equihua, and works with Payload Software', async ({ page }) => {
+test('Payload Electronics is a Payload subteam, led by Nicholas Equihua, and works with Payload Software', async ({ page }) => {
   await page.goto('/engineering/payload-electronics?scene=0')
-  await expect(page.locator('main')).toContainText('shared between the Avionics and Payload divisions')
+  await expect(page.locator('main .kicker').first()).toHaveText('Payload division')
+  await expect(page.locator('main')).not.toContainText('shared between')
   await expect(page.getByRole('link', { name: 'Nicholas Equihua' })).toBeVisible()
-  const software = page.locator('main li', { hasText: 'Payload Software' })
+  const software = page.locator('main li', { hasText: 'Payload Software, led by' })
   await expect(software.getByRole('link', { name: 'Juan Ventura-Romero' })).toHaveAttribute('href', '/team/juan-ventura-romero')
   await expect(software).toContainText('Payload Software Lead')
+})
+
+test('seven subteams: Avionics & Recovery together, Payload Software on its own', async ({ page }) => {
+  await page.goto('/engineering?scene=0')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('One rocket, seven subteams')
+  await expect(page.locator('.cards .card')).toHaveCount(7)
+  await expect(page.getByRole('heading', { level: 2, name: 'Avionics & Recovery' })).toBeVisible()
+  await expect(page.locator('main')).not.toContainText('Software across the vehicle')
+  await page.goto('/engineering/payload-software?scene=0')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Payload Software')
+  await expect(page.getByRole('link', { name: 'Juan Ventura-Romero' }).first()).toHaveAttribute('href', '/team/juan-ventura-romero')
+  // No map caption: the heading above it says what it shows
+  await expect(page.locator('.system-map figcaption')).toHaveCount(0)
 })
 
 test('the overview maps every section, and labels nothing inside the rocket', async ({ page }) => {
@@ -66,7 +80,7 @@ test('the map works without JavaScript', async ({ browser }) => {
   const page = await context.newPage()
   await page.goto('/engineering')
   await expect(legend(page)).toHaveCount(zones.length)
-  await expect(legend(page).getByRole('link', { name: 'Recovery' })).toHaveAttribute('href', '/engineering/recovery')
+  await expect(legend(page).getByRole('link', { name: 'Avionics & Recovery' }).first()).toHaveAttribute('href', '/engineering/avionics-recovery')
   await expect(page.locator('.system-map__drawing')).toBeVisible()
   await context.close()
 })
@@ -81,11 +95,12 @@ test.describe('with the 3D scene', () => {
     // Engineering frames the rocket itself
     expect(await page.evaluate(() => window.__bearo.stats().target)).toBe('engineering')
 
-    const card = page.locator('.card', { has: page.getByRole('link', { name: 'Recovery', exact: true }) })
+    const card = page.locator('.card', { has: page.getByRole('link', { name: 'Avionics & Recovery', exact: true }) })
     await card.hover()
     await expect(page.locator('.system-map .zone--recovery.is-on')).toHaveCount(2)
     await expect(legend(page).filter({ hasText: 'Recovery sections' })).toHaveClass(/is-on/)
-    await expect.poll(() => lit(page)).toEqual(zonesFor('recovery')[0].segments)
+    await expect(legend(page).filter({ hasText: 'Avionics bay' })).toHaveClass(/is-on/)
+    await expect.poll(() => lit(page)).toEqual(zonesFor('avionics-recovery').flatMap((z) => z.segments))
 
     await page.mouse.move(5, 5)
     await expect(page.locator('.system-map .is-on')).toHaveCount(0)
@@ -93,11 +108,11 @@ test.describe('with the 3D scene', () => {
   })
 
   test('a discipline page lights its own section, and leaving clears it', async ({ page }) => {
-    await page.goto('/engineering/avionics')
+    await page.goto('/engineering/aerodynamics')
     await expect(page.locator('html')).toHaveAttribute('data-scene', 'ready', READY)
-    await expect.poll(() => lit(page)).toEqual(zonesFor('avionics')[0].segments)
+    await expect.poll(() => lit(page)).toEqual(zonesFor('aerodynamics').flatMap((z) => z.segments))
     await page.getByRole('link', { name: 'Engineering', exact: true }).first().click()
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('One rocket, seven disciplines')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('One rocket, seven subteams')
     await expect.poll(() => lit(page)).toBeNull()
   })
 })

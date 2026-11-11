@@ -54,23 +54,26 @@ test('the timeline works without JavaScript', async ({ browser }) => {
   await context.close()
 })
 
-test('a project page shows status, season, sourced results, contributors, and when it was checked', async ({ page }) => {
+test('the 2018–19 rocket is told inside its season on History, with links to read more', async ({ page }) => {
+  await page.goto('/history?scene=0')
+  const season = page.locator('#season-2018-19')
+  await season.locator('summary').click()
+  const rocket = season.locator('.season-rocket')
+  await expect(rocket.getByRole('heading', { level: 3 })).toHaveText('The rocket: First Nations Launch rocket')
+  await expect(rocket.getByRole('link').first()).toHaveAttribute('href', /^https?:\/\//)
+  await expect(rocket).toContainText('Read more')
+  // It has no project page of its own any more
   await page.goto('/projects/2018-19-fnl-rocket?scene=0')
-  await expect(page.locator('main .status')).toHaveText('Completed')
-  await expect(page.locator('main .kicker').first()).toContainText('2018–19')
-  const result = page.locator('main li', { hasText: '1st place, AISES Launch category' })
-  await expect(result.getByRole('link', { name: 'Source' })).toHaveAttribute('href', /^https?:\/\//)
-  await expect(page.locator('.contributors')).toContainText('Lucia Gonzalez')
-  await expect(page.locator('.contributors')).toContainText('Team co-leader')
-  await expect(page.locator('main')).toContainText('Last verified 2026-11-02.')
-  // Empty sections are left out, not shown as "TBD"
-  for (const title of ['Testing', 'Lessons learned']) await expect(page.getByRole('heading', { name: title })).toHaveCount(0)
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Lost signal.')
 })
 
-test('projects are grouped by season, with drafts kept off the site', async ({ page }) => {
+test('Projects says what is coming and points to History, with drafts kept off the site', async ({ page }) => {
   await page.goto('/projects?scene=0')
-  await expect(page.getByRole('heading', { level: 2, name: '2018–19' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'First Nations Launch rocket' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Coming soon')
+  await expect(page.locator('main')).toContainText('Our current designs and R&D projects are coming soon.')
+  await page.locator('main').getByRole('link', { name: /History/ }).click()
+  await expect(page).toHaveURL(/\/history$/)
+  await page.goto('/projects?scene=0')
   await expect(page.locator('main')).not.toContainText('2025–26 launch vehicle')
   await page.goto('/projects/2025-26-launch-vehicle?scene=0')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Lost signal.')

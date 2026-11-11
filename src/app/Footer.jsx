@@ -54,10 +54,7 @@ export default function Footer() {
         <ReplayLaunch />
       </div>
 
-      <p className="site-footer__fine">
-        A student organization at UCLA and the technical project of{' '}
-        <a href={org.parents.aises.url}>{org.parents.aises.name}</a>.
-      </p>
+      <p className="site-footer__fine">A student organization at UCLA.</p>
     </footer>
   )
 }

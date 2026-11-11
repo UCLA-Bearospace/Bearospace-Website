@@ -31,7 +31,7 @@ test('unknown paths are not-found and noindex', () => {
 
 test('breadcrumbs lead back home', () => {
   assert.deepEqual(
-    getMeta('/engineering/recovery').crumbs.map((c) => c.path),
-    ['/', '/engineering', '/engineering/recovery'],
+    getMeta('/engineering/avionics-recovery').crumbs.map((c) => c.path),
+    ['/', '/engineering', '/engineering/avionics-recovery'],
   )
 })

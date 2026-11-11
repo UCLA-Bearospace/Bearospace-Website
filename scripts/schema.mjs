@@ -81,6 +81,8 @@ export const schemas = {
       sources: z.array(z.object({ label: text, url: url.nullable() })).min(1),
       lastVerified: date,
       publish: z.boolean(),
+      // 'history': shown inside its season on the History page instead of on Projects
+      place: z.enum(['projects', 'history']).optional(),
     })
     .refine((p) => !p.publish || p.status, { message: 'a published project needs a status', path: ['status'] }),
 
@@ -120,9 +122,11 @@ export const schemas = {
     .object({
       id: slug,
       name: text,
-      relationship: z.enum(['sponsor', 'institutional', 'home-organization', 'partner']),
+      relationship: z.enum(['sponsor', 'institutional', 'home-organization', 'partner', 'past-partner']),
       label: text,
-      url,
+      url: url.optional(),
+      description: text.optional(), // shown under past partners
+      date: date.nullable().optional(), // when a past collaboration happened, once known
       logo: z.object({ onDark: z.string().nullable(), onLight: z.string().nullable(), invertOnDark: z.boolean().optional() }).nullable(),
       showInIntro: z.boolean(),
       introOrder: z.number().optional(),

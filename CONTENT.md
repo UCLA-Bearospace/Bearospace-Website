@@ -50,7 +50,7 @@ Original images go in `assets-src/images/` (never edit them in place). `npm run 
 {
   id: 'acme-aerospace',
   name: 'Acme Aerospace',
-  relationship: 'sponsor', // sponsor | institutional | home-organization | partner
+  relationship: 'sponsor', // sponsor | institutional | home-organization | partner | past-partner
   label: 'Supported by Acme Aerospace', // exactly what the site should say
   url: 'https://acme.example',
   logo: { onDark: 'logos/acme.svg', onLight: 'logos/acme.svg', invertOnDark: true },
@@ -65,6 +65,25 @@ Original images go in `assets-src/images/` (never edit them in place). `npm run 
 ```
 
 That's all: the opening sequence, footer strip, and Sponsors page pick it up.
+
+**A past partner** (an organization that met with the team or shared its expertise, not a sponsor) needs no logo or link. It appears only on the Sponsors page, under "Past meeting partners and collaborators", never in the intro or the "Supported by" strip:
+
+```js
+{
+  id: 'mach-industries',
+  name: 'Mach Industries',
+  relationship: 'past-partner',
+  label: 'Past partner',
+  description: 'Mach Industries collaborated with Bearospace on a team meeting.',
+  date: null, // e.g. '2026-04-15' once confirmed
+  logo: null,
+  showInIntro: false,
+  order: 10,
+  activeSeasons: [],
+  verifiedAt: '2026-11-10',
+  source: 'Content review by …',
+},
+```
 
 ### Start a new season
 
@@ -101,6 +120,8 @@ contributors: [{ personSlug: 'juan-ventura-romero', contribution: 'Wrote the pay
 ```
 
 Keep `publish: false` until the status and facts are confirmed.
+
+A past season's rocket belongs on History rather than Projects: add `place: 'history'`. It then shows inside its season on `/history` (summary, objectives, hardware, and "Read more" links) and has no page of its own.
 
 ### Record a competition result
 

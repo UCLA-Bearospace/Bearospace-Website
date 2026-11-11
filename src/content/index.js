@@ -4,7 +4,7 @@
 import { org, SOURCES } from './org.js'
 import { links, contactTopics, mailto } from './links.js'
 import { divisions } from './divisions.js'
-import { disciplines, software } from './disciplines.js'
+import { disciplines } from './disciplines.js'
 import { people } from './people.js'
 import { roles, openRoles, groups } from './roles.js'
 import { projects } from './projects.js'
@@ -22,7 +22,6 @@ export {
   mailto,
   divisions,
   disciplines,
-  software,
   people,
   roles,
   openRoles,
@@ -65,13 +64,17 @@ const competitionMap = bySlug(competitions)
 export const getPerson = (slug) => personMap.get(slug)
 export const getDiscipline = (slug) => disciplineMap.get(slug)
 export const getCompetition = (slug) => competitionMap.get(slug)
+// Projects with place 'history' appear in their season on the History page, not on Projects
+const onProjects = (p) => p.publish && p.place !== 'history'
 export const getProject = (slug) => {
   const p = projectMap.get(slug)
-  return p?.publish ? p : undefined
+  return p && onProjects(p) ? p : undefined
 }
 export const getDivision = (id) => divisions.find((d) => d.id === id)
 
-export const publishedProjects = () => projects.filter((p) => p.publish)
+export const publishedProjects = () => projects.filter(onProjects)
+/** A season's rocket(s) told on the History page. */
+export const historyProjects = (season) => projects.filter((p) => p.publish && p.place === 'history' && p.season === season)
 export const publishedResults = () => results.filter((r) => r.publish)
 export const publishedMilestones = () => milestones.filter((m) => m.publish)
 
@@ -153,8 +156,11 @@ export const contributionsBy = (personSlug) =>
 
 export const projectsForDiscipline = (slug) => publishedProjects().filter((p) => p.disciplineSlugs.includes(slug))
 
-/** Sponsors in display order; `intro` limits to the opening sequence. */
+/** Sponsors in display order; `intro` limits to the opening sequence. Past partners are not sponsors. */
 export const sponsorList = ({ intro = false } = {}) =>
   sponsors
-    .filter((s) => !intro || s.showInIntro)
+    .filter((s) => s.relationship !== 'past-partner' && (!intro || s.showInIntro))
     .sort((a, b) => (intro ? a.introOrder - b.introOrder : a.order - b.order))
+
+/** Organizations that collaborated with the team without sponsoring it, in display order. */
+export const pastPartners = () => sponsors.filter((s) => s.relationship === 'past-partner').sort((a, b) => a.order - b.order)

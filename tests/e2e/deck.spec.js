@@ -151,7 +151,7 @@ test('a hidden tab mid-transition still lands on the page', async ({ page }) => 
     Object.defineProperty(document, 'hidden', { value: true, configurable: true })
     document.dispatchEvent(new Event('visibilitychange'))
   })
-  await expect(h1(page)).toHaveText('One rocket, seven disciplines', { timeout: 3000 })
+  await expect(h1(page)).toHaveText('One rocket, seven subteams', { timeout: 3000 })
   await idle(page)
 })
 
@@ -173,10 +173,12 @@ test('resizing mid-travel still frames the page, and the deck re-fits', async ({
   }
 })
 
-test('pausing motion switches to the list and plain fades', async ({ page }) => {
+test('pausing motion freezes the deck in place and uses plain fades', async ({ page }) => {
   await openDeck(page)
   await page.getByRole('button', { name: 'Pause motion' }).click()
-  await expect(nav(page)).toHaveAttribute('data-layout', 'list')
+  // Still the orbit layout, on a still frame (content review: the list confused visitors)
+  await expect(nav(page)).toHaveAttribute('data-layout', 'orbit')
+  await expect(dest(page, 'History')).toBeVisible()
   await dest(page, 'History').click()
   await expect(page.locator('html')).toHaveAttribute('data-transition', 'fade')
   await expect(h1(page)).toHaveText('Season by season')
@@ -185,12 +187,25 @@ test('pausing motion switches to the list and plain fades', async ({ page }) => 
   expect(await page.evaluate(() => window.__bearo.stats().target)).toBe('history')
 })
 
-test('reduced motion gets the list layout', async ({ page }) => {
+test('reduced motion keeps the orbit layout on a still frame', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/')
   await expect(page.locator('html')).toHaveAttribute('data-scene', 'ready', READY)
-  await expect(nav(page)).toHaveAttribute('data-layout', 'list')
+  await expect(nav(page)).toHaveAttribute('data-layout', 'orbit')
+  for (const label of ['About', 'Sponsors']) await expect(dest(page, label)).toBeInViewport()
+})
+
+test('scrolling to the footer lifts the deck with the page, so no body hides behind it', async ({ page }) => {
+  await openDeck(page)
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0)
+  const footerTop = await page.locator('.site-footer').evaluate((el) => el.getBoundingClientRect().top)
+  await expect
+    .poll(() => page.locator('.destination-item').evaluateAll((items) => Math.max(...items.map((el) => el.getBoundingClientRect().bottom))))
+    .toBeLessThan(footerTop)
+  // The scene moves with the labels
+  await expect(page.locator('.scene-host')).toHaveCSS('transform', /matrix/)
 })
 
 test('axe: the deck in orbit layout', async ({ page }) => {
@@ -214,7 +229,7 @@ test.describe('on a phone', () => {
     await page.evaluate(() => (window.__firstScene = window.__bearo))
 
     await dest(page, 'Engineering').tap()
-    await expect(h1(page)).toHaveText('One rocket, seven disciplines')
+    await expect(h1(page)).toHaveText('One rocket, seven subteams')
     await idle(page)
     await expect(page.locator('.page')).toBeVisible()
     await expect(page.locator('.page')).toHaveCSS('opacity', '1')

@@ -19,6 +19,7 @@ export const SOURCES = {
   proposal2018: 'https://spacegrant.carthage.edu/live/files/5417-ucla-proposal-11-30-18-1pdf',
   samueli2014: 'https://samueli.ucla.edu/ucla-aises-team-wins-rocket-competition/',
   juan: 'Supplied by Juan Ventura-Romero, 2026-11-02',
+  pmReview: 'Content review by Emmanuel Jaimes (Project Manager), 2026-11-10',
 }
 
 export const org = {
@@ -26,7 +27,7 @@ export const org = {
   shortName: 'Bearospace',
   tagline: "UCLA's student rocketry team",
   lede:
-    'We design, build, and fly high-power rockets — and the payloads inside them — as the technical project of AISES at UCLA.',
+    'We design, build, and fly high-power rockets — and the payloads inside them — at UCLA.',
   mission:
     'Bearospace empowers students to become the next generation of engineers, scientists, and innovators through hands-on rocketry, technical training, and community engagement.',
   currentSeason: '2026-27',
@@ -41,7 +42,6 @@ export const org = {
     source: SOURCES.siteContact,
   },
   parents: {
-    aises: { name: 'AISES at UCLA', full: 'American Indian Science and Engineering Society, UCLA chapter', url: SOURCES.aises },
     ceed: { name: 'CEED', full: 'Center for Excellence in Engineering and Diversity', url: 'https://www.ceed.ucla.edu/' },
     samueli: { name: 'UCLA Samueli', full: 'UCLA Samueli School of Engineering', url: 'https://samueli.ucla.edu/' },
   },

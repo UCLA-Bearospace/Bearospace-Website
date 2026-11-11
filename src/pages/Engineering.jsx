@@ -3,11 +3,8 @@ import { Link, useParams } from 'react-router'
 import PageFrame from '../components/PageFrame'
 import SystemMap from '../components/SystemMap'
 import { useRocketHighlight } from '../components/useRocketHighlight'
-import { Sources } from '../components/bits'
 import { OpenRoleCard, PersonCard } from '../components/people'
 import {
-  SOURCES,
-  disciplines,
   disciplinesInDivision,
   divisions,
   getDiscipline,
@@ -17,7 +14,6 @@ import {
   org,
   projectsForDiscipline,
   seasonLabel,
-  software,
   worksWithFor,
 } from '../content/index.js'
 import NotFound from './NotFound'
@@ -35,7 +31,7 @@ export default function Engineering() {
   const clear = () => setActive([])
 
   return (
-    <PageFrame kicker="Engineering" title="One rocket, seven disciplines" lede="Four divisions build every part of the vehicle and its payload, from the nose cone to the launch checklist.">
+    <PageFrame kicker="Engineering" title="One rocket, seven subteams">
       <SystemMap active={active} onHover={setActive} />
 
       {divisions.map((division) => (
@@ -66,21 +62,6 @@ export default function Engineering() {
         </section>
       ))}
 
-      <section aria-labelledby="software">
-        <h2 id="software">{software.title}</h2>
-        {software.body.map((p) => (
-          <p key={p}>{p}</p>
-        ))}
-        <ul className="inline-list">
-          {software.links.map((slug) => (
-            <li key={slug}>
-              <Link to={`/engineering/${slug}`}>{disciplines.find((d) => d.slug === slug).name}</Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <Sources items={[SOURCES.sitePrograms]} />
     </PageFrame>
   )
 }
@@ -119,7 +100,8 @@ export function Discipline() {
       <List title="What we're responsible for" items={d.responsibilities} />
 
       <h2>Where it lives on the rocket</h2>
-      <SystemMap id={`map-${slug}`} title={`${d.name} on the rocket`} active={d.zones} only={d.zones} />
+      {/* No caption: the heading above already says what the map shows */}
+      <SystemMap id={`map-${slug}`} title={null} label={`${d.name} on the rocket`} active={d.zones} only={d.zones} />
 
       <List title="What you'll work on" items={d.work} />
       <List title="Tools and methods" items={d.tools} />
@@ -180,7 +162,6 @@ export function Discipline() {
         </Link>
       </div>
 
-      <Sources items={[d.source]} />
     </PageFrame>
   )
 }
