@@ -111,6 +111,12 @@ person('maria-garcia', 'Maria Garcia', { ...shot('maria-garcia'), source: 'https
 - Profile links are optional: `links: { linkedin: 'https://www.linkedin.com/in/…' }`.
 - Ask before publishing a profile. Use `consent: false` for people who should only be named in history.
 
+### A subteam with two halves, or a role on two teams
+
+A subteam whose page should show tabs (like Avionics & Recovery) lists its halves in `parts` in `disciplines.js`, each with `id`, `name`, `summary`, `does`, `doesNot`, `work`, `skills`, and `source`; its own `responsibilities`, `work`, and `skills` stay `[]`. Give each lead role a `focus` with the part it leads (`focus: 'recovery'`), so it shows in that tab. A link to `/engineering/<slug>#<part>` opens that tab.
+
+A role that spans two teams can appear under a second roster group too: `alsoGroup: { id: 'avionics-recovery', order: 3 }` (the order within that group).
+
 ### Add a project
 
 Copy the `2018-19-fnl-rocket` entry in `projects.js`. Fill in only what you can source; leave the rest as `[]`. List contributors with what they actually did:

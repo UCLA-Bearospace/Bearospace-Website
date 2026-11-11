@@ -52,5 +52,10 @@ test('every redirect lands on a real page', () => {
       const season = hash.replace(/^season-/, '')
       assert.ok(historyProjects(season).length > 0 || content.results.some((r) => r.season === season), destination)
     }
+    // Subteam anchors open a tab (#avionics, #recovery)
+    if (path.startsWith('/engineering/') && hash) {
+      const d = content.disciplines.find((x) => `/engineering/${x.slug}` === path)
+      assert.ok(d?.parts?.some((p) => p.id === hash), destination)
+    }
   }
 })

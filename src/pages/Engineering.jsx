@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { Link, useParams } from 'react-router'
 import PageFrame from '../components/PageFrame'
 import SystemMap from '../components/SystemMap'
@@ -66,10 +66,10 @@ export default function Engineering() {
   )
 }
 
-const List = ({ title, items }) =>
+const List = ({ title, items, level: H = 'h2' }) =>
   items.length > 0 && (
     <>
-      <h2>{title}</h2>
+      <H>{title}</H>
       <ul className="tick-list">
         {items.map((x) => (
           <li key={x}>{x}</li>
@@ -77,6 +77,118 @@ const List = ({ title, items }) =>
       </ul>
     </>
   )
+
+function Leads({ title, leads, open, level: H = 'h2' }) {
+  return (
+    <>
+      <H>{title}</H>
+      {leads.length || open.length ? (
+        <ul className="people-grid">
+          {leads.map(({ role, person }) => (
+            <PersonCard key={role.personSlug} person={person} role={role} />
+          ))}
+          {open.map((r) => (
+            <OpenRoleCard key={r.title} role={r} />
+          ))}
+        </ul>
+      ) : (
+        <p>
+          No lead is listed for this season yet. <Link to="/join">Ask us how to get involved.</Link>
+        </p>
+      )}
+    </>
+  )
+}
+
+// false on the server and while hydrating, true after (the tabs need JavaScript)
+const noop = () => () => {}
+const useHydrated = () =>
+  useSyncExternalStore(
+    noop,
+    () => true,
+    () => false,
+  )
+const useHash = () =>
+  useSyncExternalStore(
+    (on) => (window.addEventListener('hashchange', on), () => window.removeEventListener('hashchange', on)),
+    () => window.location.hash.slice(1),
+    () => '',
+  )
+
+/**
+ * A subteam with two halves (Avionics & Recovery): one tab each, saying what that half does
+ * and doesn't do, its work, skills, and leads. The address follows the tab
+ * (/engineering/avionics-recovery#recovery), so a link can open either half. Without
+ * JavaScript, and before hydration, both halves show one after the other.
+ */
+function Parts({ parts, leads, open }) {
+  const hydrated = useHydrated()
+  const hash = useHash()
+  const [picked, setPicked] = useState(null)
+  const active = picked ?? (parts.some((p) => p.id === hash) ? hash : parts[0].id)
+  const season = seasonLabel(org.currentSeason)
+
+  function pick(id) {
+    setPicked(id)
+    window.history.replaceState(window.history.state, '', `#${id}`) // no scroll, no new entry
+    document.getElementById(`tab-${id}`)?.focus()
+  }
+  function onKeyDown(e, i) {
+    const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: parts.length - 1 }[e.key]
+    if (to === undefined) return
+    e.preventDefault()
+    pick(parts[(to + parts.length) % parts.length].id)
+  }
+
+  return (
+    <div className="parts">
+      {hydrated && (
+        <div className="filters" role="tablist" aria-label="Parts of this subteam">
+          {parts.map((p, i) => (
+            <button
+              key={p.id}
+              id={`tab-${p.id}`}
+              type="button"
+              role="tab"
+              className="filter"
+              aria-selected={p.id === active}
+              aria-controls={p.id}
+              tabIndex={p.id === active ? 0 : -1}
+              onClick={() => pick(p.id)}
+              onKeyDown={(e) => onKeyDown(e, i)}
+            >
+              {p.name}
+            </button>
+          ))}
+        </div>
+      )}
+      {parts.map((p) => (
+        <section
+          key={p.id}
+          id={p.id}
+          role={hydrated ? 'tabpanel' : undefined}
+          aria-labelledby={hydrated ? `tab-${p.id}` : `part-${p.id}`}
+          hidden={hydrated && p.id !== active}
+        >
+          <h2 id={`part-${p.id}`} className={hydrated ? 'sr-only' : undefined}>
+            {p.name}
+          </h2>
+          <p>{p.summary}</p>
+          <List title={`What ${p.name} does`} items={p.does} level="h3" />
+          <List title={`Not part of ${p.name}`} items={p.doesNot} level="h3" />
+          <List title="What you'll work on" items={p.work} level="h3" />
+          <List title="Skills you'll build" items={p.skills} level="h3" />
+          <Leads
+            title={`Who leads ${p.name} in ${season}`}
+            leads={leads.filter(({ role }) => role.focus === p.id)}
+            open={open.filter((r) => (r.focus ?? p.id) === p.id)}
+            level="h3"
+          />
+        </section>
+      ))}
+    </div>
+  )
+}
 
 /** /engineering/:discipline. Same module as the overview, so the two share one chunk. */
 export function Discipline() {
@@ -103,24 +215,15 @@ export function Discipline() {
       {/* No caption: the heading above already says what the map shows */}
       <SystemMap id={`map-${slug}`} title={null} label={`${d.name} on the rocket`} active={d.zones} only={d.zones} />
 
-      <List title="What you'll work on" items={d.work} />
-      <List title="Tools and methods" items={d.tools} />
-      <List title="Skills you'll build" items={d.skills} />
-
-      <h2>Who leads it in {seasonLabel(org.currentSeason)}</h2>
-      {leads.length || open.length ? (
-        <ul className="people-grid">
-          {leads.map(({ role, person }) => (
-            <PersonCard key={role.personSlug} person={person} role={role} />
-          ))}
-          {open.map((r) => (
-            <OpenRoleCard key={r.title} role={r} />
-          ))}
-        </ul>
+      {d.parts ? (
+        <Parts parts={d.parts} leads={leads} open={open} />
       ) : (
-        <p>
-          No lead is listed for this season yet. <Link to="/join">Ask us how to get involved.</Link>
-        </p>
+        <>
+          <List title="What you'll work on" items={d.work} />
+          <List title="Tools and methods" items={d.tools} />
+          <List title="Skills you'll build" items={d.skills} />
+          <Leads title={`Who leads it in ${seasonLabel(org.currentSeason)}`} leads={leads} open={open} />
+        </>
       )}
 
       {partners.length > 0 && (

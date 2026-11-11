@@ -94,10 +94,43 @@ test('the current roster groups people under Avionics & Recovery, with no open r
   const ar = groups.find((g) => g.group.id === 'avionics-recovery')
   assert.deepEqual(
     ar.members.map((m) => m.person.slug),
-    ['angel-iglesias', 'jonathan-nguyen'],
+    ['angel-iglesias', 'jonathan-nguyen', 'joel-venegas'],
   )
   assert.ok(groups.every((g) => g.open.length === 0))
   assert.ok(leadsFor('payload-software').some(({ person, role }) => person.slug === 'juan-ventura-romero' && role.title === 'Payload Software Lead'))
+})
+
+test('Avionics & Recovery is one subteam with two parts, each led by its own people', () => {
+  const d = content.disciplines.find((x) => x.slug === 'avionics-recovery')
+  assert.deepEqual(
+    d.parts.map((p) => p.id),
+    ['avionics', 'recovery'],
+  )
+  for (const p of d.parts) assert.ok(p.does.length && p.doesNot.length && p.skills.length, p.id)
+  const focus = (id) =>
+    leadsFor('avionics-recovery')
+      .filter(({ role }) => role.focus === id)
+      .map(({ person }) => person.slug)
+  assert.deepEqual(focus('avionics'), ['angel-iglesias'])
+  assert.deepEqual(focus('recovery'), ['joel-venegas', 'jonathan-nguyen'])
+})
+
+test('a role that spans two teams is listed under both roster groups', () => {
+  const groups = roster('2026-27')
+  const slugs = (id) => groups.find((g) => g.group.id === id).members.map((m) => m.person.slug)
+  assert.ok(slugs('vehicle').includes('joel-venegas'))
+  // Third under Avionics & Recovery, after the two leads (alsoGroup.order)
+  assert.deepEqual(slugs('avionics-recovery'), ['angel-iglesias', 'jonathan-nguyen', 'joel-venegas'])
+})
+
+test('a subteam needs lists or parts, and a focus must name a real part', () => {
+  const c = copy()
+  const safety = c.disciplines.find((d) => d.slug === 'safety-operations')
+  safety.responsibilities = []
+  c.roles.find((r) => r.personSlug === 'angel-iglesias' && r.season === '2026-27').focus = 'propulsion'
+  const errors = validateContent(c).join('\n')
+  assert.match(errors, /"safety-operations" › responsibilities: list at least one/)
+  assert.match(errors, /focus: no subteam this role covers has a part "propulsion"/)
 })
 
 test('a past partner is listed by name only, never in the intro or the strip', () => {

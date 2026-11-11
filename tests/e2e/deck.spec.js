@@ -128,7 +128,7 @@ test('Back and Forward replay the transitions', async ({ page }) => {
   await dest(page, 'Team').click()
   await expect(h1(page)).toHaveText('2026–27 leadership')
   await idle(page)
-  await page.getByRole('link', { name: 'Joel Venegas' }).click()
+  await page.getByRole('link', { name: 'Joel Venegas' }).first().click() // listed under two groups
   await expect(h1(page)).toHaveText('Joel Venegas')
   await idle(page)
   await page.goBack()

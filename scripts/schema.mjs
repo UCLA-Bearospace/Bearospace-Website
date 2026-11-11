@@ -22,10 +22,28 @@ export const schemas = {
     primaryDivisionId: slug,
     summary: text,
     lede: text,
-    responsibilities: z.array(text).min(1),
+    // Required unless the subteam has `parts` (shown as tabs, each with its own lists)
+    responsibilities: z.array(text),
     work: z.array(text), // may be empty: Safety & Operations lists responsibilities only
     tools: z.array(text), // may be empty: not every program page lists tools
-    skills: z.array(text).min(1),
+    skills: z.array(text),
+    parts: z
+      .array(
+        z
+          .object({
+            id: slug,
+            name: text,
+            summary: text,
+            does: z.array(text).min(1),
+            doesNot: z.array(text),
+            work: z.array(text),
+            skills: z.array(text).min(1),
+            source,
+          })
+          .strict(),
+      )
+      .min(2)
+      .optional(),
     // Where it sits on the rocket (system map); at least one section
     zones: z.array(z.enum(ZONE_IDS)).min(1),
     worksWith: z.array(z.object({ team: text, roleTitle: text }).strict()).optional(),
@@ -51,6 +69,10 @@ export const schemas = {
     order: z.number(),
     disciplineSlug: slug.optional(),
     also: z.array(slug).optional(),
+    // Which part of a subteam with tabs this role leads (a `parts` id)
+    focus: slug.optional(),
+    // Also listed under a second roster group (a role that spans two teams)
+    alsoGroup: z.object({ id: slug, order: z.number() }).strict().optional(),
     publish: z.boolean().optional(),
     source,
   }),

@@ -13,14 +13,17 @@ for (const d of disciplines) {
     await page.goto(`/engineering/${d.slug}?scene=0`)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(d.name)
     const headings = await h2s(page).allTextContents()
-    const expected = [
-      "What we're responsible for",
-      'Where it lives on the rocket',
-      d.work.length && "What you'll work on",
-      d.tools.length && 'Tools and methods',
-      "Skills you'll build",
-      'Who leads it in 2026–27',
-    ].filter(Boolean)
+    // A subteam with parts shows each part's lists in its own tab (tested below)
+    const expected = d.parts
+      ? ['Where it lives on the rocket']
+      : [
+          "What we're responsible for",
+          'Where it lives on the rocket',
+          d.work.length && "What you'll work on",
+          d.tools.length && 'Tools and methods',
+          "Skills you'll build",
+          'Who leads it in 2026–27',
+        ].filter(Boolean)
     for (const h of expected) expect(headings).toContain(h)
     for (const item of [...d.responsibilities, ...d.skills]) await expect(page.locator('main').getByText(item, { exact: true }).first()).toBeVisible()
 
@@ -61,6 +64,50 @@ test('seven subteams: Avionics & Recovery together, Payload Software on its own'
   await expect(page.getByRole('link', { name: 'Juan Ventura-Romero' }).first()).toHaveAttribute('href', '/team/juan-ventura-romero')
   // No map caption: the heading above it says what it shows
   await expect(page.locator('.system-map figcaption')).toHaveCount(0)
+})
+
+test('Avionics & Recovery: one card, two tabs saying what each half does and does not do', async ({ page }) => {
+  const d = disciplines.find((x) => x.slug === 'avionics-recovery')
+  await page.goto('/engineering?scene=0')
+  await expect(page.locator('.card', { hasText: 'Avionics & Recovery' })).toHaveCount(1)
+  await page.locator('.cards').getByRole('link', { name: 'Avionics & Recovery' }).click()
+  await expect(page).toHaveURL(/\/engineering\/avionics-recovery$/)
+
+  const tabs = page.getByRole('tab')
+  await expect(tabs).toHaveText(['Avionics', 'Recovery'])
+  await expect(tabs.first()).toHaveAttribute('aria-selected', 'true')
+  const panel = page.getByRole('tabpanel')
+  await expect(panel).toHaveCount(1) // the other is hidden
+  for (const item of [...d.parts[0].does, ...d.parts[0].doesNot]) await expect(panel.getByText(item, { exact: true })).toBeVisible()
+  await expect(panel.getByRole('heading', { name: 'Not part of Avionics' })).toBeVisible()
+  await expect(panel.getByRole('link', { name: 'Angel Iglesias' })).toBeVisible()
+
+  // Arrow keys move between tabs; the address follows, so the tab can be shared
+  await tabs.first().focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(tabs.nth(1)).toBeFocused()
+  await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true')
+  await expect(page).toHaveURL(/#recovery$/)
+  for (const item of d.parts[1].does) await expect(panel.getByText(item, { exact: true })).toBeVisible()
+  await expect(panel.getByRole('link', { name: 'Jonathan Nguyen' })).toBeVisible()
+  await expect(panel.getByRole('link', { name: 'Joel Venegas' })).toBeVisible()
+  await expect(panel.getByRole('link', { name: 'Angel Iglesias' })).toHaveCount(0)
+})
+
+test('a link to #recovery opens the Recovery tab', async ({ page }) => {
+  await page.goto('/engineering/avionics-recovery?scene=0#recovery')
+  await expect(page.getByRole('tab', { name: 'Recovery' })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByRole('tabpanel')).toContainText('Dual-deployment recovery')
+})
+
+test('without JavaScript both halves show, one after the other', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false })
+  const page = await context.newPage()
+  await page.goto('/engineering/avionics-recovery')
+  await expect(page.getByRole('tab')).toHaveCount(0)
+  await expect(page.getByRole('heading', { level: 2, name: 'Avionics', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 2, name: 'Recovery', exact: true })).toBeVisible()
+  await context.close()
 })
 
 test('the overview maps every section, and labels nothing inside the rocket', async ({ page }) => {

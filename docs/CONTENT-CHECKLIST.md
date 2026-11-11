@@ -60,6 +60,7 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 | C20 | An airbrakes subteam (the directors are to be consulted first; not yet) | Engineering, Team | Juan Ventura-Romero | Later |
 | C21 | Payload Software page text (summary, responsibilities, work, skills) drafted from facts already on the site | Engineering | Juan Ventura-Romero | Draft; Juan to confirm |
 | C22 | 2018–19 roster: hidden (`publish: false`) after the PM review removed the 2018–19 team page | Team history | | Open: publish again only if the team wants the roster shown |
+| C23 | Avionics & Recovery tabs: each half's summary and lists come from the old program pages; the "Not part of" lists (where each half's job ends) are drafted | Engineering | Juan Ventura-Romero | Draft; Juan to confirm |
 
 ## Missing materials
 

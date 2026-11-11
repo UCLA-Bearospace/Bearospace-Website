@@ -102,14 +102,17 @@ export const publishedRoles = () => roles.filter((r) => r.publish !== false)
 /** Seasons that have a roster, newest first. */
 export const rosterSeasons = () => [...new Set(publishedRoles().map((r) => r.season))].sort().reverse()
 
+const orderIn = (r, groupId) => (r.group === groupId ? r.order : r.alsoGroup.order)
+
 /** A season's roster grouped for display: [{ group, members: [{ role, person }], open: [] }] */
 export function roster(season) {
   return groups
     .map((group) => ({
       group,
+      // A role can also appear under a second group (alsoGroup), at its order there
       members: publishedRoles()
-        .filter((r) => r.season === season && r.group === group.id)
-        .sort((a, b) => a.order - b.order)
+        .filter((r) => r.season === season && (r.group === group.id || r.alsoGroup?.id === group.id))
+        .sort((a, b) => orderIn(a, group.id) - orderIn(b, group.id))
         .map((role) => ({ role, person: personMap.get(role.personSlug) })),
       open: openRoles.filter((r) => r.season === season && r.group === group.id),
     }))

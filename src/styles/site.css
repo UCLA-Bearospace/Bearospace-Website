@@ -985,11 +985,21 @@ main {
   border-color: var(--glow);
 }
 
-.filter[aria-pressed='true'] {
+.filter[aria-pressed='true'],
+.filter[aria-selected='true'] {
   border-color: var(--glow);
   background: var(--glow);
   color: var(--ink);
   font-weight: 700;
+}
+
+/* Subteam parts as tabs (Avionics & Recovery) */
+.parts {
+  margin-top: 2rem;
+}
+
+.parts [role='tabpanel'] > p:first-of-type {
+  margin-top: 0;
 }
 
 /* Lightbox: a modal <dialog> filling the screen */

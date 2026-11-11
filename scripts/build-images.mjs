@@ -3,9 +3,14 @@
 //
 // Output: public/media/<folder>/<name>-<width>.{avif,webp}   (metadata stripped)
 //         public/media/icons/*                               favicons from the logo
-//         src/generated/media.json   { "<folder>/<file>": { width, height, color?, lqip?, avif, webp } }
+//         src/generated/media.json   { "<folder>/<file>": { width, height, w: [widths], color?, lqip? } }
+//                                    or { svg: 1, width, height } for SVG logos
+//         src/generated/media-cache.json   content hashes, for the build only
 //
-// Unchanged originals are skipped (keyed by content hash), so repeat runs are fast.
+// media.json is bundled into the main script, so it stays compact: every URL follows from
+// the key and a width (/media/<folder>/<name>-<w>.<avif|webp>; src/components/media.js
+// rebuilds them). Unchanged originals are skipped (keyed by content hash), so repeat runs
+// are fast.
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, copyFileSync } from 'node:fs'
 import { basename, extname, join } from 'node:path'
@@ -16,6 +21,7 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const SRC = join(ROOT, 'assets-src', 'images')
 const OUT = join(ROOT, 'public', 'media')
 const MANIFEST = join(ROOT, 'src', 'generated', 'media.json')
+const CACHE = join(ROOT, 'src', 'generated', 'media-cache.json')
 const VERSION = 6 // bump to force a full rebuild after changing settings below
 
 // Per folder: widths to generate, optional crop aspect (height / width), which files,
@@ -33,8 +39,11 @@ const RECIPES = {
   logos: { widths: [128, 256, 512, 929], placeholder: false, only: ['bearospace-logo.png', 'ucla-samueli-block.png', 'ucla-samueli-block-rev.png', 'anduril-logo.svg'] },
 }
 
-const previous = existsSync(MANIFEST) ? JSON.parse(readFileSync(MANIFEST, 'utf8')) : {}
+const read = (file) => (existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {})
+const previous = read(MANIFEST)
+const previousHashes = read(CACHE)
 const manifest = {}
+const hashes = {}
 let built = 0
 let skipped = 0
 
@@ -46,18 +55,20 @@ for (const [folder, recipe] of Object.entries(RECIPES)) {
     const key = `${folder}/${file}`
     const input = readFileSync(join(dir, file))
     const hash = createHash('sha256').update(input).update(String(VERSION)).digest('hex').slice(0, 16)
+    hashes[key] = hash
     const name = basename(file, extname(file))
+    const urlsOf = (w) => ['avif', 'webp'].map((format) => `/media/${folder}/${name}-${w}.${format}`)
 
     // SVG logos ship as-is (they scale and can be recoloured with CSS)
     if (extname(file) === '.svg') {
       copyFileSync(join(dir, file), join(OUT, folder, file))
       const m = readFileSync(join(dir, file), 'utf8').match(/viewBox="[\d.\s-]*?([\d.]+)\s+([\d.]+)"/)
-      manifest[key] = { hash, svg: `/media/${key}`, width: m ? +m[1] : null, height: m ? +m[2] : null }
+      manifest[key] = { svg: 1, width: m ? +m[1] : null, height: m ? +m[2] : null }
       continue
     }
 
     const prev = previous[key]
-    if (prev?.hash === hash && [...prev.avif, ...prev.webp].every((s) => existsSync(join(ROOT, 'public', s.url)))) {
+    if (previousHashes[key] === hash && prev?.w?.flatMap(urlsOf).every((url) => existsSync(join(ROOT, 'public', url)))) {
       manifest[key] = prev
       skipped++
       continue
@@ -72,7 +83,7 @@ for (const [folder, recipe] of Object.entries(RECIPES)) {
     }
     const widths = [...new Set(recipe.widths.filter((w) => w < srcW).concat(Math.min(srcW, Math.max(...recipe.widths))))].sort((a, b) => a - b)
 
-    const entry = { hash, width: srcW, height: outH(srcW), avif: [], webp: [] }
+    const entry = { width: srcW, height: outH(srcW), w: widths }
     for (const w of widths) {
       for (const [format, options] of [
         ['avif', { quality: 50, effort: 4 }],
@@ -85,7 +96,6 @@ for (const [folder, recipe] of Object.entries(RECIPES)) {
           if (!recipe.maxBytes || out.length <= recipe.maxBytes || quality <= 30) break
         }
         writeFileSync(join(ROOT, 'public', url), out)
-        entry[format].push({ w, url })
       }
     }
     if (recipe.placeholder !== false) {
@@ -112,5 +122,6 @@ for (const [file, size] of [
 }
 
 mkdirSync(join(ROOT, 'src', 'generated'), { recursive: true })
-writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + '\n')
+writeFileSync(MANIFEST, JSON.stringify(manifest) + '\n')
+writeFileSync(CACHE, JSON.stringify(hashes, null, 2) + '\n')
 console.log(`images: ${built} built, ${skipped} unchanged, ${Object.keys(manifest).length} in src/generated/media.json`)

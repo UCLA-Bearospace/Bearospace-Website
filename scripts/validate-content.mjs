@@ -91,6 +91,10 @@ export function validateContent(content, { mediaRoot = join(ROOT, 'assets-src', 
     d.divisionIds?.forEach((id, k) => ref('disciplines', d, i, `divisionIds[${k}]`, id, divisions, 'divisions.js'))
     if (d.divisionIds && !d.divisionIds.includes(d.primaryDivisionId))
       report('disciplines', d, i, 'primaryDivisionId', 'must be one of divisionIds')
+    if (!d.parts) {
+      if (!d.responsibilities?.length) report('disciplines', d, i, 'responsibilities', 'list at least one (or give the subteam parts)')
+      if (!d.skills?.length) report('disciplines', d, i, 'skills', 'list at least one (or give the subteam parts)')
+    }
     d.worksWith?.forEach((w, k) => {
       if (!content.roles?.some((r) => r.title === w.roleTitle))
         report('disciplines', d, i, `worksWith[${k}].roleTitle`, `no role in roles.js is titled "${w.roleTitle}"`)
@@ -103,6 +107,12 @@ export function validateContent(content, { mediaRoot = join(ROOT, 'assets-src', 
       ref(collection, r, i, 'group', r.group, groups, 'roles.js groups')
       ref(collection, r, i, 'disciplineSlug', r.disciplineSlug, disciplines, 'disciplines.js')
       r.also?.forEach((s, k) => ref(collection, r, i, `also[${k}]`, s, disciplines, 'disciplines.js'))
+      if (r.alsoGroup) ref(collection, r, i, 'alsoGroup.id', r.alsoGroup.id, groups, 'roles.js groups')
+      if (r.focus) {
+        const covered = [r.disciplineSlug, ...(r.also ?? [])].map((s) => content.disciplines?.find((d) => d.slug === s))
+        if (!covered.some((d) => d?.parts?.some((p) => p.id === r.focus)))
+          report(collection, r, i, 'focus', `no subteam this role covers has a part "${r.focus}"`)
+      }
     })
   }
   content.projects?.forEach((p, i) => {
