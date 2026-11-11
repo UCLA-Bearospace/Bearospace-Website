@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router'
 import Img from '../components/Img'
 import { destinations } from '../site/destinations.js'
 import { getMeta } from '../site/meta.js'
-import { mailto } from '../content/index.js'
 import { setMotionPaused, useMotionPaused, useReducedMotion } from '../motion/useMotionPref'
 import { announce } from './announcer'
 
@@ -82,9 +81,9 @@ export default function Header() {
             <Link className="button button--gold" to="/join" onClick={close}>
               Join the team
             </Link>
-            <a className="button" href={mailto('sponsorship')}>
+            <Link className="button" to="/sponsors" onClick={close}>
               Sponsor a launch
-            </a>
+            </Link>
           </div>
         </div>
       </dialog>

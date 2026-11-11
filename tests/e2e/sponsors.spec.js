@@ -10,7 +10,8 @@ const withLogo = sponsorList().filter((s) => s.logo)
 
 test('every sponsor appears on the Sponsors page in order, the lead sponsor largest', async ({ page }) => {
   await page.goto('/sponsors?scene=0')
-  const names = await page.locator('.sponsor-card__name').allTextContents()
+  // Past partners have their own section below (see the next tests)
+  const names = await page.locator('.sponsor-card:not(.sponsor-card--past-partner) .sponsor-card__name').allTextContents()
   expect(names).toEqual(sponsorList().map((s) => s.name))
   await expect(page.locator('.sponsor-card').first()).toContainText('Supported by Anduril')
   const [lead, next] = await page.locator('.sponsor-card img').evaluateAll((imgs) => imgs.slice(0, 2).map((i) => i.getBoundingClientRect().height))
@@ -38,12 +39,24 @@ test.describe('the opening sequence', () => {
 test('a sponsor reaches the sponsorship email in at most two clicks from the Flight Deck', async ({ page }) => {
   const sponsorship = `mailto:${links.email}?subject=${encodeURIComponent('Sponsorship inquiry — Bearospace')}`
   await page.goto('/?scene=0')
-  // One click: the deck's "Sponsor a launch" button opens the email itself
-  await expect(page.getByRole('link', { name: 'Sponsor a launch' }).first()).toHaveAttribute('href', sponsorship)
-  // Two clicks: the Sponsors destination, then its email button
-  await page.getByRole('navigation', { name: 'Destinations' }).getByRole('link', { name: /^Sponsors/ }).click()
+  // "Sponsor a launch" opens the Sponsors page (a mailto: link did nothing without a mail app),
+  // then its email button; the address is also written out for copying
+  await page.getByRole('link', { name: 'Sponsor a launch' }).first().click()
   await expect(page).toHaveURL(/\/sponsors$/)
   await expect(page.getByRole('link', { name: 'Email us about sponsorship' })).toHaveAttribute('href', sponsorship)
+  await expect(main(page)).toContainText(links.email)
+})
+
+test('past partners are listed by name, with no logo, and stay out of the intro and the strip', async ({ page }) => {
+  await page.goto('/sponsors?scene=0')
+  const section = page.locator('section', { has: page.getByRole('heading', { name: 'Past meeting partners and collaborators' }) })
+  const mach = section.locator('li', { hasText: 'Mach Industries' })
+  await expect(mach).toBeVisible()
+  await expect(mach.locator('img')).toHaveCount(0)
+  await expect(mach.getByRole('link')).toHaveCount(0)
+  await expect(page.locator('.site-footer')).not.toContainText('Mach Industries')
+  await page.goto('/?scene=0')
+  await expect(page.locator('.deck__sponsors')).not.toContainText('Mach Industries')
 })
 
 test('the Sponsors page invents no sponsorship tiers, prices, or donation links', async ({ page }) => {
@@ -64,9 +77,12 @@ test('joining starts with the Discord, and drop-in times live in its announcemen
 })
 
 test('a discipline interest carries into the Discord prompt and the email', async ({ page }) => {
-  await page.goto('/join?interest=recovery&scene=0')
-  await expect(main(page)).toContainText('and ask about Recovery')
-  await expect(page.getByRole('link', { name: 'Email us about joining Recovery' })).toHaveAttribute('href', /Joining%20Bearospace%20\(Recovery\)/)
+  await page.goto('/join?interest=avionics-recovery&scene=0')
+  await expect(main(page)).toContainText('and ask about Avionics & Recovery')
+  await expect(page.getByRole('link', { name: 'Email us about joining Avionics & Recovery' })).toHaveAttribute(
+    'href',
+    /Joining%20Bearospace%20\(Avionics%20%26%20Recovery\)/,
+  )
 })
 
 test('Discord is in the footer, and the contact buttons are easy to tap', async ({ page }) => {

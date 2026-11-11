@@ -1,6 +1,5 @@
 import { Link, useParams } from 'react-router'
 import PageFrame from '../components/PageFrame'
-import { Sources } from '../components/bits'
 import { OpenRoleCard, PersonCard, Portrait } from '../components/people'
 import {
   contributionsBy,
@@ -36,7 +35,6 @@ function Roster({ season }) {
   const groups = roster(season)
   // Cards reveal in role order across the whole page, group after group
   const starts = groups.reduce((acc, g, i) => [...acc, i ? acc[i - 1] + groups[i - 1].members.length + groups[i - 1].open.length : 0], [])
-  const sources = [...new Set(groups.flatMap((g) => g.members.map((m) => m.role.source)))]
   return (
     <>
       <SeasonNav current={season} />
@@ -53,7 +51,6 @@ function Roster({ season }) {
           </ul>
         </section>
       ))}
-      <Sources items={sources} />
     </>
   )
 }
@@ -157,7 +154,6 @@ export function Member() {
       <p>
         <Link to="/team">Back to the team</Link>
       </p>
-      <Sources items={[person.source, ...history.map((r) => r.source)]} />
     </PageFrame>
   )
 }

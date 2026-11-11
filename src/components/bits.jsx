@@ -1,16 +1,22 @@
 import { Link } from 'react-router'
 import Img from './Img'
+
+// Pages import Img from here, not from './Img': when several page chunks import Img directly
+// while the main script reaches it through this file, Rolldown splits React, the content,
+// and Img out of the entry into shared chunks (slower first paint; check-budgets fails it).
+export { Img }
 import { sponsorList } from '../content/index.js'
 
 const isUrl = (s) => /^https?:\/\//.test(s ?? '')
 
 /** "Sources" footnote list for a page or section. Non-URL sources are shown as text. */
-export function Sources({ items }) {
+/** Outside links behind a page's facts (news coverage, organizer records), titled "Read more". */
+export function Sources({ items, title = 'Read more' }) {
   const list = [...new Map(items.filter(Boolean).map((s) => [typeof s === 'string' ? s : s.url ?? s.label, s])).values()]
   if (!list.length) return null
   return (
-    <aside className="sources" aria-label="Sources">
-      <h2 className="sources__title">Sources</h2>
+    <aside className="sources" aria-label={title}>
+      <h2 className="sources__title">{title}</h2>
       <ul>
         {list.map((s) => {
           const label = typeof s === 'string' ? s : s.label

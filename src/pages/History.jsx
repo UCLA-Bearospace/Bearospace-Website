@@ -5,7 +5,9 @@ import {
   getCompetition,
   getPerson,
   getProfile,
+  historyProjects,
   org,
+  projects,
   publishedMilestones,
   publishedResults,
   publishedRoles,
@@ -20,6 +22,7 @@ function seasons() {
     ...publishedMilestones().map((m) => m.season),
     ...publishedResults().map((r) => r.season),
     ...publishedRoles().map((r) => r.season),
+    ...projects.filter((p) => historyProjects(p.season).includes(p)).map((p) => p.season),
   ])
   return [...all].sort().reverse()
 }
@@ -31,7 +34,7 @@ export default function History() {
     <PageFrame
       kicker="History"
       title="Season by season"
-      lede="The documented story of rocketry at UCLA AISES: the teams, the rockets, and the results."
+      lede="The documented story of rocketry at UCLA: the teams, the rockets, and the results."
     >
       <nav aria-label="Seasons" className="season-jump">
         <ul className="inline-list">
@@ -59,9 +62,28 @@ export default function History() {
                 <p>
                   {m.body} <a href={m.source}>Source</a>
                 </p>
-                {m.projectSlug && (
-                  <p>
-                    <Link to={`/projects/${m.projectSlug}`}>Read the project</Link>
+              </div>
+            ))}
+            {historyProjects(season).map((p) => (
+              <div key={p.slug} className="season-rocket">
+                <h3>The rocket: {p.title}</h3>
+                <p>{p.summary}</p>
+                <ul>
+                  {[...p.objective, ...p.constraints, ...p.hardware, ...p.software].map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+                {p.sources.some((x) => x.url) && (
+                  <p className="note">
+                    Read more:{' '}
+                    {p.sources
+                      .filter((x) => x.url)
+                      .map((x, k) => (
+                        <span key={x.url}>
+                          {k > 0 && ' · '}
+                          <SourceLink source={x.url} label={x.label} />
+                        </span>
+                      ))}
                   </p>
                 )}
               </div>

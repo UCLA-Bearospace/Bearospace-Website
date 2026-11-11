@@ -8,7 +8,7 @@ test('a member profile shows the current role, disciplines, and structured data'
   await page.goto('/team/juan-ventura-romero?scene=0')
   await expect(h1(page)).toHaveText('Juan Ventura-Romero')
   await expect(page.locator('main .kicker').first()).toHaveText('Payload Software Lead · 2026–27')
-  await expect(page.locator('main').getByRole('link', { name: 'Payload Development' })).toHaveAttribute('href', '/engineering/payload')
+  await expect(page.locator('main').getByRole('link', { name: 'Payload Software' })).toHaveAttribute('href', '/engineering/payload-software')
   await expect(page.locator('.note--banner')).toHaveCount(0)
   const data = JSON.parse(await page.locator('script[type="application/ld+json"]').first().textContent())
   expect(data).toMatchObject({ '@type': 'Person', name: 'Juan Ventura-Romero', jobTitle: 'Payload Software Lead' })
@@ -20,13 +20,18 @@ test('alumni keep their page, marked as alumni', async ({ page }) => {
   await expect(page.locator('main .kicker').first()).toHaveText('Alumni · 2025–26')
 })
 
-test('people without consent are named, not linked, and have no page', async ({ page }) => {
-  await page.goto('/team/season/2018-19?scene=0')
-  const card = page.locator('.person-card', { hasText: 'Lucia Gonzalez' })
-  await expect(card).toBeVisible()
-  await expect(card.getByRole('link')).toHaveCount(0)
+test('people without consent have no page', async ({ page }) => {
   await page.goto('/team/lucia-gonzalez?scene=0')
   await expect(h1(page)).toHaveText('Lost signal.')
+})
+
+test('the 2025–26 roster carries the project manager\'s corrections, and no position is open', async ({ page }) => {
+  await page.goto('/team/season/2025-26?scene=0')
+  await expect(page.locator('.person-card', { hasText: 'Dario Kuroda' })).toBeVisible()
+  await expect(page.locator('.person-card', { hasText: 'Kenneth Fambro' })).toContainText('Payload Lead')
+  await expect(page.locator('.person-card', { hasText: 'Emmanuel Jaimes' })).toContainText('Structures and Manufacturing Director')
+  await page.goto('/team?scene=0')
+  await expect(page.locator('.person-card--open')).toHaveCount(0)
 })
 
 test('every portrait sits on the same panel, at 4:5', async ({ page }) => {

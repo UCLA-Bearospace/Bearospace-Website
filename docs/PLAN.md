@@ -861,3 +861,18 @@ Decisions made while building, recorded so later slices start from what is actua
 - **No "Upcoming" list:** the plan's manual events list would duplicate the Discord announcements and go stale, the problem the old Google Calendar had.
 - **Sponsor reach:** the deck's "Sponsor a launch" button already opens the sponsorship email (one click); the Sponsors destination is two.
 - **Not built:** the plan's escort-rocket and gold-beacon scene touches for these pages, to keep the scene chunk inside its budget (184.5 / 190 KB).
+
+### Slice 10, part 1 (project manager's content review)
+
+- **Review:** Emmanuel Jaimes (PM) reviewed a Word document of every page's text, menus, diagrams, and open questions (kept out of the repository). The site looked fine overall; the changes were wording, Mach Industries, and the structural fixes below. Juan Ventura-Romero decided the open points on 2026-11-10 (checklist "Decided").
+- **Subteams:** "subteams" replaces "disciplines" in visible text. Avionics and Recovery are one subteam (`avionics-recovery`) in the renamed Avionics & Recovery division; Payload Software is its own subteam in Payload (draft text, checklist C21), and Payload Electronics is Payload-only. Still seven subteams. Old addresses redirect (`vercel.json`): `/engineering/avionics`, `/engineering/recovery`, and the old site's electronics and recovery pages go to `/engineering/avionics-recovery`.
+- **System map:** the fins section is now "Fins and fin can" (the aft body as well as the fins; Aerodynamics builds the fin jig and assembles the can), and the airframe "Airframe and couplers". Every legend number now appears in the drawing (fins, outline, and ground included). Discipline pages drop the map caption (the heading above says it).
+- **AISES references removed at the PM's request:** About's AISES section, the footer line, the org description, and the AISES sponsor record are gone. Competition records keep their official wording.
+- **Projects and History:** `/projects` says "coming soon" and points to History. A project with `place: 'history'` (the 2018–19 rocket) renders inside its season on `/history` and has no page; `/projects/2018-19-fnl-rocket` redirects there. Milestones no longer link to projects. The 2018–19 roster is hidden (C22), so `/team/season/2018-19` redirects to the same season on History.
+- **Sources:** removed from most pages; History and Competitions keep their outside links, titled "Read more". Every record still carries its source in the content files.
+- **Sponsors:** "Sponsor a launch" (deck and menu) opens `/sponsors` instead of a `mailto:` link, which did nothing on computers without a mail app. Mach Industries is a name-only past partner (`relationship: 'past-partner'`, no logo), listed under "Past meeting partners and collaborators" and kept out of the intro and the strip.
+- **Flight Deck:**
+  - **Paused or reduced motion** keeps the orbit layout on a still frame instead of switching to the list (the engine draws one frame and pins the labels).
+  - **Scrolling to the footer** lifts the scene and its labels with the page (a transform on `.scene-host` and the label layer while the orbit layout is on), so the footer arrives below the lowest bodies instead of sliding over them.
+  - **Bodies:** Sponsors is a low-poly handshake (the escort rocket was never built); the History comet's cone tail became a contrail of fading sprites. Scene chunk 185.1 / 190 KB.
+- **Keeping the main script in one piece, again:** pages that imported `Img` directly (while the main script reached it through `components/bits`) split React, the content, and `Img` out of the entry. Pages now import `Img` from `bits`, which re-exports it. Main JS 114.4 / 115 KB.

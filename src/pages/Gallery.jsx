@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 import PageFrame from '../components/PageFrame'
-import Img from '../components/Img'
-import { Sources } from '../components/bits'
-import { SOURCES, gallery, galleryCategories, photoSlug, seasonLabel } from '../content/index.js'
+import { Img } from '../components/bits'
+import { gallery, galleryCategories, photoSlug, seasonLabel } from '../content/index.js'
 
 // The gallery (docs/PLAN.md §8.9): a masonry grid of photos, category filters where a
 // category has at least two photos, and a lightbox. Each photo has an address,
@@ -131,7 +130,6 @@ export default function Gallery() {
           </li>
         ))}
       </ul>
-      <Sources items={[SOURCES.sitePhotos]} />
 
       {photo && (
         <Lightbox

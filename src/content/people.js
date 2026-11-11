@@ -47,7 +47,8 @@ export const people = [
   person('wyatt-brown', 'Wyatt Brown', { source: SOURCES.oldSiteContact }),
   person('kenneth-fambro', 'Kenneth Fambro', { source: SOURCES.oldSiteContact }),
   person('michael-sicner', 'Michael Sicner', { source: SOURCES.oldSiteContact }),
-  person('dario-kuro', 'Dario Kuro', { source: SOURCES.oldSiteContact }),
+  // Surname corrected from the old site's "Kuro" (content review, 2026-11-10); /team/dario-kuro redirects here
+  person('dario-kuroda', 'Dario Kuroda', { source: SOURCES.pmReview }),
   person('ronaldo-garcia', 'Ronaldo Garcia', { source: SOURCES.oldSiteContact }),
   person('moises-sosa', 'Moises Sosa', { source: SOURCES.oldSiteContact }),
   person('israel-alejos', 'Israel Alejos', { source: SOURCES.oldSiteContact }),

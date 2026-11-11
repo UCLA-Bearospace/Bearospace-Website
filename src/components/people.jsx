@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import Img from './Img'
+import { Img } from './bits'
 import { hasMedia } from './media'
 
 const initials = (name) =>

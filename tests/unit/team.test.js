@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { validateContent } from '../../scripts/validate-content.mjs'
-import { content, getProfile, profilePeople, roster, rolesFor } from '../../src/content/index.js'
+import { content, getProfile, profilePeople, rolesFor, rosterSeasons } from '../../src/content/index.js'
 import { allPaths, getMeta } from '../../src/site/meta.js'
 
 // People and seasons (slice 6).
@@ -33,8 +33,8 @@ test('people without consent are named in rosters but get no profile page', () =
   assert.equal(getProfile('lucia-gonzalez'), undefined)
   assert.ok(!allPaths().includes('/team/lucia-gonzalez'))
   assert.ok(!profilePeople().some((p) => p.slug === 'lucia-gonzalez'))
-  const named = roster('2018-19').flatMap((g) => g.members.map((m) => m.person.slug))
-  assert.ok(named.includes('lucia-gonzalez'))
+  // The 2018–19 roster that named them is hidden for now (checklist C22)
+  assert.ok(!rosterSeasons().includes('2018-19'))
   assert.equal(getMeta('/team/lucia-gonzalez').notFound, true)
 })
 

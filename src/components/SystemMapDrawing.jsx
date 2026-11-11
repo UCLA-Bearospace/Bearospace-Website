@@ -33,7 +33,11 @@ const finPoints = (sign) =>
   ].join(' ')
 const FINS = [finPoints(1), finPoints(-1)]
 
-const BODY_ZONES = zones.map((z, i) => ({ ...z, n: i + 1 })).filter((z) => z.part === 'body')
+const NUMBERED = zones.map((z, i) => ({ ...z, n: i + 1 }))
+const BODY_ZONES = NUMBERED.filter((z) => z.part === 'body')
+const FIN_ZONE = NUMBERED.find((z) => z.part === 'fins') // fins plus the fin can on the body
+const numberOf = (part) => NUMBERED.find((z) => z.part === part)?.n
+const FIN_MID = (xTail(fin.rootToM) + xTail(fin.rootFromM)) / 2
 
 export default function SystemMapDrawing({ id, active }) {
   const cls = (zone, extra = '') => `zone zone--${zone}${extra}${active.includes(zone) ? ' is-on' : ''}`
@@ -55,6 +59,9 @@ export default function SystemMapDrawing({ id, active }) {
             <rect key={from} className={cls(z.id, z.approximate ? ' zone--approx' : '')} x={x(from)} y={CY - 60} width={x(to) - x(from)} height="120" />
           )),
         )}
+        {FIN_ZONE?.segments.map(([from, to]) => (
+          <rect key={from} className={cls('fins', ' zone--fincan')} x={x(from)} y={CY - 60} width={x(to) - x(from)} height="120" />
+        ))}
       </g>
       <path className={cls('airframe')} d={BODY} />
       {/* Section numbers, matching the legend */}
@@ -65,6 +72,15 @@ export default function SystemMapDrawing({ id, active }) {
           </text>
         )),
       )}
+      <text className="system-map__num" x={FIN_MID - 60} y={CY - TIP + 22}>
+        {numberOf('fins')}
+      </text>
+      <text className="system-map__num" x={x(0.62)} y={CY + R + 38}>
+        {numberOf('outline')}
+      </text>
+      <text className="system-map__num" x={24} y={GROUND - 12}>
+        {numberOf('ground')}
+      </text>
     </svg>
   )
 }

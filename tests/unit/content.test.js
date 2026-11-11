@@ -2,7 +2,23 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { validateContent } from '../../scripts/validate-content.mjs'
 import { readFileSync } from 'node:fs'
-import { content, disciplinesInZone, leadsFor, roster, rosterSeasons, publishedResults, sponsorList, worksWithFor, zones, zonesFor } from '../../src/content/index.js'
+import {
+  content,
+  disciplinesInDivision,
+  disciplinesInZone,
+  getProject,
+  historyProjects,
+  leadsFor,
+  pastPartners,
+  publishedProjects,
+  publishedResults,
+  roster,
+  rosterSeasons,
+  sponsorList,
+  worksWithFor,
+  zones,
+  zonesFor,
+} from '../../src/content/index.js'
 import { FINS, NOSE_END, OUTLINE } from '../../src/content/systemMap.js'
 
 // A deep copy we can break on purpose
@@ -51,17 +67,46 @@ test('a sponsor shown in the intro needs a logo', () => {
   assert.match(validateContent(c).join('\n'), /sponsors\.js › "anduril" › showInIntro: sponsors shown in the intro need a logo/)
 })
 
-test('Payload Electronics is one discipline shared by two divisions', () => {
-  const pe = content.disciplines.filter((d) => d.slug === 'payload-electronics')
-  assert.equal(pe.length, 1)
-  assert.deepEqual(pe[0].divisionIds.sort(), ['avionics', 'payload'])
+test('seven subteams: Avionics & Recovery combined, Payload Software its own', () => {
+  assert.equal(content.disciplines.length, 7)
+  const slugs = content.disciplines.map((d) => d.slug)
+  assert.ok(slugs.includes('avionics-recovery') && slugs.includes('payload-software'))
+  assert.ok(!slugs.includes('avionics') && !slugs.includes('recovery'))
+  assert.deepEqual(zonesFor('avionics-recovery').map((z) => z.id).sort(), ['avionics', 'recovery'])
+  // Payload Electronics belongs to the Payload division only (content review, 2026-11-10)
+  assert.deepEqual(content.disciplines.find((d) => d.slug === 'payload-electronics').divisionIds, ['payload'])
+  assert.deepEqual(
+    disciplinesInDivision('payload').map((d) => d.slug),
+    ['payload-electronics', 'payload', 'payload-software'],
+  )
 })
 
-test('the current roster groups people and shows the open Avionics Director role', () => {
+test('the current roster groups people under Avionics & Recovery, with no open roles', () => {
   const groups = roster('2026-27')
-  const avionics = groups.find((g) => g.group.id === 'avionics')
-  assert.equal(avionics.open[0].title, 'Avionics Director')
-  assert.ok(leadsFor('payload').some(({ person, role }) => person.slug === 'juan-ventura-romero' && role.title === 'Payload Software Lead'))
+  const ar = groups.find((g) => g.group.id === 'avionics-recovery')
+  assert.deepEqual(
+    ar.members.map((m) => m.person.slug),
+    ['angel-iglesias', 'jonathan-nguyen'],
+  )
+  assert.ok(groups.every((g) => g.open.length === 0))
+  assert.ok(leadsFor('payload-software').some(({ person, role }) => person.slug === 'juan-ventura-romero' && role.title === 'Payload Software Lead'))
+})
+
+test('a past partner is listed by name only, never in the intro or the strip', () => {
+  const mach = pastPartners().find((s) => s.id === 'mach-industries')
+  assert.ok(mach)
+  assert.equal(mach.logo, null)
+  assert.ok(!sponsorList().some((s) => s.id === 'mach-industries'))
+  assert.ok(!sponsorList({ intro: true }).some((s) => s.id === 'mach-industries'))
+})
+
+test('the 2018–19 rocket lives on History, not Projects', () => {
+  assert.equal(getProject('2018-19-fnl-rocket'), undefined)
+  assert.ok(!publishedProjects().some((p) => p.slug === '2018-19-fnl-rocket'))
+  assert.deepEqual(
+    historyProjects('2018-19').map((p) => p.slug),
+    ['2018-19-fnl-rocket'],
+  )
 })
 
 test('unconfirmed lineage stays hidden', () => {
@@ -111,7 +156,7 @@ test('Payload Electronics works with Payload Software, led by this season’s le
 test('a discipline must name real rocket sections and real roles', () => {
   const c = copy()
   c.disciplines[0].zones = ['engine-room']
-  c.disciplines[4].worksWith = [{ team: 'Payload Software', roleTitle: 'Chief Wizard' }]
+  c.disciplines.find((d) => d.slug === 'payload-electronics').worksWith = [{ team: 'Payload Software', roleTitle: 'Chief Wizard' }]
   const errors = validateContent(c).join('\n')
   assert.match(errors, /disciplines\.js › "aerodynamics" › zones\[0\]: Invalid option/)
   assert.match(errors, /disciplines\.js › "payload-electronics" › worksWith\[0\]\.roleTitle: no role in roles\.js is titled "Chief Wizard"/)

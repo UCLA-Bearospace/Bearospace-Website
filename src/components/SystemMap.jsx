@@ -9,17 +9,25 @@ import SystemMapDrawing from './SystemMapDrawing'
 
 const numbered = zones.map((z, i) => ({ ...z, n: i + 1 }))
 
-export default function SystemMap({ active = [], onHover, only, id = 'system-map', title = 'The rocket, section by section' }) {
+/** `title` is the visible caption; with `title={null}`, `label` names the figure for screen readers only. */
+export default function SystemMap({ active = [], onHover, only, id = 'system-map', title = 'The rocket, section by section', label }) {
   'use no memo' // a short list that re-renders on hover: memoizing it would cost more bytes than time
   const legend = only ? numbered.filter((z) => only.includes(z.id)) : numbered
   const hover = (ids) => onHover && (() => onHover(ids))
   const leave = onHover && (() => onHover([]))
 
   return (
-    <figure className="system-map" data-active={active.length > 0 || undefined} aria-labelledby={`${id}-title`}>
-      <figcaption id={`${id}-title`} className="system-map__title">
-        {title}
-      </figcaption>
+    <figure
+      className="system-map"
+      data-active={active.length > 0 || undefined}
+      aria-labelledby={title ? `${id}-title` : undefined}
+      aria-label={title ? undefined : label}
+    >
+      {title && (
+        <figcaption id={`${id}-title`} className="system-map__title">
+          {title}
+        </figcaption>
+      )}
       <div className="system-map__frame">
         <SystemMapDrawing id={id} active={active} />
       </div>

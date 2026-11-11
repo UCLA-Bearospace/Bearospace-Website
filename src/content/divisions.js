@@ -9,8 +9,8 @@ export const divisions = [
   },
   {
     id: 'avionics',
-    name: 'Avionics',
-    summary: 'The electronics that sense, record, communicate, and trigger recovery during flight.',
+    name: 'Avionics & Recovery',
+    summary: 'The electronics that sense, record, and communicate during flight, and the parachutes that bring the rocket home.',
   },
   {
     id: 'payload',

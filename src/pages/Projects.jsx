@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router'
 import PageFrame from '../components/PageFrame'
 import { SourceLink, Sources, StatusBadge } from '../components/bits'
-import Img from '../components/Img'
+import { Img } from '../components/bits'
 import { getCompetition, getDiscipline, getPerson, getProject, publishedProjects, seasonLabel } from '../content/index.js'
 import NotFound from './NotFound'
 
@@ -10,12 +10,23 @@ export function Projects() {
   // Grouped by season, newest first. (Season and discipline filters can join once there
   // are enough projects to need them.)
   const seasons = [...new Set(projects.map((p) => p.season))]
+  // Projects is for current designs and R&D (content review, 2026-11-10). Until the first
+  // write-up is confirmed, a short "coming soon" page points to History, where earlier
+  // seasons' rockets now live.
+  if (!projects.length) {
+    return (
+      <PageFrame kicker="Projects" title="Coming soon" lede="Our current designs and R&D projects are coming soon.">
+        <p>
+          This is where we’ll show what we’re designing and testing now, from this season’s payload to our research projects.
+        </p>
+        <p>
+          Earlier seasons’ rockets and results are on the <Link to="/history">History</Link> page.
+        </p>
+      </PageFrame>
+    )
+  }
   return (
-    <PageFrame
-      kicker="Projects"
-      title="What we build"
-      lede="Each project page covers the objective, the hardware and software, how it was tested, what happened, and who did what."
-    >
+    <PageFrame kicker="Projects" title="What we’re working on" lede="Our current designs and R&D projects.">
       {projects.length ? (
         seasons.map((season) => (
           <section key={season} aria-labelledby={`projects-${season}`}>
@@ -40,9 +51,6 @@ export function Projects() {
       ) : (
         <p>Project write-ups are on their way.</p>
       )}
-      <p className="note">
-        More project write-ups, including the current season’s rocket, will appear here as the team confirms their details.
-      </p>
     </PageFrame>
   )
 }

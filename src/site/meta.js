@@ -20,23 +20,23 @@ const HOME = { label: 'Home', path: '/' }
 const STATIC = {
   '/': {
     title: `${SITE} — ${org.tagline}`,
-    description: `${org.shortName} is ${org.tagline}: students who design, build, and fly high-power rockets as the technical project of AISES at UCLA.`,
+    description: `${org.shortName} is ${org.tagline}: students who design, build, and fly high-power rockets, and the payloads inside them.`,
     crumbs: [],
   },
   '/about': {
     label: 'About',
-    description: 'How Bearospace works: a student-led aerospace program, the full engineering lifecycle, and our roots in AISES at UCLA.',
+    description: 'How Bearospace works: a student-led aerospace program, the full engineering lifecycle, and a note from our project managers.',
   },
   '/engineering': {
     label: 'Engineering',
-    description: 'One rocket, seven disciplines, four divisions: aerodynamics, structures, recovery, avionics, payload, and safety & operations.',
+    description: 'One rocket, seven subteams in four divisions: aerodynamics, structures, avionics & recovery, payload development, payload electronics, payload software, and safety & operations.',
   },
-  '/projects': { label: 'Projects', description: 'Rockets and payloads Bearospace has designed, built, tested, and flown.' },
+  '/projects': { label: 'Projects', description: 'The designs and R&D projects Bearospace is working on now.' },
   '/competitions': {
     label: 'Competitions',
     description: 'Bearospace at First Nations Launch and NASA Student Launch: what each competition asks, and our results season by season.',
   },
-  '/history': { label: 'History', description: 'Seasons, rockets, teams, and results — the documented history of rocketry at UCLA AISES.' },
+  '/history': { label: 'History', description: 'Seasons, rockets, teams, and results — the documented history of Bearospace and rocketry at UCLA.' },
   '/team': { label: 'Team', description: `The ${seasonLabel(org.currentSeason)} Bearospace leadership team and past seasons.` },
   '/gallery': { label: 'Gallery', description: 'Photos from Bearospace launch days, lab sessions, and team trips.' },
   '/sponsors': { label: 'Sponsors', description: 'The organizations that support Bearospace, and how to partner with the team.' },

@@ -64,15 +64,16 @@ export const zones = [
     approximate: true,
   },
   {
+    // Aerodynamics builds the fin jig and assembles the fin can (content review, 2026-11-10)
     id: 'fins',
-    label: 'Fins',
+    label: 'Fins and fin can',
     part: 'fins',
-    segments: [FINS],
+    segments: [[FINS[0], 1]],
     approximate: false,
   },
   {
     id: 'airframe',
-    label: 'Airframe, couplers, and fin can',
+    label: 'Airframe and couplers',
     part: 'outline',
     segments: [[NOSE_END, 1]],
     approximate: false,
