@@ -59,7 +59,7 @@ export default function About() {
           <p>
             Welcome to Bearospace! We believe the best way to learn aerospace engineering is to build aerospace systems.
             Whether you’re an experienced engineer or a first-year who has never opened a CAD program, there’s a place for
-            you here — on our Vehicle, Avionics, Payload, or Operations teams, from first concept to post-flight analysis.
+            you here — on our Vehicle, Avionics & Recovery, Payload, or Operations teams, from first concept to post-flight analysis.
           </p>
           <p>
             The friendships, mentorship, and connections you make here matter as much as the rockets we launch. Our goal is

@@ -8,7 +8,7 @@ export const divisions = [
     summary: 'The rocket itself: how it flies, what it is made of, and how it comes home.',
   },
   {
-    id: 'avionics',
+    id: 'avionics-recovery',
     name: 'Avionics & Recovery',
     summary: 'The electronics that sense, record, and communicate during flight, and the parachutes that bring the rocket home.',
   },

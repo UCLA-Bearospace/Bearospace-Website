@@ -2,14 +2,14 @@
 // fractions of the rocket's length from the nose tip (0) to the tail (1).
 //
 // Only the outer shape is known from the 2025–26 model: the nose cone ends 0.367 m from
-// the tip and the fins sit 0.026–0.148 m from the tail (src/generated/rocket.meta.json;
-// tests/unit/content.test.js keeps these numbers in step with it). The internal sections are
-// the usual order for a dual-deploy rocket (payload, main parachute, avionics bay, drogue)
-// at typical positions. They are marked `approximate` and the page says so, until the team
+// the tip, and the swept fins meet the airframe 0.103–0.265 m from the tail, their tips
+// reaching back to 0.026 m (src/generated/rocket.meta.json; tests/unit/content.test.js keeps
+// these numbers in step with it). The internal sections are the usual order for a
+// dual-deploy rocket (payload, main parachute, avionics bay, drogue) at typical positions. They are marked `approximate` and the page says so, until the team
 // confirms the real layout (docs/CONTENT-CHECKLIST.md). Nothing inside a section is named.
 
 export const NOSE_END = 0.1403
-export const FINS = [0.9433, 0.99]
+export const FINS = [0.8984, 0.9606] // where the fin roots meet the airframe
 
 // The outline the map draws, in metres, copied from rocket.meta.json (the unit test checks
 // they match). Copied rather than imported: the 3D scene chunk imports that file, and a
@@ -19,7 +19,7 @@ export const OUTLINE = {
   lengthM: 2.6124,
   bodyDiameterM: 0.1651,
   finSpanM: 0.5716,
-  fin: { rootFromM: 0.0262, rootToM: 0.1481, tipFromM: 0.0262, tipToM: 0.1481 },
+  fin: { rootFromM: 0.1029, rootToM: 0.2654, tipFromM: 0.0262, tipToM: 0.1481 },
   nose: [
     [0, 0],
     [0.0363, 0.0544],
@@ -47,20 +47,16 @@ export const zones = [
     approximate: true,
   },
   {
-    id: 'recovery',
-    label: 'Recovery sections, for the main and drogue parachutes',
+    // One subteam, one section (content review, 2026-11-10): the main parachute bay, the
+    // avionics bay, and the drogue parachute bay, drawn as three bays
+    id: 'avionics-recovery',
+    label: 'Avionics and recovery: main parachute, avionics bay, and drogue parachute',
     part: 'body',
     segments: [
       [0.33, 0.5],
+      [0.5, 0.58],
       [0.58, 0.72],
     ],
-    approximate: true,
-  },
-  {
-    id: 'avionics',
-    label: 'Avionics bay',
-    part: 'body',
-    segments: [[0.5, 0.58]],
     approximate: true,
   },
   {

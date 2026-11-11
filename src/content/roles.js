@@ -8,8 +8,7 @@ export const groups = [
   { id: 'management', label: 'Management' },
   { id: 'vehicle', label: 'Vehicle' },
   { id: 'payload', label: 'Payload' },
-  { id: 'avionics-recovery', label: 'Avionics & Recovery' }, // 2026-27 onward
-  { id: 'avionics', label: 'Avionics' }, // as the 2025-26 roster was organized
+  { id: 'avionics-recovery', label: 'Avionics & Recovery' },
   { id: 'challenge', label: 'Challenge' },
   { id: 'manufacturing', label: 'Manufacturing' },
   { id: 'safety-operations', label: 'Safety & Operations' },
@@ -56,9 +55,9 @@ export const roles = [
   role('noah-tran', '2025-26', 'Structures and Recovery', 'vehicle', 1, S25),
   role('azad-aghdam', '2025-26', 'Structures and Recovery', 'vehicle', 2, S25),
   role('joel-venegas', '2025-26', 'Structures and Recovery', 'vehicle', 3, S25),
-  role('eirvin-rubio', '2025-26', 'Avionics', 'avionics', 1, S25),
-  role('dereck-rubio', '2025-26', 'Avionics', 'avionics', 2, S25),
-  role('wyatt-brown', '2025-26', 'Avionics', 'avionics', 3, S25),
+  role('eirvin-rubio', '2025-26', 'Avionics', 'avionics-recovery', 1, S25),
+  role('dereck-rubio', '2025-26', 'Avionics', 'avionics-recovery', 2, S25),
+  role('wyatt-brown', '2025-26', 'Avionics', 'avionics-recovery', 3, S25),
   // The old site listed him under Avionics; he was a Payload Lead (content review, 2026-11-10)
   role('kenneth-fambro', '2025-26', 'Payload Lead', 'payload', 1, { source: SOURCES.pmReview }),
   role('michael-sicner', '2025-26', 'Challenge', 'challenge', 1, S25),

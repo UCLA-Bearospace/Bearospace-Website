@@ -72,7 +72,15 @@ test('seven subteams: Avionics & Recovery combined, Payload Software its own', (
   const slugs = content.disciplines.map((d) => d.slug)
   assert.ok(slugs.includes('avionics-recovery') && slugs.includes('payload-software'))
   assert.ok(!slugs.includes('avionics') && !slugs.includes('recovery'))
-  assert.deepEqual(zonesFor('avionics-recovery').map((z) => z.id).sort(), ['avionics', 'recovery'])
+  // One section on the map too: the main parachute, avionics, and drogue bays
+  assert.deepEqual(
+    zonesFor('avionics-recovery').map((z) => z.id),
+    ['avionics-recovery'],
+  )
+  assert.deepEqual(
+    content.divisions.map((d) => d.id),
+    ['vehicle', 'avionics-recovery', 'payload', 'safety-operations'],
+  )
   // Payload Electronics belongs to the Payload division only (content review, 2026-11-10)
   assert.deepEqual(content.disciplines.find((d) => d.slug === 'payload-electronics').divisionIds, ['payload'])
   assert.deepEqual(
@@ -143,7 +151,7 @@ test('the system map matches the rocket model', () => {
   // Sections stay on the rocket and in order; only the model-derived ones are exact
   for (const z of zones) {
     for (const [from, to] of z.segments) assert.ok(from >= 0 && to <= 1 && from < to, z.id)
-    if (['payload', 'recovery', 'avionics'].includes(z.id)) assert.equal(z.approximate, true, z.id)
+    if (['payload', 'avionics-recovery'].includes(z.id)) assert.equal(z.approximate, true, z.id)
   }
 })
 

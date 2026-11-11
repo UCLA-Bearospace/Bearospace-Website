@@ -73,8 +73,8 @@ export const disciplines = [
     // Avionics and Recovery work as one subteam for now (PM, 2026-11-10); airbrakes join later
     slug: 'avionics-recovery',
     name: 'Avionics & Recovery',
-    divisionIds: ['avionics'],
-    primaryDivisionId: 'avionics',
+    divisionIds: ['avionics-recovery'],
+    primaryDivisionId: 'avionics-recovery',
     summary: 'Flight computers, sensors, and telemetry, and the parachutes that bring the rocket home.',
     lede:
       "Avionics & Recovery is the rocket's nervous system and its way home: flight computers, sensors, telemetry, and power, plus the dual-deployment system — a drogue parachute and a main parachute — that the electronics fire. Members design circuit boards, write embedded code, size black-powder charges and shear pins, and test everything on the bench and on the ground before it flies.",
@@ -109,7 +109,7 @@ export const disciplines = [
       'Flight testing',
       'Data analysis',
     ],
-    zones: ['avionics', 'recovery'],
+    zones: ['avionics-recovery'],
     source: `${page('electronics')} ; ${page('recovery-systems')}`,
   },
   {

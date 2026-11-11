@@ -97,10 +97,10 @@ test.describe('with the 3D scene', () => {
 
     const card = page.locator('.card', { has: page.getByRole('link', { name: 'Avionics & Recovery', exact: true }) })
     await card.hover()
-    await expect(page.locator('.system-map .zone--recovery.is-on')).toHaveCount(2)
-    await expect(legend(page).filter({ hasText: 'Recovery sections' })).toHaveClass(/is-on/)
-    await expect(legend(page).filter({ hasText: 'Avionics bay' })).toHaveClass(/is-on/)
-    await expect.poll(() => lit(page)).toEqual(zonesFor('avionics-recovery').flatMap((z) => z.segments))
+    // Three bays on the map, one band on the rocket (they touch)
+    await expect(page.locator('.system-map .zone--avionics-recovery.is-on')).toHaveCount(3)
+    await expect(legend(page).filter({ hasText: 'Avionics and recovery' })).toHaveClass(/is-on/)
+    await expect.poll(() => lit(page)).toEqual([[0.33, 0.72]])
 
     await page.mouse.move(5, 5)
     await expect(page.locator('.system-map .is-on')).toHaveCount(0)

@@ -394,8 +394,7 @@ main {
 
 /* Internal sections: a faint tint, with dashed edges where the position is approximate */
 .zone--payload,
-.zone--recovery,
-.zone--avionics {
+.zone--avionics-recovery {
   fill: rgb(169 198 255 / 0.1);
 }
 
