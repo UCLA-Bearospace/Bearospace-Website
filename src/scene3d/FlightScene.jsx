@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useRef } from 'react'
 import { useLocation } from 'react-router'
 import { createEngine } from './engine'
-import { useDirector } from '../motion/director'
+import { requestedRocketZones, useDirector } from '../motion/director'
 import { targetFor } from '../site/targets.js'
 import { reportProgress } from '../intro/progress'
 import meta from '../generated/rocket.meta.json'
@@ -11,7 +11,7 @@ import meta from '../generated/rocket.meta.json'
  * The engine lives for the component's lifetime; later changes flow through setters.
  * It hands the route transitions and the menu a small "director" API (motion/director.js).
  */
-export default function FlightScene({ motion, dimmed = false, onStatus, onEngine }) {
+export default function FlightScene({ motion, active = true, dimmed = false, onStatus, onEngine }) {
   const hostRef = useRef(null)
   const engineRef = useRef(null)
   const directorRef = useDirector()
@@ -29,6 +29,7 @@ export default function FlightScene({ motion, dimmed = false, onStatus, onEngine
       },
     })
     engine.setMotion(motion)
+    engine.setActive(active)
     // Deep link (or a scene that loaded late): open on the current page's shot
     engine.place(targetFor(pathname))
     engineRef.current = engine
@@ -37,12 +38,17 @@ export default function FlightScene({ motion, dimmed = false, onStatus, onEngine
         travel: (target) => engine.travel(target),
         place: (target) => engine.place(target),
         framing: () => engine.framing(),
+        // Hidden behind a phone-width page: nothing to fly, so transitions cut instead
+        visible: () => engine.active,
         attachLabels: (map) => engine.attachLabels(map),
         highlight: (id) => engine.highlight(id),
+        highlightZones: (segments) => engine.highlightZones(segments),
         showBodies: (on) => engine.showBodies(on),
         intro: (mode, options) => engine.intro(mode, options),
       }
     }
+    // A page may already have asked for rocket sections to be lit (Engineering)
+    engine.highlightZones(requestedRocketZones())
     onEngine?.(engine)
     if (import.meta.env.DEV || import.meta.env.VITE_TEST_HOOKS === '1') exposeTestHooks(engine)
     return engine
@@ -64,6 +70,10 @@ export default function FlightScene({ motion, dimmed = false, onStatus, onEngine
   useEffect(() => {
     engineRef.current?.setMotion(motion)
   }, [motion])
+
+  useEffect(() => {
+    engineRef.current?.setActive(active)
+  }, [active])
 
   useEffect(() => {
     // Behind a content page the scene doesn't need 60 fps

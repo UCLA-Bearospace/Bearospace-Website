@@ -1,5 +1,6 @@
 // Shapes of every content collection (docs/PLAN.md §10). Dev-only: zod never ships.
 import { z } from 'zod'
+import { ZONE_IDS } from '../src/content/systemMap.js'
 
 const season = z
   .string()
@@ -21,11 +22,31 @@ export const schemas = {
     primaryDivisionId: slug,
     summary: text,
     lede: text,
-    responsibilities: z.array(text).min(1),
-    work: z.array(text),
-    tools: z.array(text),
+    // Required unless the subteam has `parts` (shown as tabs, each with its own lists)
+    responsibilities: z.array(text),
+    work: z.array(text), // may be empty: Safety & Operations lists responsibilities only
+    tools: z.array(text), // may be empty: not every program page lists tools
     skills: z.array(text),
-    regionId: z.enum(['nose', 'body', 'fin', 'hardware']).nullable(),
+    parts: z
+      .array(
+        z
+          .object({
+            id: slug,
+            name: text,
+            summary: text,
+            does: z.array(text).min(1),
+            doesNot: z.array(text),
+            work: z.array(text),
+            skills: z.array(text).min(1),
+            source,
+          })
+          .strict(),
+      )
+      .min(2)
+      .optional(),
+    // Where it sits on the rocket (system map); at least one section
+    zones: z.array(z.enum(ZONE_IDS)).min(1),
+    worksWith: z.array(z.object({ team: text, roleTitle: text }).strict()).optional(),
     source,
   }),
 
@@ -48,6 +69,10 @@ export const schemas = {
     order: z.number(),
     disciplineSlug: slug.optional(),
     also: z.array(slug).optional(),
+    // Which part of a subteam with tabs this role leads (a `parts` id)
+    focus: slug.optional(),
+    // Also listed under a second roster group (a role that spans two teams)
+    alsoGroup: z.object({ id: slug, order: z.number() }).strict().optional(),
     publish: z.boolean().optional(),
     source,
   }),
@@ -78,6 +103,8 @@ export const schemas = {
       sources: z.array(z.object({ label: text, url: url.nullable() })).min(1),
       lastVerified: date,
       publish: z.boolean(),
+      // 'history': shown inside its season on the History page instead of on Projects
+      place: z.enum(['projects', 'history']).optional(),
     })
     .refine((p) => !p.publish || p.status, { message: 'a published project needs a status', path: ['status'] }),
 
@@ -87,6 +114,10 @@ export const schemas = {
     shortName: text,
     organizer: text,
     url,
+    // Logo beside the name (an original under assets-src/images/); `tile` puts a logo with a
+    // white background on a light tile instead of the dark page
+    // `name` and `owner` go into the page's trademark notice
+    logo: z.object({ src: z.string(), tile: z.boolean().optional(), name: text, owner: text }).strict().optional(),
     summary: z.array(text).min(1),
     source,
   }),
@@ -117,9 +148,11 @@ export const schemas = {
     .object({
       id: slug,
       name: text,
-      relationship: z.enum(['sponsor', 'institutional', 'home-organization', 'partner']),
+      relationship: z.enum(['sponsor', 'institutional', 'home-organization', 'partner', 'past-partner']),
       label: text,
-      url,
+      url: url.optional(),
+      description: text.optional(), // shown under past partners
+      date: date.nullable().optional(), // when a past collaboration happened, once known
       logo: z.object({ onDark: z.string().nullable(), onLight: z.string().nullable(), invertOnDark: z.boolean().optional() }).nullable(),
       showInIntro: z.boolean(),
       introOrder: z.number().optional(),

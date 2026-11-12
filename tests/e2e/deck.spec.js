@@ -128,7 +128,7 @@ test('Back and Forward replay the transitions', async ({ page }) => {
   await dest(page, 'Team').click()
   await expect(h1(page)).toHaveText('2026–27 leadership')
   await idle(page)
-  await page.getByRole('link', { name: 'Joel Venegas' }).click()
+  await page.getByRole('link', { name: 'Joel Venegas' }).first().click() // listed under two groups
   await expect(h1(page)).toHaveText('Joel Venegas')
   await idle(page)
   await page.goBack()
@@ -151,7 +151,7 @@ test('a hidden tab mid-transition still lands on the page', async ({ page }) => 
     Object.defineProperty(document, 'hidden', { value: true, configurable: true })
     document.dispatchEvent(new Event('visibilitychange'))
   })
-  await expect(h1(page)).toHaveText('One rocket, seven disciplines', { timeout: 3000 })
+  await expect(h1(page)).toHaveText('One rocket, seven subteams', { timeout: 3000 })
   await idle(page)
 })
 
@@ -173,10 +173,12 @@ test('resizing mid-travel still frames the page, and the deck re-fits', async ({
   }
 })
 
-test('pausing motion switches to the list and plain fades', async ({ page }) => {
+test('pausing motion freezes the deck in place and uses plain fades', async ({ page }) => {
   await openDeck(page)
   await page.getByRole('button', { name: 'Pause motion' }).click()
-  await expect(nav(page)).toHaveAttribute('data-layout', 'list')
+  // Still the orbit layout, on a still frame (content review: the list confused visitors)
+  await expect(nav(page)).toHaveAttribute('data-layout', 'orbit')
+  await expect(dest(page, 'History')).toBeVisible()
   await dest(page, 'History').click()
   await expect(page.locator('html')).toHaveAttribute('data-transition', 'fade')
   await expect(h1(page)).toHaveText('Season by season')
@@ -185,12 +187,25 @@ test('pausing motion switches to the list and plain fades', async ({ page }) => 
   expect(await page.evaluate(() => window.__bearo.stats().target)).toBe('history')
 })
 
-test('reduced motion gets the list layout', async ({ page }) => {
+test('reduced motion keeps the orbit layout on a still frame', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/')
   await expect(page.locator('html')).toHaveAttribute('data-scene', 'ready', READY)
-  await expect(nav(page)).toHaveAttribute('data-layout', 'list')
+  await expect(nav(page)).toHaveAttribute('data-layout', 'orbit')
+  for (const label of ['About', 'Sponsors']) await expect(dest(page, label)).toBeInViewport()
+})
+
+test('scrolling to the footer lifts the deck with the page, so no body hides behind it', async ({ page }) => {
+  await openDeck(page)
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0)
+  const footerTop = await page.locator('.site-footer').evaluate((el) => el.getBoundingClientRect().top)
+  await expect
+    .poll(() => page.locator('.destination-item').evaluateAll((items) => Math.max(...items.map((el) => el.getBoundingClientRect().bottom))))
+    .toBeLessThan(footerTop)
+  // The scene moves with the labels
+  await expect(page.locator('.scene-host')).toHaveCSS('transform', /matrix/)
 })
 
 test('axe: the deck in orbit layout', async ({ page }) => {
@@ -198,4 +213,64 @@ test('axe: the deck in orbit layout', async ({ page }) => {
   const { violations } = await new AxeBuilder({ page }).analyze()
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
   expect(serious, serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`).join('\n')).toEqual([])
+})
+
+// Phones: the deck is a list over the flying rocket, and the scene is paused (not torn
+// down) behind content pages. Tearing it down on every navigation left iPhones on a blank
+// screen after the wipe, and rebuilt the scene on every return to the deck.
+test.describe('on a phone', () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
+
+  test('every destination opens, one after another, and the scene is kept', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.locator('html')).toHaveAttribute('data-scene', 'ready', READY)
+    await expect(nav(page)).toHaveAttribute('data-layout', 'list')
+    // The test hooks object is created once per engine: the same object means the same scene
+    await page.evaluate(() => (window.__firstScene = window.__bearo))
+
+    await dest(page, 'Engineering').tap()
+    await expect(h1(page)).toHaveText('One rocket, seven subteams')
+    await idle(page)
+    await expect(page.locator('.page')).toBeVisible()
+    await expect(page.locator('.page')).toHaveCSS('opacity', '1')
+    // Hidden behind the page: still there, not drawing
+    expect(await page.evaluate(() => window.__bearo.stats().running)).toBe(false)
+    expect(await page.evaluate(() => window.__bearo === window.__firstScene)).toBe(true)
+
+    // A second page from the menu, then back to the deck and on to a third
+    await page.locator('.site-header').getByRole('link', { name: 'Menu', exact: true }).tap()
+    await page.getByRole('dialog').getByRole('link', { name: 'Team', exact: true }).tap()
+    await expect(h1(page)).toHaveText('2026–27 leadership')
+    await idle(page)
+    await expect(page.locator('.page')).toHaveCSS('opacity', '1')
+
+    await page.locator('.site-header').getByRole('link', { name: 'Bearospace home' }).tap()
+    await expect(h1(page)).toHaveText('Bearospace')
+    await idle(page)
+    await expect(page.locator('html')).toHaveAttribute('data-scene', 'ready')
+    expect(await page.evaluate(() => window.__bearo.stats().running)).toBe(true)
+    expect(await page.evaluate(() => window.__bearo === window.__firstScene)).toBe(true)
+
+    await dest(page, 'Gallery').tap()
+    await expect(h1(page)).toHaveText('Launch days and lab nights')
+    await idle(page)
+    await expect(page.locator('.page')).toHaveCSS('opacity', '1')
+  })
+})
+
+test('a transition that breaks part-way still lands on the page, uncovered', async ({ page }) => {
+  await openDeck(page)
+  // The wipe's bands refuse to animate (a browser quirk, say)
+  await page.evaluate(() => {
+    const animate = Element.prototype.animate
+    Element.prototype.animate = function (...args) {
+      if (this.classList.contains('wipe-band')) throw new Error('no animation for you')
+      return animate.apply(this, args)
+    }
+  })
+  await dest(page, 'Team').click()
+  await expect(h1(page)).toHaveText('2026–27 leadership')
+  await idle(page)
+  await expect(page.locator('.wipe')).toBeHidden()
+  await expect(page.locator('main')).toHaveCSS('opacity', '1')
 })

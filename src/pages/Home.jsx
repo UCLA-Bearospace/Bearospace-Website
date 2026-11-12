@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router'
-import { mailto, org } from '../content/index.js'
+import { org } from '../content/index.js'
 import { SponsorStrip } from '../components/bits'
 import { isLandingLocation } from '../app/landing'
 import { getLastDestination } from '../menu/menuState'
@@ -32,9 +32,10 @@ export default function Home() {
           <Link className="button button--gold" to="/join">
             Join the team
           </Link>
-          <a className="button" href={mailto('sponsorship')}>
+          {/* The Sponsors page, not an email link: mailto does nothing without a mail app */}
+          <Link className="button" to="/sponsors">
             Sponsor a launch
-          </a>
+          </Link>
         </div>
       </section>
 

@@ -5,29 +5,113 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/home", "destination": "/", "permanent": true },
-    { "source": "/technical-programs", "destination": "/engineering", "permanent": true },
-    { "source": "/technical-programs/aerodynamics", "destination": "/engineering/aerodynamics", "permanent": true },
-    { "source": "/technical-programs/internalexternal-structures", "destination": "/engineering/structures", "permanent": true },
-    { "source": "/technical-programs/recovery-systems", "destination": "/engineering/recovery", "permanent": true },
-    { "source": "/technical-programs/electronics", "destination": "/engineering/avionics", "permanent": true },
-    { "source": "/technical-programs/payload-electronics", "destination": "/engineering/payload-electronics", "permanent": true },
-    { "source": "/technical-programs/payload-development", "destination": "/engineering/payload", "permanent": true },
-    { "source": "/technical-programs/safety-operations", "destination": "/engineering/safety-operations", "permanent": true },
-    { "source": "/photos", "destination": "/gallery", "permanent": true },
-    { "source": "/contact", "destination": "/join", "permanent": true },
-    { "source": "/about/sponsorship", "destination": "/sponsors", "permanent": true }
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/technical-programs",
+      "destination": "/engineering",
+      "permanent": true
+    },
+    {
+      "source": "/technical-programs/aerodynamics",
+      "destination": "/engineering/aerodynamics",
+      "permanent": true
+    },
+    {
+      "source": "/technical-programs/internalexternal-structures",
+      "destination": "/engineering/structures",
+      "permanent": true
+    },
+    {
+      "source": "/technical-programs/recovery-systems",
+      "destination": "/engineering/avionics-recovery#recovery",
+      "permanent": true
+    },
+    {
+      "source": "/technical-programs/electronics",
+      "destination": "/engineering/avionics-recovery#avionics",
+      "permanent": true
+    },
+    {
+      "source": "/technical-programs/payload-electronics",
+      "destination": "/engineering/payload-electronics",
+      "permanent": true
+    },
+    {
+      "source": "/technical-programs/payload-development",
+      "destination": "/engineering/payload",
+      "permanent": true
+    },
+    {
+      "source": "/technical-programs/safety-operations",
+      "destination": "/engineering/safety-operations",
+      "permanent": true
+    },
+    {
+      "source": "/photos",
+      "destination": "/gallery",
+      "permanent": true
+    },
+    {
+      "source": "/contact",
+      "destination": "/join",
+      "permanent": true
+    },
+    {
+      "source": "/about/sponsorship",
+      "destination": "/sponsors",
+      "permanent": true
+    },
+    {
+      "source": "/engineering/avionics",
+      "destination": "/engineering/avionics-recovery#avionics",
+      "permanent": true
+    },
+    {
+      "source": "/engineering/recovery",
+      "destination": "/engineering/avionics-recovery#recovery",
+      "permanent": true
+    },
+    {
+      "source": "/team/dario-kuro",
+      "destination": "/team/dario-kuroda",
+      "permanent": true
+    },
+    {
+      "source": "/team/season/2018-19",
+      "destination": "/history#season-2018-19",
+      "permanent": true
+    },
+    {
+      "source": "/projects/2018-19-fnl-rocket",
+      "destination": "/history#season-2018-19",
+      "permanent": true
+    }
   ],
   "headers": [
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
       ]
     }
   ]

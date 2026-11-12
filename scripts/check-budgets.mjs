@@ -48,7 +48,35 @@ const rows = [
 const model = join(DIST, 'models', 'rocket.jvm2')
 if (existsSync(model)) rows.push({ name: 'Rocket model (gz)', bytes: gz(model), limit: 60 * KB })
 
+// Gallery: the largest 1280-wide photo, in either format (docs/PLAN.md §8.9: ≤180 KB)
+const galleryDir = join(DIST, 'media', 'gallery')
+if (existsSync(galleryDir)) {
+  const sizes = readdirSync(galleryDir)
+    .filter((f) => /-1280\.(avif|webp)$/.test(f))
+    .map((f) => readFileSync(join(galleryDir, f)).length)
+  if (sizes.length) rows.push({ name: 'Gallery photo 1280w', bytes: Math.max(...sizes), limit: 180 * KB })
+}
+
+// Headshots: the largest 480-wide AVIF portrait (docs/PLAN.md §9.5: ≤25 KB)
+const team = join(DIST, 'media', 'team')
+if (existsSync(team)) {
+  const sizes = readdirSync(team)
+    .filter((f) => f.endsWith('-480.avif'))
+    .map((f) => readFileSync(join(team, f)).length)
+  if (sizes.length) rows.push({ name: 'Headshot 480w AVIF', bytes: Math.max(...sizes), limit: 25 * KB })
+}
+
 let failed = false
+
+// The entry must be one file. When page code imports a module that a lazy chunk also
+// imports, Rolldown splits React, the router and the content into shared chunks the entry
+// pulls in: more requests before first paint (docs/PLAN.md, slice 5 notes).
+const entryDeps = importsOf(initial[0])
+if (entryDeps.length) {
+  failed = true
+  console.log(`FAIL  entry script imports ${entryDeps.join(', ')}; it should be a single file (see docs/PLAN.md slice 5 notes)`)
+}
+
 for (const { name, bytes, limit } of rows) {
   const over = bytes > limit
   failed ||= over

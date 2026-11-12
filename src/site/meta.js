@@ -20,23 +20,23 @@ const HOME = { label: 'Home', path: '/' }
 const STATIC = {
   '/': {
     title: `${SITE} — ${org.tagline}`,
-    description: `${org.shortName} is ${org.tagline}: students who design, build, and fly high-power rockets as the technical project of AISES at UCLA.`,
+    description: `${org.shortName} is ${org.tagline}: students who design, build, and fly high-power rockets, and the payloads inside them.`,
     crumbs: [],
   },
   '/about': {
     label: 'About',
-    description: 'How Bearospace works: a student-led aerospace program, the full engineering lifecycle, and our roots in AISES at UCLA.',
+    description: 'How Bearospace works: a student-led aerospace program, the full engineering lifecycle, and a note from our project managers.',
   },
   '/engineering': {
     label: 'Engineering',
-    description: 'One rocket, seven disciplines, four divisions: aerodynamics, structures, recovery, avionics, payload, and safety & operations.',
+    description: 'One rocket, seven subteams in four divisions: aerodynamics, structures, avionics & recovery, payload development, payload electronics, payload software, and safety & operations.',
   },
-  '/projects': { label: 'Projects', description: 'Rockets and payloads Bearospace has designed, built, tested, and flown.' },
+  '/projects': { label: 'Projects', description: 'The designs and R&D projects Bearospace is working on now.' },
   '/competitions': {
     label: 'Competitions',
-    description: 'Bearospace at First Nations Launch and NASA Student Launch: what each competition asks, and our results season by season.',
+    description: 'Bearospace at NASA Student Launch and First Nations Launch: what each competition asks, and our results season by season.',
   },
-  '/history': { label: 'History', description: 'Seasons, rockets, teams, and results — the documented history of rocketry at UCLA AISES.' },
+  '/history': { label: 'History', description: 'Seasons, rockets, teams, and results — the documented history of Bearospace and rocketry at UCLA.' },
   '/team': { label: 'Team', description: `The ${seasonLabel(org.currentSeason)} Bearospace leadership team and past seasons.` },
   '/gallery': { label: 'Gallery', description: 'Photos from Bearospace launch days, lab sessions, and team trips.' },
   '/sponsors': { label: 'Sponsors', description: 'The organizations that support Bearospace, and how to partner with the team.' },
@@ -46,13 +46,34 @@ const STATIC = {
   },
 }
 
-const page = (path, { label, description, parent = HOME, title, noindex = false }) => ({
+const page = (path, { label, description, parent = HOME, title, noindex = false, jsonLd = null }) => ({
   path,
   title: title ?? `${label} · ${SITE}`,
   description,
   crumbs: [...(parent === HOME ? [HOME] : [HOME, parent]), { label, path }],
   noindex,
+  jsonLd, // structured data for search engines, written into the prerendered <head>
 })
+
+/**
+ * schema.org Person for a profile page. Profiles exist only for people who agreed to one
+ * (consent), and the photo is left out until they confirm it is theirs (headshotVerified).
+ */
+function personJsonLd(person, latest, current) {
+  const links = Object.values(person.links ?? {})
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: person.name,
+    ...(latest ? { jobTitle: latest.title } : {}),
+    [current ? 'memberOf' : 'alumniOf']: { '@type': 'Organization', name: SITE },
+    ...(org.siteUrl ? { url: `${org.siteUrl}/team/${person.slug}` } : {}),
+    ...(org.siteUrl && person.headshot && person.headshotVerified
+      ? { image: `${org.siteUrl}/media/${person.headshot.replace(/.w+$/, '-640.webp')}` }
+      : {}),
+    ...(links.length ? { sameAs: links } : {}),
+  }
+}
 
 export const notFound = (path) => ({
   path,
@@ -91,8 +112,14 @@ export function getMeta(pathname) {
     const person = getProfile(slug)
     if (person) {
       const [latest] = rolesFor(slug)
+      const current = latest?.season === org.currentSeason
       const role = latest ? `${latest.title}, ${seasonLabel(latest.season)}` : 'Bearospace member'
-      return page(path, { label: person.name, description: `${person.name} — ${role}, Bearospace at UCLA.`, parent })
+      return page(path, {
+        label: person.name,
+        description: `${person.name} — ${role}, Bearospace at UCLA.`,
+        parent,
+        jsonLd: personJsonLd(person, latest, current),
+      })
     }
   }
   return notFound(path)

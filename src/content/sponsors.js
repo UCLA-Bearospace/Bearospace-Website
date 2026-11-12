@@ -3,7 +3,7 @@ import { SOURCES } from './org.js'
 // Sponsors and supporters. The same records drive the opening sequence, the
 // "Supported by" strip, and the Sponsors page, so a new sponsor only needs a row here.
 //
-//   relationship  sponsor | institutional | home-organization | partner
+//   relationship  sponsor | institutional | home-organization | partner | past-partner
 //   label         public wording, shown exactly
 //   logo          paths under assets-src/images/ (onDark for dark backgrounds)
 //   showInIntro   appears in the opening sequence, ordered by introOrder, with introKicker
@@ -21,8 +21,9 @@ export const sponsors = [
     introKicker: 'Supported by',
     order: 1,
     activeSeasons: ['2026-27'],
-    // Wording decided 2026-11-02; logo-usage approval still to be recorded (checklist C1)
-    verifiedAt: '2026-11-02',
+    // A full sponsor; logo use approved (Juan Ventura-Romero, 2026-11-07; checklist C1).
+    // Public wording decided 2026-11-02.
+    verifiedAt: '2026-11-07',
     source: SOURCES.juan,
   },
   {
@@ -42,16 +43,20 @@ export const sponsors = [
     source: SOURCES.aises,
   },
   {
-    id: 'aises-ucla',
-    name: 'AISES at UCLA',
-    relationship: 'home-organization',
-    label: 'Home organization',
-    url: SOURCES.aises,
+    // A meeting collaboration, never a sponsor: listed under "Past meeting partners and
+    // collaborators", name only (no logo), and never in the opening or the "Supported by"
+    // strip. Date and details to come (checklist C17).
+    id: 'mach-industries',
+    name: 'Mach Industries',
+    relationship: 'past-partner',
+    label: 'Past partner',
+    description: 'Mach Industries collaborated with Bearospace on a team meeting.',
+    date: null,
     logo: null,
     showInIntro: false,
-    order: 3,
-    activeSeasons: ['2025-26', '2026-27'],
-    verifiedAt: '2026-11-02',
-    source: SOURCES.aises,
+    order: 10,
+    activeSeasons: [],
+    verifiedAt: '2026-11-10',
+    source: SOURCES.pmReview,
   },
 ]

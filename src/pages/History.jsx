@@ -1,16 +1,20 @@
 import { Link } from 'react-router'
 import PageFrame from '../components/PageFrame'
+import { SourceLink } from '../components/bits'
 import {
   getCompetition,
   getPerson,
   getProfile,
+  historyProjects,
   org,
+  projects,
   publishedMilestones,
   publishedResults,
   publishedRoles,
   seasonLabel,
 } from '../content/index.js'
 import { ordinal } from '../lib/format'
+import { gaps } from '../lib/seasons'
 
 /** Every season with something documented, newest first. */
 function seasons() {
@@ -18,17 +22,22 @@ function seasons() {
     ...publishedMilestones().map((m) => m.season),
     ...publishedResults().map((r) => r.season),
     ...publishedRoles().map((r) => r.season),
+    ...projects.filter((p) => historyProjects(p.season).includes(p)).map((p) => p.season),
   ])
   return [...all].sort().reverse()
 }
 
+// Opened by the visitor (not on load): its contents fade in (site.css, .season)
+const markToggled = (e) => (e.currentTarget.parentElement.dataset.toggled = '')
+
 export default function History() {
   const list = seasons()
+  const missing = gaps(list)
   return (
     <PageFrame
       kicker="History"
       title="Season by season"
-      lede="The documented story of rocketry at UCLA AISES: the teams, the rockets, and the results."
+      lede="The documented story of rocketry at UCLA: the teams, the rockets, and the results."
     >
       <nav aria-label="Seasons" className="season-jump">
         <ul className="inline-list">
@@ -40,13 +49,14 @@ export default function History() {
         </ul>
       </nav>
 
+      <div className="timeline">
       {list.map((season, i) => {
         const milestones = publishedMilestones().filter((m) => m.season === season)
         const results = publishedResults().filter((r) => r.season === season)
         const people = publishedRoles().filter((r) => r.season === season)
         return (
           <details key={season} id={`season-${season}`} className="season" open={i < 2}>
-            <summary>
+            <summary onClick={markToggled}>
               <h2>{seasonLabel(season)}</h2>
             </summary>
             {milestones.map((m) => (
@@ -55,9 +65,28 @@ export default function History() {
                 <p>
                   {m.body} <a href={m.source}>Source</a>
                 </p>
-                {m.projectSlug && (
-                  <p>
-                    <Link to={`/projects/${m.projectSlug}`}>Read the project</Link>
+              </div>
+            ))}
+            {historyProjects(season).map((p) => (
+              <div key={p.slug} className="season-rocket">
+                <h3>The rocket: {p.title}</h3>
+                <p>{p.summary}</p>
+                <ul>
+                  {[...p.objective, ...p.constraints, ...p.hardware, ...p.software].map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+                {p.sources.some((x) => x.url) && (
+                  <p className="note">
+                    Read more:{' '}
+                    {p.sources
+                      .filter((x) => x.url)
+                      .map((x, k) => (
+                        <span key={x.url}>
+                          {k > 0 && ' · '}
+                          <SourceLink source={x.url} label={x.label} />
+                        </span>
+                      ))}
                   </p>
                 )}
               </div>
@@ -69,6 +98,8 @@ export default function History() {
                   {results.map((r) => (
                     <li key={r.category}>
                       {ordinal(r.placement)}, {r.category} — {getCompetition(r.competitionSlug).name}
+                      {r.awardType === 'report' && <span className="tag">Report award</span>}{' '}
+                      <SourceLink source={r.sourceUrl} label={<>Source<span className="sr-only">: {r.category}</span></>} />
                     </li>
                   ))}
                 </ul>
@@ -99,11 +130,16 @@ export default function History() {
           </details>
         )
       })}
+      </div>
 
-      <p className="note">
-        No public record has been found yet for 2019–20 through 2022–23. Have photos or stories from those seasons?{' '}
-        <Link to="/join">Tell us.</Link>
-      </p>
+      {missing.length > 0 && (
+        <p className="note">
+          No public record has been found yet for{' '}
+          {missing.map(([from, to]) => (from === to ? seasonLabel(from) : `${seasonLabel(from)} through ${seasonLabel(to)}`)).join(', ')}.
+          Have photos or stories from {missing.length > 1 || missing[0][0] !== missing[0][1] ? 'those seasons' : 'that season'}?{' '}
+          <Link to="/join">Tell us.</Link>
+        </p>
+      )}
     </PageFrame>
   )
 }

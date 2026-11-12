@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import Img from './Img'
+import { Img } from './bits'
 import { hasMedia } from './media'
 
 const initials = (name) =>
@@ -22,12 +22,15 @@ export function Portrait({ person, sizes = '160px', eager = false }) {
   )
 }
 
-/** A person with their role; links to the profile when they have one. */
-/** `eager` for portraits visible on load (they are often the page's largest paint). */
-export function PersonCard({ person, role, eager = false }) {
+/**
+ * A person with their role; links to the profile when they have one. `eager` for portraits
+ * visible on load (they are often the page's largest paint). `index` orders the reveal
+ * when the page arrives by navigation (cards light up in role order).
+ */
+export function PersonCard({ person, role, eager = false, index = 0 }) {
   const name = person.consent ? <Link to={`/team/${person.slug}`}>{person.name}</Link> : person.name
   return (
-    <li className="person-card">
+    <li className="person-card" style={{ '--i': index }}>
       <Portrait person={person} eager={eager} />
       <span className="person-card__text">
         <strong className="person-card__name">{name}</strong>
@@ -37,16 +40,16 @@ export function PersonCard({ person, role, eager = false }) {
   )
 }
 
-export function OpenRoleCard({ role }) {
+export function OpenRoleCard({ role, index = 0 }) {
   return (
-    <li className="person-card person-card--open">
+    <li className="person-card person-card--open" style={{ '--i': index }}>
       <span className="portrait portrait--initials" aria-hidden="true">
         ?
       </span>
       <span className="person-card__text">
         <strong className="person-card__name">{role.title}</strong>
         <span className="person-card__role">
-          Open position · <Link to="/join">Get involved</Link>
+          Open position · <Link to={role.disciplineSlug ? `/join?interest=${role.disciplineSlug}` : '/join'}>Get involved</Link>
         </span>
       </span>
     </li>

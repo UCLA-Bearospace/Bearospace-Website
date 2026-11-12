@@ -15,7 +15,7 @@ export const projects = [
     season: '2018-19',
     status: 'completed',
     competitionSlug: 'first-nations-launch',
-    disciplineSlugs: ['structures', 'avionics', 'recovery'],
+    disciplineSlugs: ['structures', 'avionics-recovery'],
     summary: 'The rocket that won first place in the AISES Launch category at First Nations Launch 2019.',
     objective: [
       'Fly a competition-supplied motor to an apogee between 3,500 and 5,000 feet above ground level, and recover the rocket safely.',
@@ -45,6 +45,8 @@ export const projects = [
     ],
     lastVerified: '2026-11-02',
     publish: true,
+    // Told in its season on History; Projects is for current designs and R&D (content review, 2026-11-10)
+    place: 'history',
   },
   {
     slug: '2025-26-launch-vehicle',
@@ -52,7 +54,7 @@ export const projects = [
     season: '2025-26',
     status: null, // unknown until the team confirms whether and where it flew (checklist C3, D8)
     competitionSlug: 'nasa-student-launch',
-    disciplineSlugs: ['aerodynamics', 'structures', 'recovery', 'avionics'],
+    disciplineSlugs: ['aerodynamics', 'structures', 'avionics-recovery'],
     summary: 'A carbon-fiber high-power rocket, and the model behind the 3D rocket on this site.',
     objective: [],
     constraints: [],

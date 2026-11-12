@@ -40,6 +40,11 @@ export default function Footer() {
           <li>
             <a href={links.linkedin}>LinkedIn</a>
           </li>
+          {links.discord && (
+            <li>
+              <a href={links.discord}>Discord</a>
+            </li>
+          )}
         </ul>
       </div>
 
@@ -49,10 +54,7 @@ export default function Footer() {
         <ReplayLaunch />
       </div>
 
-      <p className="site-footer__fine">
-        A student organization at UCLA and the technical project of{' '}
-        <a href={org.parents.aises.url}>{org.parents.aises.name}</a>.
-      </p>
+      <p className="site-footer__fine">A student organization at UCLA.</p>
     </footer>
   )
 }

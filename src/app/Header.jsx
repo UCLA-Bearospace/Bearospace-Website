@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router'
 import Img from '../components/Img'
 import { destinations } from '../site/destinations.js'
 import { getMeta } from '../site/meta.js'
-import { mailto } from '../content/index.js'
 import { setMotionPaused, useMotionPaused, useReducedMotion } from '../motion/useMotionPref'
 import { announce } from './announcer'
 
@@ -64,13 +63,13 @@ export default function Header() {
           </button>
           <nav aria-label="Menu">
             <ul className="menu-overlay__list">
-              <li>
+              <li style={{ '--i': 0 }}>
                 <Link to="/" onClick={close}>
                   Flight Deck
                 </Link>
               </li>
-              {destinations.map((d) => (
-                <li key={d.id}>
+              {destinations.map((d, i) => (
+                <li key={d.id} style={{ '--i': i + 1 }}>
                   <Link to={d.path} onClick={close}>
                     {d.label}
                   </Link>
@@ -82,9 +81,9 @@ export default function Header() {
             <Link className="button button--gold" to="/join" onClick={close}>
               Join the team
             </Link>
-            <a className="button" href={mailto('sponsorship')}>
+            <Link className="button" to="/sponsors" onClick={close}>
               Sponsor a launch
-            </a>
+            </Link>
           </div>
         </div>
       </dialog>

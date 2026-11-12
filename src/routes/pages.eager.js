@@ -2,7 +2,7 @@
 import Home from '../pages/Home'
 import About from '../pages/About'
 import Engineering from '../pages/Engineering'
-import Discipline from '../pages/Discipline'
+import { Discipline } from '../pages/Engineering'
 import { Project, Projects } from '../pages/Projects'
 import Competitions from '../pages/Competitions'
 import History from '../pages/History'

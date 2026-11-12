@@ -53,9 +53,9 @@ test('in-site navigation updates the title and moves focus to the new heading', 
   await expect(page).toHaveTitle(getMeta('/engineering').title)
   await expect(page.getByRole('heading', { level: 1 })).toBeFocused()
 
-  await page.getByRole('link', { name: 'Recovery' }).click()
-  await expect(page).toHaveTitle(getMeta('/engineering/recovery').title)
-  await expect(page.getByRole('heading', { level: 1, name: 'Recovery' })).toBeFocused()
+  await page.locator('.cards').getByRole('link', { name: 'Avionics & Recovery' }).click()
+  await expect(page).toHaveTitle(getMeta('/engineering/avionics-recovery').title)
+  await expect(page.getByRole('heading', { level: 1, name: 'Avionics & Recovery' })).toBeFocused()
   await expect(page.getByRole('navigation', { name: 'Breadcrumb' })).toContainText('Engineering')
 })
 
@@ -106,18 +106,18 @@ test('unknown pages show the not-found page', async ({ page }) => {
 })
 
 test('discipline pages carry the interest through to the join email', async ({ page }) => {
-  await page.goto('/engineering/avionics?scene=0')
+  await page.goto('/engineering/avionics-recovery?scene=0')
   await page.locator('.cta-band').getByRole('link', { name: 'Get involved' }).click()
-  await expect(page).toHaveURL(/\/join\?interest=avionics$/)
+  await expect(page).toHaveURL(/\/join\?interest=avionics-recovery$/)
   const href = await page.getByRole('link', { name: /Email us about joining/ }).getAttribute('href')
-  expect(decodeURIComponent(href)).toContain('Joining Bearospace (Avionics)')
+  expect(decodeURIComponent(href)).toContain('Joining Bearospace (Avionics & Recovery)')
 })
 
 test('a direct link with ?interest hydrates without a mismatch', async ({ page }) => {
   const errors = []
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()))
-  await page.goto('/join?interest=recovery&scene=0')
-  await expect(page.getByRole('link', { name: /Email us about joining Recovery/ })).toBeVisible()
+  await page.goto('/join?interest=payload-software&scene=0')
+  await expect(page.getByRole('link', { name: /Email us about joining Payload Software/ })).toBeVisible()
   expect(errors).toEqual([])
 })
 

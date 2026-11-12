@@ -2,15 +2,16 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Link } from 'react-router'
 import { destinations } from '../site/destinations.js'
 import { useDirector } from '../motion/director'
-import { useMotionAllowed } from '../motion/useMotionPref'
 import { useSceneStatus } from '../app/sceneStatus'
 import { useMediaQuery } from '../lib/useMediaQuery'
 import { getLastDestination, setLastDestination } from './menuState'
 
 // The Flight Deck destinations: one set of real links, in two layouts.
 //   orbit  each link is pinned to its body in the 3D scene (the engine positions it)
-//   list   a plain vertical list: phones, portrait screens, reduced/paused motion,
-//          no WebGL, while the scene loads, and the prerendered HTML
+//   list   a plain vertical list: phones, portrait screens, no WebGL, while the scene
+//          loads, and the prerendered HTML
+// Paused or reduced motion keeps the orbit layout on a still frame (the engine draws one
+// frame and pins the labels): switching to the list confused visitors (content review).
 // One link is tabbable at a time (roving tabindex); arrow keys move in reading order,
 // which is also the constellation's top-to-bottom order. Home/End jump to the ends.
 
@@ -25,11 +26,11 @@ const useHydrated = () =>
 
 export default function OrbitNav({ focusOnMount = false }) {
   const status = useSceneStatus()
-  const motion = useMotionAllowed()
   const wide = useMediaQuery(ORBIT_QUERY)
   const hydrated = useHydrated()
-  const orbit = hydrated && status === 'ready' && motion && wide
+  const orbit = hydrated && status === 'ready' && wide
   const directorRef = useDirector()
+  const nav = useRef(null)
   const items = useRef(new Map())
   const links = useRef(new Map())
   const [active, setActive] = useState(() => getLastDestination() ?? destinations[0].id)
@@ -49,6 +50,28 @@ export default function OrbitNav({ focusOnMount = false }) {
       director.showBodies(true)
     }
   }, [orbit, status, directorRef])
+
+  // The scene and the labels are fixed to the screen, but the deck is part of the page:
+  // scrolling down to the footer lifts both with the page, so the footer arrives below
+  // the lowest bodies instead of sliding over them (content review).
+  useEffect(() => {
+    if (!orbit) return
+    const layers = [document.querySelector('.scene-host'), nav.current].filter(Boolean)
+    let raf = 0
+    const lift = () => {
+      raf = 0
+      const y = Math.max(0, window.scrollY)
+      for (const el of layers) el.style.transform = y ? `translate3d(0, ${-y}px, 0)` : ''
+    }
+    const onScroll = () => (raf ||= requestAnimationFrame(lift))
+    lift()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      cancelAnimationFrame(raf)
+      for (const el of layers) el.style.transform = ''
+    }
+  }, [orbit])
 
   // Back on the deck after visiting a destination: focus returns to it
   useEffect(() => {
@@ -82,7 +105,7 @@ export default function OrbitNav({ focusOnMount = false }) {
   }
 
   return (
-    <nav className="deck__destinations" aria-label="Destinations" data-layout={orbit ? 'orbit' : 'list'}>
+    <nav ref={nav} className="deck__destinations" aria-label="Destinations" data-layout={orbit ? 'orbit' : 'list'}>
       <ul>
         {destinations.map((d, i) => (
           <li

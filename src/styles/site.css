@@ -33,6 +33,15 @@ main {
   font-size: var(--step--1);
 }
 
+/* A note that needs to be seen first (alumni profiles) */
+.note--banner {
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--glow);
+  border-radius: 6px;
+  background: rgb(169 198 255 / 0.08);
+  color: var(--star);
+}
+
 /* --- Buttons ------------------------------------------------------------------ */
 
 .button {
@@ -160,10 +169,59 @@ main {
   border: 0;
   background: rgb(7 8 26 / 0.96);
   color: var(--star);
+  /* Opening fades the menu in and drops it into place; closing reverses it (browsers with
+     @starting-style; the others open it instantly, as before) */
+  opacity: 0;
+  transform: translateY(-14px);
+  transition:
+    opacity 0.25s var(--ease),
+    transform 0.3s var(--ease),
+    overlay 0.3s allow-discrete,
+    display 0.3s allow-discrete;
+}
+
+.menu-overlay[open] {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .menu-overlay[open] {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
 }
 
 .menu-overlay::backdrop {
+  background: rgb(7 8 26 / 0);
+  transition:
+    background-color 0.3s var(--ease),
+    overlay 0.3s allow-discrete,
+    display 0.3s allow-discrete;
+}
+
+.menu-overlay[open]::backdrop {
   background: rgb(7 8 26 / 0.6);
+}
+
+@starting-style {
+  .menu-overlay[open]::backdrop {
+    background: rgb(7 8 26 / 0);
+  }
+}
+
+/* The links arrive one after another */
+.menu-overlay[open] .menu-overlay__list li,
+.menu-overlay[open] .cta-row {
+  animation: menu-in 0.32s var(--ease) both;
+  animation-delay: calc(50ms + var(--i, 9) * 22ms);
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
 }
 
 .menu-overlay__inner {
@@ -191,6 +249,15 @@ main {
   font-weight: 700;
   text-decoration: none;
   border-bottom: 1px solid var(--line);
+  transition:
+    color var(--fast) var(--ease),
+    padding-left 0.25s var(--ease);
+}
+
+.menu-overlay__list a:hover,
+.menu-overlay__list a:focus-visible {
+  padding-left: 0.5rem;
+  color: var(--gold);
 }
 
 /* --- Flight Deck (home) -------------------------------------------------------- */
@@ -337,6 +404,150 @@ main {
   border-color: var(--glow);
 }
 
+.card--link:focus-within {
+  border-color: var(--glow);
+}
+
+/* --- Engineering system map (slice 5) ------------------------------------------ */
+
+.system-map {
+  margin: 1.5rem 0 2.25rem;
+}
+
+.system-map__title {
+  margin-bottom: 0.75rem;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+}
+
+/* The picture's viewBox is 1040 × 280 */
+.system-map__frame {
+  aspect-ratio: 1040 / 280;
+}
+
+.system-map__drawing {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.system-map__body {
+  fill: #23262f; /* carbon fibre, as on the 3D rocket */
+}
+
+/* Line widths are screen pixels, so the outline stays crisp from phone to desktop */
+.zone {
+  vector-effect: non-scaling-stroke;
+  transition:
+    fill var(--fast) var(--ease),
+    stroke var(--fast) var(--ease),
+    opacity var(--fast) var(--ease);
+}
+
+.zone--nose {
+  fill: #2f6bd1;
+}
+
+/* Internal sections: a faint tint, with dashed edges where the position is approximate */
+.zone--payload,
+.zone--avionics-recovery {
+  fill: rgb(169 198 255 / 0.1);
+}
+
+.zone--approx {
+  stroke: rgb(169 198 255 / 0.55);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.zone--fins {
+  fill: #121319;
+  stroke: #c9d8ff;
+  stroke-width: 1.5;
+}
+
+.zone--airframe {
+  fill: none;
+  stroke: #c9d8ff;
+  stroke-width: 1.5;
+}
+
+.zone--ground {
+  stroke: var(--line);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+/* One section lit, the rest stepped back */
+.system-map[data-active] .zone:not(.is-on, .zone--airframe) {
+  opacity: 0.45;
+}
+
+.zone.is-on {
+  fill: var(--glow);
+  opacity: 1;
+}
+
+.zone--airframe.is-on {
+  fill: none;
+  stroke: var(--glow);
+  stroke-width: 3;
+}
+
+.zone--ground.is-on {
+  stroke: var(--glow);
+}
+
+.system-map__num {
+  fill: var(--mute);
+  font: 700 28px var(--font-mono);
+  text-anchor: middle;
+}
+
+.system-map__legend {
+  display: grid;
+  gap: 0.35rem;
+  margin: 1rem 0 0;
+  padding-left: 1.75rem;
+}
+
+.system-map__legend li {
+  padding: 0.15rem 0.35rem;
+  border-radius: 6px;
+}
+
+.system-map__legend li.is-on {
+  background: rgb(169 198 255 / 0.12);
+}
+
+.system-map__legend li::marker {
+  color: var(--mute);
+  font-family: var(--font-mono);
+}
+
+.system-map__name {
+  font-weight: 700;
+}
+
+.system-map__approx,
+.system-map__note {
+  color: var(--mute);
+  font-size: var(--step--1);
+}
+
+.system-map__note {
+  margin: 0.75rem 0 0;
+}
+
+/* Too small to read on phones; the numbered legend still matches the drawing's order */
+@media (max-width: 40rem) {
+  .system-map__num {
+    display: none;
+  }
+}
+
 .steps {
   padding-left: 1.25rem;
 }
@@ -413,6 +624,27 @@ main {
 
 .table-wrap {
   overflow-x: auto;
+}
+
+/* Mission log, first visit by navigation: each row types itself in (src/pages/Competitions.jsx) */
+.log--type tbody tr {
+  animation: log-type min(calc(var(--chars) * 20ms), 600ms) steps(var(--chars), end) both;
+  animation-delay: calc(300ms + var(--row) * 140ms);
+}
+
+@keyframes log-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log--type tbody tr {
+    animation: none;
+  }
 }
 
 /* Narrow screens: each result becomes a small labelled card */
@@ -503,13 +735,17 @@ main {
 }
 
 /* People */
+/* Every portrait sits on the same light panel (the image pipeline flattens photos onto it) */
 .portrait {
   display: block;
   width: 100%;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: var(--radius);
-  background: var(--night);
+  background: rgb(248 248 248);
+  transition:
+    transform var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease);
 }
 
 .portrait img {
@@ -525,8 +761,35 @@ main {
   font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 800;
-  color: var(--glow);
-  border: 1px dashed var(--line);
+  color: var(--night);
+}
+
+/* A card that links to a profile lifts a little under the pointer */
+.person-card:has(a):hover .portrait {
+  transform: translateY(-4px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+/* Arriving by navigation, cards rise in role order, each wiped up from the bottom */
+.page--enter .person-card {
+  animation: card-in 420ms var(--ease) both;
+  animation-delay: calc(160ms + min(var(--i, 0), 14) * 50ms);
+}
+
+@keyframes card-in {
+  from {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(12px);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page--enter .person-card {
+    animation: none;
+  }
 }
 
 .people-grid {
@@ -591,16 +854,171 @@ main {
   margin-bottom: 1rem;
 }
 
+/* On wider screens the season list stays in reach while reading */
+@media (min-width: 40rem) {
+  .season-jump {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-inline: -0.5rem;
+    padding: 0.5rem;
+    border-radius: 0 0 var(--radius) var(--radius);
+    background: var(--panel);
+  }
+}
+
+/* The comet's trail runs down the timeline. Where the browser supports scroll-driven
+   animation, it draws itself as the page scrolls and a comet head leads it; elsewhere
+   (or with reduced motion) the trail is simply there. Decorative only. */
+.timeline {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  left: 0.35rem;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, var(--glow), rgb(169 198 255 / 0.15));
+  transform-origin: top;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .timeline::before {
+      animation: trail-draw linear both;
+      animation-timeline: scroll(root);
+    }
+    .timeline::after {
+      content: '';
+      position: absolute;
+      left: calc(0.35rem - 5px);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--star);
+      box-shadow:
+        0 0 10px 3px var(--glow),
+        0 -14px 18px 2px rgb(169 198 255 / 0.35);
+      animation: comet-fall linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+@keyframes trail-draw {
+  from {
+    transform: scaleY(0.04);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes comet-fall {
+  from {
+    top: 0.5rem;
+  }
+  to {
+    top: calc(100% - 1rem);
+  }
+}
+
+/* A dated testing log on project pages */
+.test-log time {
+  font-family: var(--font-mono);
+  color: var(--mute);
+}
+
 .season {
   margin: 1rem 0;
   padding: 0.5rem 1rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  transition:
+    border-color var(--fast) var(--ease),
+    background-color 0.3s var(--ease);
 }
 
+.season:hover,
+.season[open] {
+  border-color: rgb(169 198 255 / 0.5);
+}
+
+.season[open] {
+  background-color: rgb(169 198 255 / 0.03);
+}
+
+/* A chevron that turns as the dropdown opens (in place of the browser's triangle) */
 .season summary {
+  position: relative;
+  padding-right: 2rem;
   cursor: pointer;
-  list-style-position: outside;
+  list-style: none;
+}
+
+.season summary::-webkit-details-marker {
+  display: none;
+}
+
+.season summary::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0.35rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-right: 2px solid var(--glow);
+  border-bottom: 2px solid var(--glow);
+  transform: translateY(-75%) rotate(45deg);
+  transition: transform 0.35s var(--ease);
+}
+
+.season[open] > summary::after {
+  transform: translateY(-25%) rotate(225deg);
+}
+
+/* Opening and closing slide the panel open and shut, where the browser can animate a
+   dropdown's height (::details-content with interpolate-size); elsewhere it simply opens.
+   Either way the contents fade and drift in, once the visitor has opened it (data-toggled;
+   seasons that load open stay still, so the page's first paint isn't delayed). */
+@supports (interpolate-size: allow-keywords) {
+  .season {
+    interpolate-size: allow-keywords;
+  }
+  .season::details-content {
+    block-size: 0;
+    overflow-y: clip;
+    transition:
+      block-size 0.4s var(--ease),
+      content-visibility 0.4s allow-discrete;
+  }
+  .season[open]::details-content {
+    block-size: auto;
+  }
+}
+
+.season[data-toggled][open] > :not(summary) {
+  animation: reveal 0.45s var(--ease) both;
+}
+
+.season[data-toggled][open] > :nth-child(3) {
+  animation-delay: 40ms;
+}
+
+.season[data-toggled][open] > :nth-child(n + 4) {
+  animation-delay: 80ms;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
 }
 
 .season summary h2 {
@@ -613,6 +1031,8 @@ main {
 }
 
 /* Gallery */
+/* Three columns on desktop; two on phones (a tap opens the full photo), which keeps the
+   first screen's downloads small */
 .gallery {
   columns: 3 18rem;
   column-gap: 1rem;
@@ -624,6 +1044,19 @@ main {
 .gallery li {
   break-inside: avoid;
   margin-bottom: 1rem;
+}
+
+@media (max-width: 40rem) {
+  .gallery {
+    columns: 2;
+    column-gap: 0.75rem;
+  }
+  .gallery li {
+    margin-bottom: 0.75rem;
+  }
+  .gallery figcaption {
+    font-size: var(--step--1);
+  }
 }
 
 .gallery figure {
@@ -638,6 +1071,356 @@ main {
 
 .gallery figcaption {
   margin-top: 0.35rem;
+}
+
+.gallery__open {
+  display: block;
+  border-radius: var(--radius);
+}
+
+.gallery__open:hover img {
+  filter: brightness(1.08);
+}
+
+/* Arriving by navigation, photos fade and scale in, in order */
+.page--enter .gallery li {
+  animation: photo-in 420ms var(--ease) both;
+  animation-delay: calc(160ms + min(var(--i, 0), 12) * 40ms);
+}
+
+@keyframes photo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Category filters (only categories with two or more photos) */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.filter {
+  min-height: 44px;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--star);
+  font: inherit;
+  cursor: pointer;
+}
+
+.filter:hover {
+  border-color: var(--glow);
+}
+
+.filter[aria-pressed='true'],
+.filter[aria-selected='true'] {
+  border-color: var(--glow);
+  background: var(--glow);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Competitions: one dropdown each (like History's seasons), with a stage tracker */
+.competition summary {
+  padding: 0.25rem 0;
+}
+
+.competition__head {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  vertical-align: middle;
+}
+
+.competition__title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.competition .competition__title h2 {
+  display: block;
+  margin: 0;
+}
+
+.competition__stage {
+  font-size: var(--step--1);
+  color: var(--mute);
+}
+
+.competition__stage strong {
+  color: var(--gold);
+}
+
+/* Closed: a thin line showing how far through the season it is */
+.tracker-mini {
+  display: block;
+  height: 6px;
+  margin: 0.75rem 0 0.25rem;
+  border-radius: 999px;
+  background: rgb(169 198 255 / 0.16);
+  overflow: hidden;
+}
+
+.tracker-mini span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--gold), var(--flame));
+}
+
+.competition[open] .tracker-mini {
+  display: none; /* the full tracker below takes over */
+}
+
+/* Open: a segmented bar, one segment per stage, done / now / next */
+.tracker {
+  display: grid;
+  grid-template-columns: repeat(var(--stages), minmax(0, 1fr));
+  gap: 4px;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tracker li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-top: 24px;
+  text-align: center;
+}
+
+.tracker li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 14px;
+  border: 1px solid var(--line);
+  background: rgb(169 198 255 / 0.12);
+}
+
+.tracker li:first-child::before {
+  border-radius: 999px 0 0 999px;
+}
+
+.tracker li:last-child::before {
+  border-radius: 0 999px 999px 0;
+}
+
+.tracker .is-done::before {
+  border-color: var(--gold);
+  background: var(--gold);
+}
+
+.tracker .is-now::before {
+  border-color: var(--gold);
+  background: repeating-linear-gradient(-45deg, var(--gold) 0 8px, var(--flame) 8px 16px);
+  background-size: 22.6px 22.6px;
+  box-shadow: 0 0 14px rgb(255 209 0 / 0.45);
+  animation: tracker-stripes 0.9s linear infinite;
+}
+
+@keyframes tracker-stripes {
+  to {
+    background-position: 22.6px 0;
+  }
+}
+
+.tracker__name {
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 700;
+  color: var(--mute);
+}
+
+.tracker .is-done .tracker__name {
+  color: var(--star);
+}
+
+.tracker .is-now .tracker__name {
+  color: var(--gold);
+}
+
+.tracker__date {
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--mute);
+}
+
+.tracker__now {
+  margin: 1rem 0 1.5rem;
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius);
+  background: rgb(255 209 0 / 0.06);
+}
+
+.tracker__now h3 {
+  margin: 0 0 0.4rem;
+}
+
+.tracker__now p:last-child {
+  margin-bottom: 0;
+}
+
+/* Phones: the stages run down the page */
+@media (max-width: 40rem) {
+  .tracker {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+  .tracker li {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 0.6rem;
+    padding: 0.35rem 0 0.35rem 26px;
+    text-align: left;
+  }
+  .tracker li::before {
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    height: auto;
+  }
+  .tracker li:first-child::before {
+    border-radius: 999px 999px 0 0;
+  }
+  .tracker li:last-child::before {
+    border-radius: 0 0 999px 999px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tracker .is-now::before {
+    animation: none;
+  }
+}
+
+.competition__logo,
+.competition__logo img {
+  display: block;
+  flex: none;
+  width: auto;
+  height: 72px;
+}
+
+/* A logo with a white background sits on its own light tile */
+.competition__logo--tile {
+  padding: 4px;
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.competition__logo--tile img {
+  height: 64px;
+}
+
+/* Subteam parts as tabs (Avionics & Recovery) */
+.parts {
+  margin-top: 2rem;
+}
+
+.parts [role='tabpanel'] > p:first-of-type {
+  margin-top: 0;
+}
+
+/* Switching tabs fades the new half in */
+.parts [role='tabpanel']:not([hidden]) {
+  animation: reveal 0.35s var(--ease) both;
+}
+
+.filter {
+  transition:
+    border-color var(--fast) var(--ease),
+    background-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+
+/* Lightbox: a modal <dialog> filling the screen */
+.lightbox {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: var(--gutter);
+  border: 0;
+  background: transparent;
+  color: var(--star);
+}
+
+.lightbox[open] {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 0.75rem;
+}
+
+.lightbox::backdrop {
+  background: rgb(7 8 26 / 0.94);
+}
+
+.lightbox__bar,
+.lightbox__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.lightbox__count {
+  font-family: var(--font-mono);
+  color: var(--mute);
+}
+
+.lightbox__figure {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-height: 0;
+  margin: 0;
+  touch-action: pan-y; /* horizontal swipes move between photos */
+}
+
+.lightbox__image {
+  display: grid;
+  min-height: 0;
+  place-items: center;
+}
+
+.lightbox__image picture {
+  display: contents;
+}
+
+.lightbox__image img {
+  max-width: 100%;
+  /* Room left for the bar, caption, and buttons */
+  max-height: calc(100dvh - 2 * var(--gutter) - 11rem);
+  width: auto;
+  height: auto;
+  border-radius: var(--radius);
+  object-fit: contain;
+}
+
+.lightbox figcaption {
+  max-width: 60rem;
+  margin: 0.75rem auto 0;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page--enter .gallery li {
+    animation: none;
+  }
 }
 
 .media-row {

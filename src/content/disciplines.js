@@ -4,8 +4,9 @@ import { SOURCES } from './org.js'
 // current Google Site (one URL per discipline). A discipline can belong to more than one
 // division: Payload Electronics is shared by Avionics and Payload.
 //
-// regionId ties a discipline to a part of the rocket model for the system map
-// (nose, body, fin, hardware, or null for ground work).
+// zones place a discipline on the rocket for the system map (systemMap.js).
+// worksWith names a team the discipline works closely with, by the role that leads it,
+// so the page always shows the current season's lead.
 
 const page = (slug) => `https://sites.google.com/view/uclabearospace/technical-programs/${slug}`
 
@@ -33,7 +34,7 @@ export const disciplines = [
     ],
     tools: ['Computational modeling and CFD'],
     skills: ['CFD simulation', 'Aerospace analysis', 'Design validation', 'Flight dynamics', 'Technical research'],
-    regionId: 'nose',
+    zones: ['nose', 'fins'],
     source: page('aerodynamics'),
   },
   {
@@ -65,65 +66,76 @@ export const disciplines = [
       'Mechanical design',
       'Manufacturing processes',
     ],
-    regionId: 'body',
+    zones: ['airframe'],
     source: page('internalexternal-structures'),
   },
   {
-    slug: 'recovery',
-    name: 'Recovery',
-    divisionIds: ['vehicle'],
-    primaryDivisionId: 'vehicle',
-    summary: 'Bringing the rocket and payload home safely after flight.',
-    lede:
-      "Recovery brings the rocket and payload home safely. We design dual-deployment systems — a drogue parachute and a main parachute — size black-powder charges and shear pins, sequence deployment, and test until it's reliable. It's one of the most safety-critical jobs on the team and a real introduction to reliability engineering.",
-    responsibilities: [
-      'Dual-deployment recovery with drogue and main parachutes',
-      'Deployment mechanisms that work reliably under extreme conditions',
-      'Descent-rate, black-powder charge, and shear-pin calculations; deployment sequencing',
-    ],
-    work: [
-      'Drogue deployment systems',
-      'Main parachute systems',
-      'Avionics bay integration',
-      'Black powder testing',
-      'Recovery validation campaigns',
-      'Flight readiness verification',
-    ],
+    // Avionics and Recovery work as one subteam for now (PM, 2026-11-10); airbrakes join later
+    slug: 'avionics-recovery',
+    name: 'Avionics & Recovery',
+    divisionIds: ['avionics-recovery'],
+    primaryDivisionId: 'avionics-recovery',
+    summary: 'Flight computers, sensors, and telemetry, and the parachutes that bring the rocket home.',
+    lede: 'One subteam with two halves that work hand in hand: Avionics builds the rocket’s electronics, and Recovery designs the parachutes those electronics deploy.',
+    // One subteam card, two tabs on its page (content review, 2026-11-10). The page shows
+    // each part's lists instead of the subteam-wide ones; roles say which part they lead
+    // with `focus`. "Not part of" lists draw the line between the halves and neighbours.
+    responsibilities: [],
+    work: [],
     tools: [],
-    skills: ['Recovery system design', 'Reliability engineering', 'Flight testing', 'Data analysis', 'Systems validation'],
-    regionId: 'body',
-    source: page('recovery-systems'),
-  },
-  {
-    slug: 'avionics',
-    name: 'Avionics',
-    divisionIds: ['avionics'],
-    primaryDivisionId: 'avionics',
-    summary: 'Flight computers, sensors, telemetry, power, and recovery electronics.',
-    lede:
-      "Avionics is the rocket's nervous system: flight computers, sensors, telemetry, power distribution, and the electronics that fire recovery events. Members design circuit boards, write embedded code, and test it on the bench before it ever flies.",
-    responsibilities: [
-      'Sensors, flight computers, and telemetry systems',
-      'Power distribution and deployment electronics',
-      'Real-time flight data for payload operation and recovery',
+    skills: [],
+    parts: [
+      {
+        id: 'avionics',
+        name: 'Avionics',
+        summary:
+          "The rocket's nervous system: flight computers, sensors, telemetry, power distribution, and the electronics that fire recovery events. Members design circuit boards, write embedded code, and test it on the bench before it ever flies.",
+        does: [
+          'Sensors, flight computers, and telemetry systems',
+          'Power distribution and deployment electronics',
+          'Real-time flight data for payload operation and recovery',
+        ],
+        doesNot: [
+          'Sizing, packing, and testing the parachutes (Recovery)',
+          "The payload's own electronics and code (Payload Electronics and Payload Software)",
+        ],
+        work: ['Flight computer integration', 'Sensor networks', 'Telemetry systems', 'Power management', 'Data acquisition systems', 'Recovery electronics'],
+        skills: ['PCB design', 'Embedded programming', 'Sensor integration', 'Electrical testing', 'Data systems engineering'],
+        source: page('electronics'),
+      },
+      {
+        id: 'recovery',
+        name: 'Recovery',
+        summary:
+          "Recovery brings the rocket and payload home safely with a dual-deployment system: a drogue parachute, then a main parachute. It's one of the most safety-critical jobs on the team and a real introduction to reliability engineering.",
+        does: [
+          'Dual-deployment recovery with drogue and main parachutes',
+          'Deployment mechanisms that work reliably under extreme conditions',
+          'Descent-rate, black-powder charge, and shear-pin calculations; deployment sequencing',
+        ],
+        doesNot: [
+          'Designing the flight computers that fire the charges (Avionics)',
+          'Building the airframe and couplers around the parachute bays (Structures)',
+        ],
+        work: [
+          'Drogue deployment systems',
+          'Main parachute systems',
+          'Avionics bay integration',
+          'Black powder testing',
+          'Recovery validation campaigns',
+          'Flight readiness verification',
+        ],
+        skills: ['Recovery system design', 'Reliability engineering', 'Flight testing', 'Data analysis', 'Systems validation'],
+        source: page('recovery-systems'),
+      },
     ],
-    work: [
-      'Flight computer integration',
-      'Sensor networks',
-      'Telemetry systems',
-      'Power management',
-      'Data acquisition systems',
-      'Recovery electronics',
-    ],
-    tools: [],
-    skills: ['PCB design', 'Embedded programming', 'Sensor integration', 'Electrical testing', 'Data systems engineering'],
-    regionId: 'body',
-    source: page('electronics'),
+    zones: ['avionics-recovery'],
+    source: `${page('electronics')} ; ${page('recovery-systems')}`,
   },
   {
     slug: 'payload-electronics',
     name: 'Payload Electronics',
-    divisionIds: ['avionics', 'payload'],
+    divisionIds: ['payload'],
     primaryDivisionId: 'payload',
     summary: 'The electrical architecture that lets the payload act on its own.',
     lede:
@@ -142,7 +154,13 @@ export const disciplines = [
     ],
     tools: [],
     skills: ['PCB design', 'Electronics architecture', 'Power systems', 'Sensor networks', 'Hardware integration'],
-    regionId: 'body',
+    zones: ['payload'],
+    worksWith: [
+      {
+        team: 'Payload Software',
+        roleTitle: 'Payload Software Lead',
+      },
+    ],
     source: page('payload-electronics'),
   },
   {
@@ -168,8 +186,30 @@ export const disciplines = [
     ],
     tools: [],
     skills: ['Systems engineering', 'CAD design', 'FEA', 'Mechanical integration', 'Project management'],
-    regionId: 'body',
+    zones: ['payload'],
     source: page('payload-development'),
+  },
+  {
+    // Draft written from what the site already says about payload software; Juan Ventura-Romero
+    // (Payload Software Lead) to confirm (docs/CONTENT-CHECKLIST.md)
+    slug: 'payload-software',
+    name: 'Payload Software',
+    divisionIds: ['payload'],
+    primaryDivisionId: 'payload',
+    summary: "The code behind the payload's autonomous mechanisms.",
+    lede:
+      "Payload Software writes the code that lets the payload act on its own: reading its sensors, making decisions, and driving the motors and mechanisms that carry out each year's mission. It works closely with Payload Electronics and Payload Development, and every change is tested on the bench and in the field before it flies.",
+    responsibilities: [
+      "Software for the payload's autonomous functions",
+      'Control of payload motors and mechanisms',
+      'Testing payload software on the bench and in the field',
+    ],
+    work: ['Embedded software for the payload', 'Sensor data processing', 'Motor and mechanism control', 'Mission autonomy logic', 'Software testing and simulation'],
+    tools: [],
+    skills: ['Embedded programming', 'Control systems', 'Software testing', 'Systems integration'],
+    zones: ['payload'],
+    worksWith: [{ team: 'Payload Electronics', roleTitle: 'Payload Electronics Lead' }],
+    source: SOURCES.juan,
   },
   {
     slug: 'safety-operations',
@@ -191,17 +231,7 @@ export const disciplines = [
     work: [],
     tools: [],
     skills: ['Technical leadership', 'Engineering documentation', 'Operational management', 'Risk management'],
-    regionId: null,
+    zones: ['ground'],
     source: page('safety-operations'),
   },
 ]
-
-/** How software shows up across the vehicle (Engineering overview). */
-export const software = {
-  title: 'Software across the vehicle',
-  body: [
-    'Software runs through every system. Embedded code on the flight computers records sensor data and fires recovery events. Payload software drives the autonomous mechanisms inside the payload. Analysis scripts support simulation, CFD, and post-flight data review.',
-  ],
-  links: ['avionics', 'payload', 'payload-electronics', 'aerodynamics'],
-  source: SOURCES.sitePrograms,
-}
