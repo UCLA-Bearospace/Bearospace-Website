@@ -91,18 +91,29 @@ export function validateContent(content, { mediaRoot = join(ROOT, 'assets-src', 
     d.divisionIds?.forEach((id, k) => ref('disciplines', d, i, `divisionIds[${k}]`, id, divisions, 'divisions.js'))
     if (d.divisionIds && !d.divisionIds.includes(d.primaryDivisionId))
       report('disciplines', d, i, 'primaryDivisionId', 'must be one of divisionIds')
+    if (!d.parts) {
+      if (!d.responsibilities?.length) report('disciplines', d, i, 'responsibilities', 'list at least one (or give the subteam parts)')
+      if (!d.skills?.length) report('disciplines', d, i, 'skills', 'list at least one (or give the subteam parts)')
+    }
     d.worksWith?.forEach((w, k) => {
       if (!content.roles?.some((r) => r.title === w.roleTitle))
         report('disciplines', d, i, `worksWith[${k}].roleTitle`, `no role in roles.js is titled "${w.roleTitle}"`)
     })
   })
   content.people?.forEach((p, i) => media('people', p, i, 'headshot', p.headshot))
+  content.competitions?.forEach((c, i) => media('competitions', c, i, 'logo.src', c.logo?.src))
   for (const collection of ['roles', 'openRoles']) {
     content[collection]?.forEach((r, i) => {
       if (collection === 'roles') ref(collection, r, i, 'personSlug', r.personSlug, people, 'people.js')
       ref(collection, r, i, 'group', r.group, groups, 'roles.js groups')
       ref(collection, r, i, 'disciplineSlug', r.disciplineSlug, disciplines, 'disciplines.js')
       r.also?.forEach((s, k) => ref(collection, r, i, `also[${k}]`, s, disciplines, 'disciplines.js'))
+      if (r.alsoGroup) ref(collection, r, i, 'alsoGroup.id', r.alsoGroup.id, groups, 'roles.js groups')
+      if (r.focus) {
+        const covered = [r.disciplineSlug, ...(r.also ?? [])].map((s) => content.disciplines?.find((d) => d.slug === s))
+        if (!covered.some((d) => d?.parts?.some((p) => p.id === r.focus)))
+          report(collection, r, i, 'focus', `no subteam this role covers has a part "${r.focus}"`)
+      }
     })
   }
   content.projects?.forEach((p, i) => {
@@ -133,9 +144,26 @@ export function validateContent(content, { mediaRoot = join(ROOT, 'assets-src', 
   return errors
 }
 
+/** The competition trackers (src/content/competitionTimeline.js, kept out of the main script). */
+export function validateTimelines(timelines, competitions) {
+  const errors = []
+  const at = (slug, field, message) => errors.push(`competitionTimeline.js › "${slug}" › ${field}: ${message}`)
+  for (const [slug, t] of Object.entries(timelines)) {
+    if (!competitions.some((c) => c.slug === slug)) at(slug, 'key', 'is not in competitions.js')
+    const ids = t.stages.map((s) => s.id)
+    if (!ids.includes(t.current)) at(slug, 'current', `"${t.current}" is not one of its stages (${ids.join(', ')})`)
+    ids.forEach((id, i) => ids.indexOf(id) !== i && at(slug, `stages[${i}].id`, `"${id}" is used twice`))
+    t.stages.forEach((s, i) => ['short', 'name', 'date', 'about'].forEach((k) => !s[k] && at(slug, `stages[${i}].${k}`, 'is required')))
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(t.asOf ?? '')) at(slug, 'asOf', 'must be a date like 2026-11-11')
+    if (!t.source?.url) at(slug, 'source.url', 'is required')
+  }
+  return errors
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const { content } = await import('../src/content/index.js')
-  const errors = validateContent(content)
+  const { timelines } = await import('../src/content/competitionTimeline.js')
+  const errors = [...validateContent(content), ...validateTimelines(timelines, content.competitions)]
   if (errors.length) {
     console.error(`Content has ${errors.length} problem(s):\n  ` + errors.join('\n  '))
     console.error('\nSee CONTENT.md for how each file is laid out.')

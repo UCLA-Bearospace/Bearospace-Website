@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { results } from '../../src/content/index.js'
+import { timelines } from '../../src/content/competitionTimeline.js'
 
 // Projects, competitions, and history (slice 7). `?scene=0` keeps the 3D scene out of the way.
 
@@ -17,6 +18,55 @@ test('the 2024–25 First Nations Launch awards read as report awards, never "th
     await expect(row.getByRole('link', { name: /Source/ })).toHaveAttribute('href', /^https?:\/\//)
   }
   await expect(page.locator('main')).not.toContainText(/third place overall/i)
+})
+
+test('NASA Student Launch comes first, then First Nations Launch, each with its logo', async ({ page }) => {
+  await page.goto('/competitions?scene=0')
+  const dropdowns = page.locator('details.competition')
+  await expect(dropdowns.locator('summary h2')).toHaveText(['NASA Student Launch', 'First Nations Launch'])
+  for (const [slug, file] of [
+    ['nasa-student-launch', /\/nasa-insignia\.svg$/],
+    ['first-nations-launch', /\/first-nations-launch-logo-\d+\.(avif|webp)$/],
+  ]) {
+    const logo = page.locator(`#${slug} .competition__head img`)
+    await expect(logo).toBeVisible()
+    await expect(logo).toHaveAttribute('alt', '') // decorative: the name is beside it
+    await expect.poll(() => logo.evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true)
+    expect(await logo.evaluate((img) => img.currentSrc)).toMatch(file)
+  }
+  // A trademark notice names each logo's owner and says why the logos are shown
+  const notice = page.locator('main .note', { hasText: 'trademarks of' })
+  await expect(notice).toContainText('NASA insignia and First Nations Launch logo are trademarks of NASA and the NASA Wisconsin Space Grant Consortium')
+  await expect(notice).toContainText('informational and historical purposes only')
+  await expect(notice).toContainText('does not imply endorsement')
+})
+
+test('each competition is a dropdown: closed it shows the stage, open it shows the stage tracker', async ({ page }) => {
+  await page.goto('/competitions?scene=0')
+  for (const slug of Object.keys(timelines)) {
+    const t = timelines[slug]
+    const now = t.stages.findIndex((s) => s.id === t.current)
+    const box = page.locator(`details#${slug}`)
+    // Closed: logo, name, and where the season stands; the tracker is out of sight
+    await expect(box).not.toHaveAttribute('open', /.*/)
+    await expect(box.locator('summary')).toContainText(`Now: ${t.stages[now].name}`)
+    await expect(box.locator('.tracker')).toBeHidden()
+    // Open: every stage in order, the done ones marked, the current one aria-current
+    await box.locator('summary').click()
+    const stages = box.locator('.tracker li')
+    await expect(stages).toHaveCount(t.stages.length)
+    await expect(box.locator('.tracker__name')).toHaveText(t.stages.map((s, i) => (i < now ? `${s.short} (done)` : s.short)))
+    await expect(stages.nth(now)).toHaveAttribute('aria-current', 'step')
+    await expect(box.locator('.tracker .is-done')).toHaveCount(now)
+    await expect(box.locator('.tracker__now')).toContainText(t.stages[now].about)
+    await expect(box.locator('.tracker__now').getByRole('link')).toHaveAttribute('href', t.source.url)
+  }
+})
+
+test('a link to a competition opens its dropdown', async ({ page }) => {
+  await page.goto('/competitions?scene=0#first-nations-launch')
+  await expect(page.locator('details#first-nations-launch')).toHaveAttribute('open', '')
+  await expect(page.locator('details#nasa-student-launch')).not.toHaveAttribute('open', /.*/)
 })
 
 test('every result in the mission log links to its source; unconfirmed ones never appear', async ({ page }) => {

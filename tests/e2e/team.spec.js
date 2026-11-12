@@ -20,6 +20,14 @@ test('alumni keep their page, marked as alumni', async ({ page }) => {
   await expect(page.locator('main .kicker').first()).toHaveText('Alumni · 2025–26')
 })
 
+test('Joel is listed under Vehicle and under Avionics & Recovery, as his role spans both', async ({ page }) => {
+  await page.goto('/team?scene=0')
+  for (const group of ['Vehicle', 'Avionics & Recovery']) {
+    const section = page.locator('section', { has: page.getByRole('heading', { level: 2, name: group, exact: true }) })
+    await expect(section.locator('.person-card', { hasText: 'Joel Venegas' })).toContainText('Structures & Recovery Director')
+  }
+})
+
 test('people without consent have no page', async ({ page }) => {
   await page.goto('/team/lucia-gonzalez?scene=0')
   await expect(h1(page)).toHaveText('Lost signal.')

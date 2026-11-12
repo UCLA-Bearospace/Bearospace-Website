@@ -73,43 +73,63 @@ export const disciplines = [
     // Avionics and Recovery work as one subteam for now (PM, 2026-11-10); airbrakes join later
     slug: 'avionics-recovery',
     name: 'Avionics & Recovery',
-    divisionIds: ['avionics'],
-    primaryDivisionId: 'avionics',
+    divisionIds: ['avionics-recovery'],
+    primaryDivisionId: 'avionics-recovery',
     summary: 'Flight computers, sensors, and telemetry, and the parachutes that bring the rocket home.',
-    lede:
-      "Avionics & Recovery is the rocket's nervous system and its way home: flight computers, sensors, telemetry, and power, plus the dual-deployment system — a drogue parachute and a main parachute — that the electronics fire. Members design circuit boards, write embedded code, size black-powder charges and shear pins, and test everything on the bench and on the ground before it flies.",
-    responsibilities: [
-      'Sensors, flight computers, and telemetry systems',
-      'Power distribution and deployment electronics',
-      'Real-time flight data for payload operation and recovery',
-      'Dual-deployment recovery with drogue and main parachutes',
-      'Deployment mechanisms that work reliably under extreme conditions',
-      'Descent-rate, black-powder charge, and shear-pin calculations; deployment sequencing',
-    ],
-    work: [
-      'Flight computer integration',
-      'Sensor networks',
-      'Telemetry systems',
-      'Power management',
-      'Data acquisition systems',
-      'Recovery electronics and avionics bay integration',
-      'Drogue and main parachute systems',
-      'Black powder testing',
-      'Recovery validation campaigns',
-      'Flight readiness verification',
-    ],
+    lede: 'One subteam with two halves that work hand in hand: Avionics builds the rocket’s electronics, and Recovery designs the parachutes those electronics deploy.',
+    // One subteam card, two tabs on its page (content review, 2026-11-10). The page shows
+    // each part's lists instead of the subteam-wide ones; roles say which part they lead
+    // with `focus`. "Not part of" lists draw the line between the halves and neighbours.
+    responsibilities: [],
+    work: [],
     tools: [],
-    skills: [
-      'PCB design',
-      'Embedded programming',
-      'Sensor integration',
-      'Electrical testing',
-      'Recovery system design',
-      'Reliability engineering',
-      'Flight testing',
-      'Data analysis',
+    skills: [],
+    parts: [
+      {
+        id: 'avionics',
+        name: 'Avionics',
+        summary:
+          "The rocket's nervous system: flight computers, sensors, telemetry, power distribution, and the electronics that fire recovery events. Members design circuit boards, write embedded code, and test it on the bench before it ever flies.",
+        does: [
+          'Sensors, flight computers, and telemetry systems',
+          'Power distribution and deployment electronics',
+          'Real-time flight data for payload operation and recovery',
+        ],
+        doesNot: [
+          'Sizing, packing, and testing the parachutes (Recovery)',
+          "The payload's own electronics and code (Payload Electronics and Payload Software)",
+        ],
+        work: ['Flight computer integration', 'Sensor networks', 'Telemetry systems', 'Power management', 'Data acquisition systems', 'Recovery electronics'],
+        skills: ['PCB design', 'Embedded programming', 'Sensor integration', 'Electrical testing', 'Data systems engineering'],
+        source: page('electronics'),
+      },
+      {
+        id: 'recovery',
+        name: 'Recovery',
+        summary:
+          "Recovery brings the rocket and payload home safely with a dual-deployment system: a drogue parachute, then a main parachute. It's one of the most safety-critical jobs on the team and a real introduction to reliability engineering.",
+        does: [
+          'Dual-deployment recovery with drogue and main parachutes',
+          'Deployment mechanisms that work reliably under extreme conditions',
+          'Descent-rate, black-powder charge, and shear-pin calculations; deployment sequencing',
+        ],
+        doesNot: [
+          'Designing the flight computers that fire the charges (Avionics)',
+          'Building the airframe and couplers around the parachute bays (Structures)',
+        ],
+        work: [
+          'Drogue deployment systems',
+          'Main parachute systems',
+          'Avionics bay integration',
+          'Black powder testing',
+          'Recovery validation campaigns',
+          'Flight readiness verification',
+        ],
+        skills: ['Recovery system design', 'Reliability engineering', 'Flight testing', 'Data analysis', 'Systems validation'],
+        source: page('recovery-systems'),
+      },
     ],
-    zones: ['avionics', 'recovery'],
+    zones: ['avionics-recovery'],
     source: `${page('electronics')} ; ${page('recovery-systems')}`,
   },
   {

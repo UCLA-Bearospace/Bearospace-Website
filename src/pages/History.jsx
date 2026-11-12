@@ -27,6 +27,9 @@ function seasons() {
   return [...all].sort().reverse()
 }
 
+// Opened by the visitor (not on load): its contents fade in (site.css, .season)
+const markToggled = (e) => (e.currentTarget.parentElement.dataset.toggled = '')
+
 export default function History() {
   const list = seasons()
   const missing = gaps(list)
@@ -53,7 +56,7 @@ export default function History() {
         const people = publishedRoles().filter((r) => r.season === season)
         return (
           <details key={season} id={`season-${season}`} className="season" open={i < 2}>
-            <summary>
+            <summary onClick={markToggled}>
               <h2>{seasonLabel(season)}</h2>
             </summary>
             {milestones.map((m) => (

@@ -37,7 +37,13 @@ const NUMBERED = zones.map((z, i) => ({ ...z, n: i + 1 }))
 const BODY_ZONES = NUMBERED.filter((z) => z.part === 'body')
 const FIN_ZONE = NUMBERED.find((z) => z.part === 'fins') // fins plus the fin can on the body
 const numberOf = (part) => NUMBERED.find((z) => z.part === part)?.n
-const FIN_MID = (xTail(fin.rootToM) + xTail(fin.rootFromM)) / 2
+// The fins' number sits just ahead of the top fin's leading edge, clear of the fin itself
+const FIN_LABEL = {
+  x: (xTail(fin.rootToM) + xTail(fin.tipToM)) / 2 - 38,
+  y: (CY - R + CY - TIP) / 2 + 10,
+}
+// One number per section, over the middle of its whole length (a section can be several bays)
+const middle = (z) => (x(z.segments[0][0]) + x(z.segments.at(-1)[1])) / 2
 
 export default function SystemMapDrawing({ id, active }) {
   const cls = (zone, extra = '') => `zone zone--${zone}${extra}${active.includes(zone) ? ' is-on' : ''}`
@@ -65,14 +71,12 @@ export default function SystemMapDrawing({ id, active }) {
       </g>
       <path className={cls('airframe')} d={BODY} />
       {/* Section numbers, matching the legend */}
-      {BODY_ZONES.flatMap((z) =>
-        z.segments.map(([from, to]) => (
-          <text key={from} className="system-map__num" x={(x(from) + x(to)) / 2} y={CY - R - 16}>
-            {z.n}
-          </text>
-        )),
-      )}
-      <text className="system-map__num" x={FIN_MID - 60} y={CY - TIP + 22}>
+      {BODY_ZONES.map((z) => (
+        <text key={z.id} className="system-map__num" x={middle(z)} y={CY - R - 16}>
+          {z.n}
+        </text>
+      ))}
+      <text className="system-map__num" x={FIN_LABEL.x} y={FIN_LABEL.y}>
         {numberOf('fins')}
       </text>
       <text className="system-map__num" x={x(0.62)} y={CY + R + 38}>

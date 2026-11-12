@@ -27,12 +27,12 @@
     },
     {
       "source": "/technical-programs/recovery-systems",
-      "destination": "/engineering/avionics-recovery",
+      "destination": "/engineering/avionics-recovery#recovery",
       "permanent": true
     },
     {
       "source": "/technical-programs/electronics",
-      "destination": "/engineering/avionics-recovery",
+      "destination": "/engineering/avionics-recovery#avionics",
       "permanent": true
     },
     {
@@ -67,12 +67,12 @@
     },
     {
       "source": "/engineering/avionics",
-      "destination": "/engineering/avionics-recovery",
+      "destination": "/engineering/avionics-recovery#avionics",
       "permanent": true
     },
     {
       "source": "/engineering/recovery",
-      "destination": "/engineering/avionics-recovery",
+      "destination": "/engineering/avionics-recovery#recovery",
       "permanent": true
     },
     {

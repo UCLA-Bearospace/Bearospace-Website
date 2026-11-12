@@ -140,8 +140,17 @@ if (!config.noseEndMm) for (let v = 0; v < mm.length / 3; v++) if (vR(v) >= 0.97
 const finVerts = []
 for (let v = 0; v < mm.length / 3; v++) if (vR(v) > bodyR + 4) finVerts.push(v)
 const finTipR = Math.max(...finVerts.map(vR))
-const finStartX = Math.min(...finVerts.map(vX))
 const tipVerts = finVerts.filter((v) => vR(v) > bodyR + 0.9 * (finTipR - bodyR))
+// The root edge: the fins are flat plates whose triangles run from the tip to the skin, so
+// the root is the inboard corners of the triangles that reach out past the skin. (Taking it
+// from the outboard vertices alone measured the tip twice and drew the swept fins as rectangles.)
+const finSet = new Set(finVerts)
+const rootVerts = new Set()
+for (let t = 0; t < idx.length; t += 3) {
+  const tri = [idx[t], idx[t + 1], idx[t + 2]]
+  if (tri.some((v) => finSet.has(v))) for (const v of tri) if (!finSet.has(v)) rootVerts.add(v)
+}
+const rootXs = [...rootVerts].map(vX)
 
 // Fin roll angle and count from the angular clusters of the outermost vertices
 const deg = (v) => ((Math.atan2(vB(v), vA(v)) * 180) / Math.PI + 360) % 360
@@ -260,8 +269,8 @@ const meta = {
   finSpanM: m(finTipR * 2),
   noseLengthM: m(shoulderX),
   fin: {
-    rootFromM: m(L - Math.max(...finVerts.map(vX))),
-    rootToM: m(L - finStartX),
+    rootFromM: m(L - Math.max(...rootXs)),
+    rootToM: m(L - Math.min(...rootXs)),
     tipFromM: m(L - Math.max(...tipVerts.map(vX))),
     tipToM: m(L - Math.min(...tipVerts.map(vX))),
   },

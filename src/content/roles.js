@@ -8,8 +8,7 @@ export const groups = [
   { id: 'management', label: 'Management' },
   { id: 'vehicle', label: 'Vehicle' },
   { id: 'payload', label: 'Payload' },
-  { id: 'avionics-recovery', label: 'Avionics & Recovery' }, // 2026-27 onward
-  { id: 'avionics', label: 'Avionics' }, // as the 2025-26 roster was organized
+  { id: 'avionics-recovery', label: 'Avionics & Recovery' },
   { id: 'challenge', label: 'Challenge' },
   { id: 'manufacturing', label: 'Manufacturing' },
   { id: 'safety-operations', label: 'Safety & Operations' },
@@ -34,19 +33,26 @@ export const roles = [
   role('bianca-vasquez', '2026-27', 'Project Manager', 'management', 2, S26),
   role('noah-hernandez', '2026-27', 'Vice Project Manager', 'management', 3, S26),
   role('alexander-astorga', '2026-27', 'Aerodynamics Director', 'vehicle', 1, { disciplineSlug: 'aerodynamics', ...S26 }),
-  role('joel-venegas', '2026-27', 'Structures & Recovery Director', 'vehicle', 2, { disciplineSlug: 'structures', also: ['avionics-recovery'], ...S26 }),
+  // Joel leads Structures and Recovery, so the roster lists him in both groups
+  role('joel-venegas', '2026-27', 'Structures & Recovery Director', 'vehicle', 2, {
+    disciplineSlug: 'structures',
+    also: ['avionics-recovery'],
+    focus: 'recovery',
+    alsoGroup: { id: 'avionics-recovery', order: 3 },
+    ...S26,
+  }),
   role('azad-aghdam', '2026-27', 'Aerodynamics Lead', 'vehicle', 3, { disciplineSlug: 'aerodynamics', ...S26 }),
   role('jonathan-mendez-aguilar', '2026-27', 'Structures Lead', 'vehicle', 4, { disciplineSlug: 'structures', ...S26 }),
   role('brian-sierra', '2026-27', 'Structures Lead', 'vehicle', 5, { disciplineSlug: 'structures', ...S26 }),
   role('daniel-montano', '2026-27', 'Structures Lead', 'vehicle', 6, { disciplineSlug: 'structures', ...S26 }),
-  role('jonathan-nguyen', '2026-27', 'Recovery Lead', 'avionics-recovery', 2, { disciplineSlug: 'avionics-recovery', ...S26 }),
+  role('jonathan-nguyen', '2026-27', 'Recovery Lead', 'avionics-recovery', 2, { disciplineSlug: 'avionics-recovery', focus: 'recovery', ...S26 }),
   role('natalie-lopez', '2026-27', 'Payload Director', 'payload', 1, { disciplineSlug: 'payload', ...S26 }),
   role('brandon-aguilar', '2026-27', 'Payload Lead', 'payload', 2, { disciplineSlug: 'payload', ...S26 }),
   role('alan-alfaro', '2026-27', 'Payload Lead', 'payload', 3, { disciplineSlug: 'payload', ...S26 }),
   // Not yet on the official roster (checklist C9)
   role('juan-ventura-romero', '2026-27', 'Payload Software Lead', 'payload', 4, { disciplineSlug: 'payload-software', source: SOURCES.juan }),
   role('nicholas-equihua', '2026-27', 'Payload Electronics Lead', 'payload', 5, { disciplineSlug: 'payload-electronics', ...S26 }),
-  role('angel-iglesias', '2026-27', 'Avionics Lead', 'avionics-recovery', 1, { disciplineSlug: 'avionics-recovery', ...S26 }),
+  role('angel-iglesias', '2026-27', 'Avionics Lead', 'avionics-recovery', 1, { disciplineSlug: 'avionics-recovery', focus: 'avionics', ...S26 }),
 
   // 2025–26 (titles as published)
   role('isrrael-sumano', '2025-26', 'Project Manager', 'management', 1, S25),
@@ -56,9 +62,9 @@ export const roles = [
   role('noah-tran', '2025-26', 'Structures and Recovery', 'vehicle', 1, S25),
   role('azad-aghdam', '2025-26', 'Structures and Recovery', 'vehicle', 2, S25),
   role('joel-venegas', '2025-26', 'Structures and Recovery', 'vehicle', 3, S25),
-  role('eirvin-rubio', '2025-26', 'Avionics', 'avionics', 1, S25),
-  role('dereck-rubio', '2025-26', 'Avionics', 'avionics', 2, S25),
-  role('wyatt-brown', '2025-26', 'Avionics', 'avionics', 3, S25),
+  role('eirvin-rubio', '2025-26', 'Avionics', 'avionics-recovery', 1, S25),
+  role('dereck-rubio', '2025-26', 'Avionics', 'avionics-recovery', 2, S25),
+  role('wyatt-brown', '2025-26', 'Avionics', 'avionics-recovery', 3, S25),
   // The old site listed him under Avionics; he was a Payload Lead (content review, 2026-11-10)
   role('kenneth-fambro', '2025-26', 'Payload Lead', 'payload', 1, { source: SOURCES.pmReview }),
   role('michael-sicner', '2025-26', 'Challenge', 'challenge', 1, S25),

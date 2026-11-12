@@ -10,29 +10,33 @@ import { SOURCES } from './org.js'
 //   awardType   overall | flight | report | design | participation
 
 export const competitions = [
-  {
-    slug: 'first-nations-launch',
-    name: 'First Nations Launch',
-    shortName: 'FNL',
-    organizer: 'NASA Wisconsin Space Grant Consortium, Carthage College (Kenosha, Wisconsin)',
-    url: SOURCES.fnl,
-    summary: [
-      'An international collegiate high-power rocketry competition for students at Tribal Colleges and Universities, Native American–serving institutions, and schools with active AISES chapters.',
-      'Through the 2018–19 season, teams competed in Tribal Launch and AISES Launch categories. Since 2020 it has run as a NASA Artemis Student Challenge with Moon, Mars, and Gateway challenges, judged on flight performance and on oral and written reports.',
-    ],
-    source: SOURCES.fnl,
-  },
+  // NASA Student Launch first, then First Nations Launch (Juan, 2026-11-11)
   {
     slug: 'nasa-student-launch',
     name: 'NASA Student Launch',
     shortName: 'NASA SL',
     organizer: "NASA Marshall Space Flight Center's Office of STEM Engagement (Huntsville, Alabama)",
     url: SOURCES.nasaSL,
+    logo: { src: 'logos/nasa-insignia.svg', name: 'NASA insignia', owner: 'NASA' },
     summary: [
       'A nine-month challenge in which teams design, build, test, and launch a high-power rocket carrying a scientific or engineering payload.',
       'Teams pass a series of reviews — Preliminary Design, Critical Design, Flight Readiness, and Launch Readiness — before flying in Huntsville, then submit a Post-Launch Assessment Review.',
     ],
     source: SOURCES.nasaSL,
+  },
+  {
+    slug: 'first-nations-launch',
+    name: 'First Nations Launch',
+    shortName: 'FNL',
+    organizer: 'NASA Wisconsin Space Grant Consortium, Carthage College (Kenosha, Wisconsin)',
+    url: SOURCES.fnl,
+    // White background: shown on a light tile
+    logo: { src: 'logos/first-nations-launch-logo.webp', tile: true, name: 'First Nations Launch logo', owner: 'the NASA Wisconsin Space Grant Consortium' },
+    summary: [
+      'An international collegiate high-power rocketry competition for students at Tribal Colleges and Universities, Native American–serving institutions, and schools with active AISES chapters.',
+      'Through the 2018–19 season, teams competed in Tribal Launch and AISES Launch categories. Since 2020 it has run as a NASA Artemis Student Challenge with Moon, Mars, and Gateway challenges, judged on flight performance and on oral and written reports.',
+    ],
+    source: SOURCES.fnl,
   },
 ]
 

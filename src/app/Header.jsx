@@ -63,13 +63,13 @@ export default function Header() {
           </button>
           <nav aria-label="Menu">
             <ul className="menu-overlay__list">
-              <li>
+              <li style={{ '--i': 0 }}>
                 <Link to="/" onClick={close}>
                   Flight Deck
                 </Link>
               </li>
-              {destinations.map((d) => (
-                <li key={d.id}>
+              {destinations.map((d, i) => (
+                <li key={d.id} style={{ '--i': i + 1 }}>
                   <Link to={d.path} onClick={close}>
                     {d.label}
                   </Link>

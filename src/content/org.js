@@ -25,7 +25,7 @@ export const SOURCES = {
 export const org = {
   name: 'Bearospace at UCLA',
   shortName: 'Bearospace',
-  tagline: "UCLA's student rocketry team",
+  tagline: "UCLA student rocketry team",
   lede:
     'We design, build, and fly high-power rockets — and the payloads inside them — at UCLA.',
   mission:
