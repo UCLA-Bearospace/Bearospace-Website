@@ -36,7 +36,15 @@ export const PORTRAIT_PANEL = { r: 248, g: 248, b: 248 }
 const RECIPES = {
   gallery: { widths: [480, 640, 960, 1280], maxBytes: 180 * 1024 },
   team: { widths: [320, 480, 640], aspect: 1.25, panel: PORTRAIT_PANEL }, // 4:5, cropped from the top
-  logos: { widths: [128, 256, 512, 929], placeholder: false, only: ['bearospace-logo.png', 'ucla-samueli-block.png', 'ucla-samueli-block-rev.png', 'anduril-logo.svg'] },
+  logos: { widths: [128, 256, 512, 929], placeholder: false, only: [
+      'bearospace-logo.png',
+      'ucla-samueli-block.png',
+      'ucla-samueli-block-rev.png',
+      'anduril-logo.svg',
+      'nasa-insignia.svg',
+      'first-nations-launch-logo.webp',
+    ],
+  },
 }
 
 const read = (file) => (existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {})

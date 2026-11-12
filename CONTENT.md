@@ -133,6 +133,10 @@ A past season's rocket belongs on History rather than Projects: add `place: 'his
 
 Add a row to `results` in `competitions.js` with the organizer's category wording, the placement, `awardType` (`overall`, `flight`, `report`, `design`, or `participation`), and a `sourceUrl`. Only `confidence: 'confirmed'` rows can be published.
 
+### Move a competition to its next stage
+
+Each competition on `/competitions` has a stage tracker, in `src/content/competitionTimeline.js` (kept separate so it loads only on that page). When the team finishes a stage, change that competition's `current` to the next stage's `id` and `asOf` to today's date. At the start of a new season, replace its `season`, `stages` (with the organizer's dates), and `source` with the new handbook or calendar.
+
 ### Add photos
 
 1. Put the original in `assets-src/images/gallery/` with a descriptive file name (`2027-04-launch-pad.jpg`).

@@ -34,7 +34,7 @@ const STATIC = {
   '/projects': { label: 'Projects', description: 'The designs and R&D projects Bearospace is working on now.' },
   '/competitions': {
     label: 'Competitions',
-    description: 'Bearospace at First Nations Launch and NASA Student Launch: what each competition asks, and our results season by season.',
+    description: 'Bearospace at NASA Student Launch and First Nations Launch: what each competition asks, and our results season by season.',
   },
   '/history': { label: 'History', description: 'Seasons, rockets, teams, and results — the documented history of Bearospace and rocketry at UCLA.' },
   '/team': { label: 'Team', description: `The ${seasonLabel(org.currentSeason)} Bearospace leadership team and past seasons.` },

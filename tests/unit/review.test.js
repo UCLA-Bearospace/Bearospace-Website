@@ -4,6 +4,8 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { content, historyProjects } from '../../src/content/index.js'
 import { destinations } from '../../src/site/destinations.js'
 import { allPaths, getMeta } from '../../src/site/meta.js'
+import { stageOf, timelines } from '../../src/content/competitionTimeline.js'
+import { validateTimelines } from '../../scripts/validate-content.mjs'
 
 // Guards for the project manager's content review (slice 10, 2026-11-10).
 
@@ -58,4 +60,24 @@ test('every redirect lands on a real page', () => {
       assert.ok(d?.parts?.some((p) => p.id === hash), destination)
     }
   }
+})
+
+test('competition trackers: NASA Student Launch at its PDR, First Nations Launch planning', () => {
+  assert.deepEqual(validateTimelines(timelines, content.competitions), [])
+  assert.equal(stageOf('nasa-student-launch').stage.id, 'pdr')
+  assert.deepEqual(
+    timelines['nasa-student-launch'].stages.map((s) => s.short),
+    ['Proposal', 'Selected', 'PDR', 'CDR', 'FRR', 'Launch', 'PLAR'],
+  )
+  assert.equal(stageOf('first-nations-launch').index, 0)
+  assert.equal(stageOf('first-nations-launch').stage.id, 'planning')
+})
+
+test('a tracker must point at a real stage', () => {
+  const broken = structuredClone(timelines)
+  broken['nasa-student-launch'].current = 'cdrr'
+  broken['moon-race'] = { ...broken['first-nations-launch'] }
+  const errors = validateTimelines(broken, content.competitions).join('\n')
+  assert.match(errors, /"nasa-student-launch" › current: "cdrr" is not one of its stages/)
+  assert.match(errors, /"moon-race" › key: is not in competitions\.js/)
 })

@@ -19,6 +19,7 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 | Sources on pages | Removed from most pages; History and Competitions keep outside links under "Read more". Sources stay in the content files | Juan Ventura-Romero | 2026-11-10 |
 | AISES | AISES references removed at the PM's request. Historical records keep their official wording (competition categories such as "AISES Launch", First Nations Launch eligibility) | Emmanuel Jaimes (PM), Juan Ventura-Romero | 2026-11-10 |
 | Wording | "Subteams" replaces "disciplines" in visible text | Juan Ventura-Romero | 2026-11-10 |
+| Competition order | NASA Student Launch first, then First Nations Launch, each with its logo | Juan Ventura-Romero | 2026-11-11 |
 | Paused motion | The Flight Deck freezes in place instead of switching to a list | Juan Ventura-Romero | 2026-11-10 |
 
 ## Source discrepancies
@@ -61,6 +62,8 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 | C21 | Payload Software page text (summary, responsibilities, work, skills) drafted from facts already on the site | Engineering | Juan Ventura-Romero | Draft; Juan to confirm |
 | C22 | 2018–19 roster: hidden (`publish: false`) after the PM review removed the 2018–19 team page | Team history | | Open: publish again only if the team wants the roster shown |
 | C23 | Avionics & Recovery tabs: each half's summary and lists come from the old program pages; the "Not part of" lists (where each half's job ends) are drafted | Engineering | Juan Ventura-Romero | Draft; Juan to confirm |
+| C24 | Use of the NASA insignia ("meatball") and the First Nations Launch logo on the Competitions page. NASA restricts its insignia to uses it approves; a team that competes may still need permission. FNL's logo belongs to the Wisconsin Space Grant Consortium | Competitions | Juan Ventura-Romero | Added 2026-11-11 at Juan's request, with a notice on the page: trademarks of their owners, shown for identification and informational and historical purposes only, no endorsement implied. The notice is not a substitute for permission, which is not yet recorded. Remove the `logo` fields in `competitions.js` to take them down |
+| C25 | Competition trackers (`src/content/competitionTimeline.js`): NASA Student Launch 2026–27 is shown at its Preliminary Design Review, from the handbook's dates (proposal and selection shown as done, which says UCLA was selected; the NASA team list for 2026–27 names UCLA, D4). First Nations Launch is shown as Planning, at Juan's request | Competitions | Juan Ventura-Romero | Open: confirm the NASA stage, and move each tracker on as the season goes |
 
 ## Missing materials
 

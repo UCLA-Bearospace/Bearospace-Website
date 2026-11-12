@@ -114,6 +114,10 @@ export const schemas = {
     shortName: text,
     organizer: text,
     url,
+    // Logo beside the name (an original under assets-src/images/); `tile` puts a logo with a
+    // white background on a light tile instead of the dark page
+    // `name` and `owner` go into the page's trademark notice
+    logo: z.object({ src: z.string(), tile: z.boolean().optional(), name: text, owner: text }).strict().optional(),
     summary: z.array(text).min(1),
     source,
   }),
