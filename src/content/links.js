@@ -9,6 +9,8 @@ export const links = {
   // (supplied by Juan Ventura-Romero, 2026-11-07), so the site links there rather than
   // keeping a second list that could go stale.
   discord: 'https://discord.gg/SUWtpwJ8AB',
+  // The team's GoFundMe, the Flight Deck's Donate button (supplied by Juan, 2026-11-12)
+  gofundme: 'https://gofund.me/d9aaeb338',
   // Interest form and Linktree: unconfirmed (checklist C6, C7)
   joinForm: null,
   linktree: null,

@@ -21,6 +21,9 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 | Wording | "Subteams" replaces "disciplines" in visible text | Juan Ventura-Romero | 2026-11-10 |
 | Competition order | NASA Student Launch first, then First Nations Launch, each with its logo | Juan Ventura-Romero | 2026-11-11 |
 | Paused motion | The Flight Deck freezes in place instead of switching to a list | Juan Ventura-Romero | 2026-11-10 |
+| Emmanuel Jaimes, 2025–26 | Both Project Manager and Structures and Manufacturing Director that season (two roster rows) | Juan Ventura-Romero | 2026-11-12 |
+| Where our members have gone | Internships and full-time jobs of eight members (`careers.js`), shown on `/team`, on their profiles, and as a list of organizations on `/join`. Worded "members", not "alumni", because four are on the current leadership. Precision Castparts Corp. named as the parent of Carlton Forge Works and Avibank | Juan Ventura-Romero | 2026-11-12 |
+| Donate | A green Donate button on the Flight Deck opens the team's GoFundMe (https://gofund.me/d9aaeb338) | Juan Ventura-Romero | 2026-11-12 |
 
 ## Source discrepancies
 
@@ -64,6 +67,8 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 | C23 | Avionics & Recovery tabs: each half's summary and lists come from the old program pages; the "Not part of" lists (where each half's job ends) are drafted | Engineering | Juan Ventura-Romero | Draft; Juan to confirm |
 | C24 | Use of the NASA insignia ("meatball") and the First Nations Launch logo on the Competitions page. NASA restricts its insignia to uses it approves; a team that competes may still need permission. FNL's logo belongs to the Wisconsin Space Grant Consortium | Competitions | Juan Ventura-Romero | Added 2026-11-11 at Juan's request, with a notice on the page: trademarks of their owners, shown for identification and informational and historical purposes only, no endorsement implied. The notice is not a substitute for permission, which is not yet recorded. Remove the `logo` fields in `competitions.js` to take them down |
 | C25 | Competition trackers (`src/content/competitionTimeline.js`): NASA Student Launch 2026–27 is shown at its Preliminary Design Review, from the handbook's dates (proposal and selection shown as done, which says UCLA was selected; the NASA team list for 2026–27 names UCLA, D4). First Nations Launch is shown as Planning, at Juan's request | Competitions | Juan Ventura-Romero | Open: confirm the NASA stage, and move each tracker on as the season goes |
+| C26 | Each member named in "Where our members have gone" (`careers.js`) agrees to their employer being shown (see C11) | Team, Join | Juan Ventura-Romero | Open |
+| C27 | Exact job titles for the careers list (each position's `title` is null, so it reads "Intern" or "Full-time") | Team, Join | Juan Ventura-Romero | Open: Juan to send the refined roles |
 
 ## Missing materials
 

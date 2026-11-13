@@ -56,7 +56,9 @@ export const roles = [
 
   // 2025–26 (titles as published)
   role('isrrael-sumano', '2025-26', 'Project Manager', 'management', 1, S25),
-  // Corrected from the old site's "Project Manager" (content review, 2026-11-10)
+  // Emmanuel held both roles that season: Project Manager (Juan, 2026-11-12) and
+  // Structures and Manufacturing Director (content review, 2026-11-10)
+  role('emmanuel-jaimes', '2025-26', 'Project Manager', 'management', 2, { source: SOURCES.juanUpdate }),
   role('emmanuel-jaimes', '2025-26', 'Structures and Manufacturing Director', 'manufacturing', 0, { source: SOURCES.pmReview }),
   role('josephine-rivera-hoagland', '2025-26', 'Public Relations Officer', 'management', 3, S25),
   role('noah-tran', '2025-26', 'Structures and Recovery', 'vehicle', 1, S25),

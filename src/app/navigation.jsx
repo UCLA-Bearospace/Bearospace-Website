@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
-import { useLocation, useNavigationType } from 'react-router'
+import { useLocation } from 'react-router'
 import { getMeta } from '../site/meta.js'
 import { org } from '../content/index.js'
 import { readStore, writeStore } from '../lib/storage'
@@ -37,7 +37,6 @@ const SCROLL_KEY = 'bearo:scroll'
 
 export function ScrollManager() {
   const location = useLocation()
-  const type = useNavigationType()
   const saved = useRef(null)
 
   useEffect(() => {
@@ -62,13 +61,40 @@ export function ScrollManager() {
     }
   }, [location.key])
 
-  // Back/Forward restores; new pages start at the top (or at their #hash)
+  // Back/Forward restores; new pages start at the top (or at their #hash). This renders
+  // under <Routes location={displayLocation}>, where react-router reports every navigation
+  // as POP, so a history entry with a saved position is the sign of a return visit.
   useLayoutEffect(() => {
     if (isLandingLocation(location.key)) return
-    if (type === 'POP') window.scrollTo(0, saved.current?.[location.key] ?? 0)
-    else if (location.hash) document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView()
-    else window.scrollTo(0, 0)
-  }, [location.key, location.hash, type])
+    // (Only ever return a cleanup function from here: React calls whatever comes back)
+    const restore = saved.current?.[location.key]
+    if (restore !== undefined) {
+      window.scrollTo(0, restore)
+      return
+    }
+    const id = location.hash ? decodeURIComponent(location.hash.slice(1)) : ''
+    const target = id ? document.getElementById(id) : null
+    if (target) {
+      target.scrollIntoView()
+      return
+    }
+    window.scrollTo(0, 0)
+    if (!id) return
+    // Coming from another page, the target arrives with the lazily loaded page: wait for it
+    const observer = new MutationObserver(() => {
+      const el = document.getElementById(id)
+      if (el) {
+        observer.disconnect()
+        el.scrollIntoView()
+      }
+    })
+    observer.observe(document.body, { childList: true, subtree: true })
+    const giveUp = setTimeout(() => observer.disconnect(), 5000)
+    return () => {
+      observer.disconnect()
+      clearTimeout(giveUp)
+    }
+  }, [location.key, location.hash])
 
   return null
 }

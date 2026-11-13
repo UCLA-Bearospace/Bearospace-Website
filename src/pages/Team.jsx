@@ -11,6 +11,7 @@ import {
   rolesFor,
   seasonLabel,
 } from '../content/index.js'
+import { careerList, careersFor, describePosition } from '../content/careers.js'
 import NotFound from './NotFound'
 
 function SeasonNav({ current }) {
@@ -55,6 +56,33 @@ function Roster({ season }) {
   )
 }
 
+/** Internships and jobs members have gone on to (src/content/careers.js). */
+function WhereTheyWent() {
+  return (
+    <section id="where-they-went" aria-labelledby="where-they-went-title">
+      <h2 id="where-they-went-title">Where our members have gone</h2>
+      <p>Internships and full-time roles Bearospace members have gone on to.</p>
+      <ul className="people-grid people-grid--wide">
+        {careerList().map(({ person, positions }) => (
+          <li key={person.slug} className="person-card">
+            <Portrait person={person} />
+            <span className="person-card__text">
+              <strong className="person-card__name">
+                {person.consent ? <Link to={`/team/${person.slug}`}>{person.name}</Link> : person.name}
+              </strong>
+              <ul className="person-card__positions">
+                {positions.map((p) => (
+                  <li key={describePosition(p)}>{describePosition(p)}</li>
+                ))}
+              </ul>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 export function Team() {
   return (
     <PageFrame
@@ -63,6 +91,7 @@ export function Team() {
       lede="The students leading Bearospace this season, by division. Every member page stays at the same address after people graduate."
     >
       <Roster season={org.currentSeason} />
+      <WhereTheyWent />
     </PageFrame>
   )
 }
@@ -85,6 +114,7 @@ export function Member() {
   const current = history.find((r) => r.season === org.currentSeason)
   const latest = history[0]
   const contributions = contributionsBy(slug)
+  const positions = careersFor(slug)
   const disciplines = [...new Set(history.flatMap((r) => [r.disciplineSlug, ...(r.also ?? [])]).filter(Boolean))]
   const links = Object.entries(person.links ?? {})
 
@@ -109,6 +139,17 @@ export function Member() {
               </li>
             ))}
           </ul>
+
+          {positions.length > 0 && (
+            <>
+              <h2>Industry experience</h2>
+              <ul>
+                {positions.map((p) => (
+                  <li key={describePosition(p)}>{describePosition(p)}</li>
+                ))}
+              </ul>
+            </>
+          )}
 
           {disciplines.length > 0 && (
             <>

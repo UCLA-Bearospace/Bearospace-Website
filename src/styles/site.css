@@ -81,6 +81,17 @@ main {
   color: var(--ink);
 }
 
+.button--green {
+  background: var(--go);
+  border-color: var(--go);
+  color: var(--ink);
+}
+
+.button--green:hover {
+  background: #7aeaab;
+  color: var(--ink);
+}
+
 .button--ghost {
   border-color: var(--line);
 }
@@ -573,6 +584,12 @@ main {
   min-height: 24px;
 }
 
+/* Join: the organizations members have gone on to */
+.career-orgs {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
 .cta-band {
   display: flex;
   flex-wrap: wrap;
@@ -816,6 +833,21 @@ main {
   color: var(--mute);
 }
 
+/* "Where our members have gone": room for a company name or two under each card */
+.people-grid--wide {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+}
+
+.person-card__positions {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--step--1);
+  color: var(--mute);
+}
+
 .person-card--open .person-card__name {
   color: var(--gold);
 }
@@ -864,6 +896,11 @@ main {
     padding: 0.5rem;
     border-radius: 0 0 var(--radius) var(--radius);
     background: var(--panel);
+  }
+
+  /* Arriving at /team#where-they-went, the heading lands below the sticky season list */
+  #where-they-went {
+    scroll-margin-top: 5rem;
   }
 }
 

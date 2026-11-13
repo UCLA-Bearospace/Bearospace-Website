@@ -25,12 +25,13 @@ That means: in `projects.js`, the entry `2018-19-fnl-rocket`, field `contributor
 | File | What's in it |
 |---|---|
 | `org.js` | Name, mission, current season, location, website address (`siteUrl`) |
-| `links.js` | Email, Instagram, LinkedIn, Discord (the Join page's main button; meeting and office-hour times are announced there), interest form |
+| `links.js` | Email, Instagram, LinkedIn, Discord (the Join page's main button; meeting and office-hour times are announced there), GoFundMe (the Flight Deck's Donate button), interest form |
 | `divisions.js` | The four divisions |
 | `disciplines.js` | The seven disciplines: what they do, work, tools, skills, where they sit on the rocket (`zones`), teams they work with |
 | `systemMap.js` | The rocket's sections for the Engineering map. When the team confirms where the payload, recovery, and avionics bays really are, update their positions and set `approximate: false` |
 | `people.js` | Each person once: name, headshot, links, consent |
 | `roles.js` | Who did what in each season, plus open positions |
+| `careers.js` | Where members have gone: internships and jobs (Team and Join pages, profiles) |
 | `projects.js` | Project pages |
 | `competitions.js` | Competitions and every recorded result |
 | `milestones.js` | Other dated moments for the History page |
@@ -110,6 +111,18 @@ person('maria-garcia', 'Maria Garcia', { ...shot('maria-garcia'), source: 'https
 - Put their photo at `assets-src/images/team/maria-garcia.png` (any size; it's cropped to a 4:5 portrait from the top, and a transparent or white background ends up on the same light panel as everyone else's). Keep `headshotVerified: false` until they confirm it's them: until then the photo is shown but not offered to search engines. No photo? Leave out `...shot(...)`; the site shows initials.
 - Profile links are optional: `links: { linkedin: 'https://www.linkedin.com/in/…' }`.
 - Ask before publishing a profile. Use `consent: false` for people who should only be named in history.
+
+### Add where a member has gone (internships and jobs)
+
+"Where our members have gone" on `/team`, the "Industry experience" list on profiles, and the organization list on `/join` all come from `src/content/careers.js` (kept separate so only those pages load it). One entry per person, positions in the order to show them:
+
+```js
+{ personSlug: 'maria-garcia', positions: [intern('Northrop Grumman', { times: 2 }), fullTime('NASA')] },
+```
+
+- `times` for repeat internships at the same place (2 or more); `parent` for a company that belongs to a group (`parent: PCC`).
+- Once someone confirms their exact job title, set `title` (`intern('NASA', { title: 'Payload Systems Intern' })`); it replaces the plain "Intern" or "Full-time".
+- Ask the person before listing their employer.
 
 ### A subteam with two halves, or a role on two teams
 
