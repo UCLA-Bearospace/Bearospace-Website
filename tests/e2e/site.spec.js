@@ -62,11 +62,13 @@ test('in-site navigation updates the title and moves focus to the new heading', 
 test('Back restores the scroll position', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 })
   await page.goto('/team?scene=0')
-  await page.getByRole('link', { name: 'Alexander Astorga' }).scrollIntoViewIfNeeded()
+  // The roster's card (he is also in "Where our members have gone")
+  const card = page.locator('.people-grid:not(.people-grid--wide)').getByRole('link', { name: 'Alexander Astorga' })
+  await card.scrollIntoViewIfNeeded()
   await page.waitForTimeout(150)
   const y = await page.evaluate(() => window.scrollY)
   expect(y).toBeGreaterThan(200)
-  await page.getByRole('link', { name: 'Alexander Astorga' }).click()
+  await card.click()
   await expect(page).toHaveURL(/alexander-astorga$/)
   // The page swaps under the transition wipe, then starts at the top
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Alexander Astorga')

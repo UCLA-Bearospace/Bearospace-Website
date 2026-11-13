@@ -37,9 +37,44 @@ test('the 2025–26 roster carries the project manager\'s corrections, and no po
   await page.goto('/team/season/2025-26?scene=0')
   await expect(page.locator('.person-card', { hasText: 'Dario Kuroda' })).toBeVisible()
   await expect(page.locator('.person-card', { hasText: 'Kenneth Fambro' })).toContainText('Payload Lead')
-  await expect(page.locator('.person-card', { hasText: 'Emmanuel Jaimes' })).toContainText('Structures and Manufacturing Director')
   await page.goto('/team?scene=0')
   await expect(page.locator('.person-card--open')).toHaveCount(0)
+})
+
+const groupSection = (page, name) =>
+  page.locator('section', { has: page.getByRole('heading', { level: 2, name, exact: true }) })
+
+test('in 2025–26 Emmanuel was both a Project Manager and the Structures and Manufacturing Director', async ({ page }) => {
+  await page.goto('/team/season/2025-26?scene=0')
+  await expect(groupSection(page, 'Management').locator('.person-card', { hasText: 'Emmanuel Jaimes' })).toContainText('Project Manager')
+  await expect(groupSection(page, 'Manufacturing').locator('.person-card', { hasText: 'Emmanuel Jaimes' })).toContainText(
+    'Structures and Manufacturing Director',
+  )
+  await page.goto('/team/emmanuel-jaimes?scene=0')
+  const roles = page.locator('.profile').getByRole('heading', { name: 'Roles' }).locator('+ ul')
+  await expect(roles).toContainText('Project Manager, 2025–26')
+  await expect(roles).toContainText('Structures and Manufacturing Director, 2025–26')
+})
+
+test('the team page shows where members have gone, and profiles list it too', async ({ page }) => {
+  await page.goto('/team?scene=0')
+  const section = page.locator('#where-they-went')
+  await expect(section.getByRole('heading', { level: 2 })).toHaveText('Where our members have gone')
+  await expect(section.locator('.person-card')).toHaveCount(8)
+  await expect(section.locator('.person-card', { hasText: 'Dereck Rubio' })).toContainText('Intern · Northrop Grumman (twice)')
+  await expect(section.locator('.person-card', { hasText: 'Dereck Rubio' })).toContainText('Full-time · Mortenson')
+  await page.goto('/team/michael-sicner?scene=0')
+  const experience = page.locator('.profile').getByRole('heading', { name: 'Industry experience' }).locator('+ ul')
+  await expect(experience).toContainText('Full-time · Northrop Grumman')
+})
+
+test('the join page names the organizations and links to who went where', async ({ page }) => {
+  await page.goto('/join?scene=0')
+  const orgs = page.locator('.career-orgs li')
+  await expect(orgs).toHaveText(['PPG', 'Northrop Grumman', 'Mortenson', 'Carlton Forge Works', 'Lockheed Martin', 'NASA', 'Avibank'])
+  await page.getByRole('link', { name: 'See who went where' }).click()
+  await expect(page).toHaveURL(/\/team#where-they-went$/)
+  await expect(page.locator('#where-they-went')).toBeInViewport()
 })
 
 test('every portrait sits on the same panel, at 4:5', async ({ page }) => {

@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 import { Link, useLocation } from 'react-router'
 import PageFrame from '../components/PageFrame'
 import { contactTopics, disciplines, getDiscipline, links, mailto, org } from '../content/index.js'
+import { careerOrgs } from '../content/careers.js'
 
 // ?interest=<discipline> (from discipline pages) preselects the membership email subject.
 // Read after hydration so the prerendered HTML (which has no query) still matches.
@@ -32,6 +33,17 @@ export default function Join() {
           </li>
         ))}
       </ul>
+
+      <h2>Where our members have gone</h2>
+      <p>Bearospace members have gone on to internships and full-time roles at:</p>
+      <ul className="inline-list inline-list--wrap career-orgs">
+        {careerOrgs().map((name) => (
+          <li key={name}>{name}</li>
+        ))}
+      </ul>
+      <p>
+        <Link to="/team#where-they-went">See who went where</Link>
+      </p>
 
       <h2>Your next step</h2>
       {links.discord && (

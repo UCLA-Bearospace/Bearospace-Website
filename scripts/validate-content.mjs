@@ -160,10 +160,33 @@ export function validateTimelines(timelines, competitions) {
   return errors
 }
 
+/** Where members have gone (src/content/careers.js, kept out of the main script). */
+export function validateCareers(careers, people) {
+  const errors = []
+  const at = (slug, field, message) => errors.push(`careers.js › "${slug}" › ${field}: ${message}`)
+  careers.forEach((c, i) => {
+    const slug = c.personSlug ?? `#${i + 1}`
+    if (!people.some((p) => p.slug === c.personSlug)) at(slug, 'personSlug', 'is not in people.js')
+    if (careers.findIndex((o) => o.personSlug === c.personSlug) !== i) at(slug, 'personSlug', 'is used twice (give one entry several positions)')
+    if (!c.positions?.length) at(slug, 'positions', 'list at least one')
+    c.positions?.forEach((p, k) => {
+      if (!['internship', 'full-time'].includes(p.kind)) at(slug, `positions[${k}].kind`, `"${p.kind}" must be "internship" or "full-time"`)
+      if (!p.org?.trim()) at(slug, `positions[${k}].org`, 'is required')
+      if (p.times !== undefined && !(Number.isInteger(p.times) && p.times >= 2)) at(slug, `positions[${k}].times`, 'must be a whole number, 2 or more')
+    })
+  })
+  return errors
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const { content } = await import('../src/content/index.js')
   const { timelines } = await import('../src/content/competitionTimeline.js')
-  const errors = [...validateContent(content), ...validateTimelines(timelines, content.competitions)]
+  const { careers } = await import('../src/content/careers.js')
+  const errors = [
+    ...validateContent(content),
+    ...validateTimelines(timelines, content.competitions),
+    ...validateCareers(careers, content.people),
+  ]
   if (errors.length) {
     console.error(`Content has ${errors.length} problem(s):\n  ` + errors.join('\n  '))
     console.error('\nSee CONTENT.md for how each file is laid out.')

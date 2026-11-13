@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router'
-import { org } from '../content/index.js'
+import { links, org } from '../content/index.js'
 import { SponsorStrip } from '../components/bits'
 import { isLandingLocation } from '../app/landing'
 import { getLastDestination } from '../menu/menuState'
@@ -36,6 +36,11 @@ export default function Home() {
           <Link className="button" to="/sponsors">
             Sponsor a launch
           </Link>
+          {links.gofundme && (
+            <a className="button button--green" href={links.gofundme}>
+              Donate<span className="sr-only"> on GoFundMe</span>
+            </a>
+          )}
         </div>
       </section>
 
