@@ -41,7 +41,14 @@ export default function IntroGate() {
   }, [home, mode, run, directorRef])
 
   if (!home) return null
-  const sponsors = sponsorList({ intro: true })
+  // Sponsors that share a kicker share a card ("Supported by": Anduril, then SendCutSend
+  // under it), so the sequence keeps its timing however many sponsors there are
+  const cards = sponsorList({ intro: true }).reduce((acc, s) => {
+    const last = acc.at(-1)
+    if (last?.kicker === s.introKicker) last.sponsors.push(s)
+    else acc.push({ kicker: s.introKicker, relationship: s.relationship, sponsors: [s] })
+    return acc
+  }, [])
 
   return (
     <div className="intro" ref={overlay} role="region" aria-label="Opening sequence">
@@ -66,12 +73,17 @@ export default function IntroGate() {
           <Img src="logos/bearospace-logo.png" alt="" sizes="(min-width: 40rem) 22rem, 60vw" eager />
           <span className="intro__sweep" />
         </div>
-        {sponsors.map((s) => (
-          <div key={s.id} className={`intro__sponsor intro__sponsor--${s.relationship}`}>
-            <p className="kicker">{s.introKicker}</p>
-            <span className={s.logo?.onDark ? (s.logo.invertOnDark ? 'intro__logo intro__logo--invert' : 'intro__logo') : 'intro__logo intro__logo--plate'}>
-              <Img src={s.logo?.onDark ?? s.logo?.onLight} alt={s.name} sizes="70vw" />
-            </span>
+        {cards.map((card) => (
+          <div key={card.sponsors[0].id} className={`intro__sponsor intro__sponsor--${card.relationship}`}>
+            <p className="kicker">{card.kicker}</p>
+            {card.sponsors.map((s) => (
+              <span
+                key={s.id}
+                className={s.logo?.onDark ? (s.logo.invertOnDark ? 'intro__logo intro__logo--invert' : 'intro__logo') : 'intro__logo intro__logo--plate'}
+              >
+                <Img src={s.logo?.onDark ?? s.logo?.onLight} alt={s.name} sizes="70vw" />
+              </span>
+            ))}
           </div>
         ))}
         <div className="intro__flash" />

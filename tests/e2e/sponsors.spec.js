@@ -14,8 +14,21 @@ test('every sponsor appears on the Sponsors page in order, the lead sponsor larg
   const names = await page.locator('.sponsor-card:not(.sponsor-card--past-partner) .sponsor-card__name').allTextContents()
   expect(names).toEqual(sponsorList().map((s) => s.name))
   await expect(page.locator('.sponsor-card').first()).toContainText('Supported by Anduril')
-  const [lead, next] = await page.locator('.sponsor-card img').evaluateAll((imgs) => imgs.slice(0, 2).map((i) => i.getBoundingClientRect().height))
-  expect(lead).toBeGreaterThan(next)
+  await expect(page.locator('.sponsor-card').nth(1)).toContainText('Supported by SendCutSend')
+  // Sponsors share one tier, shown larger than the home institution
+  const height = (sel) => page.locator(`${sel} img`).first().evaluate((i) => i.getBoundingClientRect().height)
+  const [anduril, scs, samueli] = [await height('.sponsor-card--sponsor'), await height('.sponsor-card--sponsor:nth-child(2)'), await height('.sponsor-card--institutional')]
+  expect(scs).toBeCloseTo(anduril, 0)
+  expect(anduril).toBeGreaterThan(samueli)
+})
+
+test('SendCutSend uses its approved white logo on the dark site, scaled proportionally', async ({ page }) => {
+  await page.goto('/sponsors?scene=0')
+  const logo = page.locator('.sponsor-card', { hasText: 'Supported by SendCutSend' }).getByRole('img', { name: 'SendCutSend' })
+  await expect(logo).toHaveAttribute('src', /sendcutsend-logo-white\.svg$/)
+  await expect(logo).toHaveCSS('filter', 'none')
+  const box = await logo.boundingBox()
+  expect(box.width / box.height).toBeCloseTo(273.74 / 57.56, 1)
 })
 
 test('sponsors with a logo appear in the "Supported by" strip on every page', async ({ page }) => {
@@ -28,11 +41,16 @@ test('sponsors with a logo appear in the "Supported by" strip on every page', as
 
 test.describe('the opening sequence', () => {
   test.use({ storageState: { cookies: [], origins: [] } })
-  test('shows every intro sponsor, in order, with its kicker', async ({ page }) => {
+  test('shows every intro sponsor, in order, with its kicker; sponsors sharing a kicker share a card', async ({ page }) => {
     await page.goto('/')
+    const kickers = [...new Set(intro.map((s) => s.introKicker))]
     const cards = page.locator('.intro__sponsor')
-    await expect(cards).toHaveCount(intro.length)
-    for (const [i, s] of intro.entries()) await expect(cards.nth(i)).toContainText(s.introKicker)
+    await expect(cards).toHaveCount(kickers.length)
+    for (const [i, kicker] of kickers.entries()) {
+      await expect(cards.nth(i).locator('.kicker')).toHaveText(kicker)
+      const names = intro.filter((s) => s.introKicker === kicker).map((s) => s.name)
+      expect(await cards.nth(i).locator('.intro__logo img').evaluateAll((imgs) => imgs.map((img) => img.alt))).toEqual(names)
+    }
   })
 })
 

@@ -67,6 +67,10 @@ Original images go in `assets-src/images/` (never edit them in place). `npm run 
 
 That's all: the opening sequence, footer strip, and Sponsors page pick it up.
 
+- Also add the logo's file name to the `logos.only` list in `scripts/build-images.mjs`, or it won't be copied into the site.
+- Follow the sponsor's brand guidelines: use their approved files and colours as supplied. A white version for the site's dark background beats `invertOnDark` when they provide one. If their SVG has a wide empty artboard, trim the `viewBox` to the artwork (as with SendCutSend's), or the logo shows up tiny.
+- In the opening sequence, sponsors with the same `introKicker` share one card, stacked in `introOrder` (SendCutSend sits under Anduril on the "Supported by" card). That keeps the sequence's timing the same however many sponsors there are.
+
 **A past partner** (an organization that met with the team or shared its expertise, not a sponsor) needs no logo or link. It appears only on the Sponsors page, under "Past meeting partners and collaborators", never in the intro or the "Supported by" strip:
 
 ```js

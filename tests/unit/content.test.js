@@ -158,7 +158,7 @@ test('unconfirmed lineage stays hidden', () => {
 test('sponsors come back in intro order for the opening sequence', () => {
   assert.deepEqual(
     sponsorList({ intro: true }).map((s) => s.id),
-    ['anduril', 'ucla-samueli'],
+    ['anduril', 'sendcutsend', 'ucla-samueli'],
   )
 })
 

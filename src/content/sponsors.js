@@ -27,6 +27,27 @@ export const sponsors = [
     source: SOURCES.juan,
   },
   {
+    // Same tier as Anduril, listed under it (Juan Ventura-Romero, 2026-11-12). Logo: the
+    // approved "Powered by" lockup with the laser, horizontal, from
+    // https://sendcutsend.com/brand-assets/ in its approved white (dark backgrounds) and
+    // black (light backgrounds), unaltered apart from trimming the empty artboard margin.
+    // Their rules: an approved logo only, never the laser without the text, black, red, or
+    // white only, scaled proportionally, at least one "n" of clear space all round.
+    id: 'sendcutsend',
+    name: 'SendCutSend',
+    relationship: 'sponsor',
+    label: 'Supported by SendCutSend',
+    url: 'https://sendcutsend.com/',
+    logo: { onDark: 'logos/sendcutsend-logo-white.svg', onLight: 'logos/sendcutsend-logo-black.svg' },
+    showInIntro: true,
+    introOrder: 2,
+    introKicker: 'Supported by',
+    order: 2,
+    activeSeasons: ['2026-27'],
+    verifiedAt: '2026-11-12',
+    source: SOURCES.juanUpdate,
+  },
+  {
     id: 'ucla-samueli',
     name: 'UCLA Samueli School of Engineering',
     relationship: 'institutional',
@@ -35,9 +56,9 @@ export const sponsors = [
     // Reversed (white text) lockup on dark backgrounds, the standard block on light ones
     logo: { onDark: 'logos/ucla-samueli-block-rev.png', onLight: 'logos/ucla-samueli-block.png' },
     showInIntro: true,
-    introOrder: 2,
+    introOrder: 3,
     introKicker: 'Built at',
-    order: 2,
+    order: 3,
     activeSeasons: ['2025-26', '2026-27'],
     verifiedAt: null, // label pending (checklist C2)
     source: SOURCES.aises,

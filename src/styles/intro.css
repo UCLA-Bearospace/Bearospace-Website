@@ -144,6 +144,16 @@ html[data-intro-ended] .stage {
   height: auto;
 }
 
+/* A second sponsor on the same card (SendCutSend under Anduril): a little smaller, with at
+   least one "n" of its script of clear space above it (SendCutSend's logo rules) */
+.intro__logo + .intro__logo {
+  margin-top: clamp(1rem, 3vw, 2.5rem);
+}
+
+.intro__logo + .intro__logo img {
+  width: max(32vw, min(56vw, 21rem));
+}
+
 .intro__logo--invert img {
   filter: invert(1);
 }
