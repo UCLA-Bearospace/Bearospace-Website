@@ -24,6 +24,7 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 | Emmanuel Jaimes, 2025–26 | Both Project Manager and Structures and Manufacturing Director that season (two roster rows) | Juan Ventura-Romero | 2026-11-12 |
 | Where our members have gone | Internships and full-time jobs of eight members (`careers.js`), shown on `/team`, on their profiles, and as a list of organizations on `/join`. Worded "members", not "alumni", because four are on the current leadership. Precision Castparts Corp. named as the parent of Carlton Forge Works and Avibank | Juan Ventura-Romero | 2026-11-12 |
 | Donate | A green Donate button on the Flight Deck opens the team's GoFundMe (https://gofund.me/d9aaeb338) | Juan Ventura-Romero | 2026-11-12 |
+| SendCutSend | A sponsor on Anduril's tier, listed under it everywhere: "Supported by SendCutSend" on the Sponsors page, in the "Supported by" strip, and on the intro's "Supported by" card below Anduril. Logo: their approved horizontal "Powered by" lockup with the laser, in white on the dark site (black version kept for light backgrounds), from https://sendcutsend.com/brand-assets/ | Juan Ventura-Romero | 2026-11-12 |
 
 ## Source discrepancies
 
@@ -69,6 +70,7 @@ Seeded 2026-11-02 from `docs/PLAN.md` §4.5 and §12.
 | C25 | Competition trackers (`src/content/competitionTimeline.js`): NASA Student Launch 2026–27 is shown at its Preliminary Design Review, from the handbook's dates (proposal and selection shown as done, which says UCLA was selected; the NASA team list for 2026–27 names UCLA, D4). First Nations Launch is shown as Planning, at Juan's request | Competitions | Juan Ventura-Romero | Open: confirm the NASA stage, and move each tracker on as the season goes |
 | C26 | Each member named in "Where our members have gone" (`careers.js`) agrees to their employer being shown (see C11) | Team, Join | Juan Ventura-Romero | Open |
 | C27 | Exact job titles for the careers list (each position's `title` is null, so it reads "Intern" or "Full-time") | Team, Join | Juan Ventura-Romero | Open: Juan to send the refined roles |
+| C28 | SendCutSend: confirm the public wording ("Supported by SendCutSend") and that they're happy with the "Powered by" logo as used; active season(s) (set to 2026–27) | Intro, Sponsors | Juan Ventura-Romero | Open. Their brand page grants partners use of the approved logos |
 
 ## Missing materials
 

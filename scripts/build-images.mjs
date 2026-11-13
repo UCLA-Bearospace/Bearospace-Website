@@ -41,6 +41,8 @@ const RECIPES = {
       'ucla-samueli-block.png',
       'ucla-samueli-block-rev.png',
       'anduril-logo.svg',
+      'sendcutsend-logo-white.svg',
+      'sendcutsend-logo-black.svg',
       'nasa-insignia.svg',
       'first-nations-launch-logo.webp',
     ],
