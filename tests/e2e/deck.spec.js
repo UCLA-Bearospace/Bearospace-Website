@@ -208,6 +208,15 @@ test('scrolling to the footer lifts the deck with the page, so no body hides beh
   await expect(page.locator('.scene-host')).toHaveCSS('transform', /matrix/)
 })
 
+test('the green Donate button opens the GoFundMe and stays in the title column', async ({ page }) => {
+  await openDeck(page)
+  const donate = page.locator('.deck__title').getByRole('link', { name: 'Donate on GoFundMe' })
+  await expect(donate).toHaveAttribute('href', 'https://gofund.me/d9aaeb338')
+  await expect(donate).toHaveCSS('background-color', 'rgb(61, 220, 132)')
+  const [button, column] = [await donate.boundingBox(), await page.locator('.deck__title').boundingBox()]
+  expect(button.x + button.width).toBeLessThanOrEqual(column.x + column.width + 1)
+})
+
 test('axe: the deck in orbit layout', async ({ page }) => {
   await openDeck(page)
   const { violations } = await new AxeBuilder({ page }).analyze()

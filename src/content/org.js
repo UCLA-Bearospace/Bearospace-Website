@@ -19,6 +19,7 @@ export const SOURCES = {
   proposal2018: 'https://spacegrant.carthage.edu/live/files/5417-ucla-proposal-11-30-18-1pdf',
   samueli2014: 'https://samueli.ucla.edu/ucla-aises-team-wins-rocket-competition/',
   juan: 'Supplied by Juan Ventura-Romero, 2026-11-02',
+  juanUpdate: 'Supplied by Juan Ventura-Romero, 2026-11-12',
   pmReview: 'Content review by Emmanuel Jaimes (Project Manager), 2026-11-10',
 }
 
