@@ -31,7 +31,8 @@ export const roles = [
   // 2026–27
   role('emmanuel-jaimes', '2026-27', 'Project Manager', 'management', 1, S26),
   role('bianca-vasquez', '2026-27', 'Project Manager', 'management', 2, S26),
-  role('noah-hernandez', '2026-27', 'Vice Project Manager', 'management', 3, S26),
+  // Hidden pending a roster realignment (2026-11-15); restore or replace in the follow-up
+  role('noah-hernandez', '2026-27', 'Vice Project Manager', 'management', 3, { ...S26, publish: false }),
   role('alexander-astorga', '2026-27', 'Aerodynamics Director', 'vehicle', 1, { disciplineSlug: 'aerodynamics', ...S26 }),
   // Joel leads Structures and Recovery, so the roster lists him in both groups
   role('joel-venegas', '2026-27', 'Structures & Recovery Director', 'vehicle', 2, {
